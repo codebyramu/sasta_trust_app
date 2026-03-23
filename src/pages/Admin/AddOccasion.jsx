@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { addOccasion, toBase64 } from '../../services/db';
+import { addOccasion, uploadMedia, addMediaToOccasion } from '../../services/db';
 import { useNavigate } from 'react-router-dom';
-import { Save, ImagePlus } from 'lucide-react';
+import { Save, ImagePlus, CheckCircle2 } from 'lucide-react';
 
 const modules = {
   toolbar: [
@@ -28,7 +28,7 @@ export const AddOccasion = () => {
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
   const [content, setContent] = useState('');
-  const [coverMedia, setCoverMedia] = useState([]);
+  const [coverFile, setCoverFile] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -44,11 +44,10 @@ export const AddOccasion = () => {
       };
       const newOcc = await addOccasion(occasionData);
       
-      // If we selected cover images on creation
-      if (coverMedia.length > 0) {
-        const mediaUtils = await import('../../services/db');
-        const b64Array = await Promise.all(coverMedia.map(f => mediaUtils.toBase64(f)));
-        await mediaUtils.addMediaToOccasion(newOcc.id, b64Array);
+      // Handle optional single cover image
+      if (coverFile) {
+        const url = await uploadMedia(coverFile);
+        await addMediaToOccasion(newOcc.id, [url]); // Passes as array for db.js flexibility
       }
       
       alert('Occasion Created Successfully!');
@@ -61,10 +60,18 @@ export const AddOccasion = () => {
     }
   };
 
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+        setCoverFile(e.target.files[0]);
+    }
+  };
+
   return (
     <div className="container slide-up" style={{ padding: '2rem 24px', maxWidth: '800px' }}>
       <div className="card">
-        <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)' }}><Save size={24} /> Create Occasion / Festival</h2>
+        <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--accent-primary)' }}>
+            <Save size={28} /> Create Occasion / Festival
+        </h2>
         
         <form onSubmit={handleSubmit}>
           <div className="input-group">
@@ -91,12 +98,13 @@ export const AddOccasion = () => {
           </div>
 
           <div className="input-group">
-            <label className="input-label">Initial Cover Media (Optional)</label>
-            <label className="input-field" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', justifyContent: 'center', borderStyle: 'dashed' }}>
-               <ImagePlus size={18} color="var(--accent-primary)" /> Choose Files (Max 5)
-               <input type="file" multiple accept="image/*,video/*" style={{ display: 'none' }} onChange={(e) => setCoverMedia(Array.from(e.target.files).slice(0, 5))} />
+            <label className="input-label">Thumbnail / Cover Image (Optional)</label>
+            <label className="input-field" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', justifyContent: 'center', borderStyle: 'dashed', background: coverFile ? 'var(--bg-secondary)' : 'transparent' }}>
+               <ImagePlus size={20} color="var(--accent-primary)" /> 
+               {coverFile ? <span style={{ color: 'var(--success)', fontWeight: 700 }}>{coverFile.name} (Ready)</span> : "Click to Upload Covers Image"}
+               <input type="file" accept="image/*,video/*" style={{ display: 'none' }} onChange={handleFileChange} />
             </label>
-            {coverMedia.length > 0 && <span style={{ fontSize: '0.9rem', color: 'var(--success)' }}>{coverMedia.length} files selected</span>}
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginTop: '0.5rem' }}>This image will be shown as the primary thumbnail for all users.</p>
           </div>
 
           <div className="input-group">
@@ -108,11 +116,12 @@ export const AddOccasion = () => {
               modules={modules}
               formats={formats}
               placeholder="Write a beautiful description for the occasion..."
+              style={{ minHeight: '150px' }}
             />
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem', padding: '1rem' }} disabled={saving}>
-            {saving ? 'Saving...' : 'Publish Occasion'}
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '2.5rem', padding: '1.25rem', fontSize: '1.1rem' }} disabled={saving}>
+            {saving ? 'Creating...' : 'Publish Occasion'}
           </button>
         </form>
       </div>

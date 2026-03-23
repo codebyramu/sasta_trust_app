@@ -7,8 +7,10 @@ import { OccasionDetails } from './pages/OccasionDetails';
 import { AddOccasion } from './pages/Admin/AddOccasion';
 import { SendReceipt } from './pages/Admin/SendReceipt';
 import { UserReceipts } from './pages/UserReceipts';
+
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuth } from './context/AuthContext';
+import { BackgroundManager } from './components/BackgroundManager';
 
 function App() {
   const { loading } = useAuth();
@@ -20,6 +22,7 @@ function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navigation />
+      <BackgroundManager />
       
       <main style={{ flex: 1, position: 'relative' }}>
         <Routes>
@@ -27,7 +30,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/occasion/:id" element={<OccasionDetails />} />
           
-          <Route path="/user/receipts" element={<UserReceipts />} />
+          <Route path="/donate" element={<UserReceipts />} />
+          <Route path="/donations" element={<UserReceipts />} />
 
           <Route path="/admin" element={
             <ProtectedRoute requireOwner={true}>

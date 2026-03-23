@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getOccasions, addMediaToOccasion, toBase64, deleteOccasion, deleteMediaFromOccasion, updateOccasion } from '../services/db';
+import { getOccasions, addMediaToOccasion, uploadMedia, deleteOccasion, deleteMediaFromOccasion, updateOccasion } from '../services/db';
 import { useAuth } from '../context/AuthContext';
-import { ImagePlus, ArrowLeft, Loader2, Trash2, Edit2, Save, X } from 'lucide-react';
+import { ImagePlus, ArrowLeft, Loader2, Trash2, Edit2, Save, X, Youtube, Facebook } from 'lucide-react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -108,7 +108,7 @@ export const OccasionDetails = () => {
 
     try {
       setUploading(true);
-      const mediaArray = await Promise.all(files.map(f => toBase64(f)));
+      const mediaArray = await Promise.all(files.map(f => uploadMedia(f)));
       const updated = await addMediaToOccasion(id, mediaArray);
       setOccasion({ ...updated });
     } catch (err) {
@@ -117,6 +117,68 @@ export const OccasionDetails = () => {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleAddExternalLink = async () => {
+    const link = window.prompt("Paste YouTube or Facebook Video Link here:");
+    if (!link) return;
+
+    if (occasion.media.length + 1 > 50) {
+      alert("Cannot exceed 50 media limit.");
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const updated = await addMediaToOccasion(id, [link]);
+      setOccasion({ ...updated });
+    } catch (err) {
+      alert(err.message || 'Error saving link');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const renderMedia = (src) => {
+    if (!src) return null;
+    const isYoutube = src.includes('youtube.com') || src.includes('youtu.be');
+    const isFacebook = src.includes('facebook.com') || src.includes('fb.watch');
+
+    if (isYoutube) {
+       let videoId = '';
+       if (src.includes('v=')) videoId = src.split('v=')[1].split('&')[0];
+       else if (src.includes('youtu.be/')) videoId = src.split('youtu.be/')[1].split('?')[0];
+       
+       return (
+         <iframe 
+           width="100%" height="100%" 
+           src={`https://www.youtube.com/embed/${videoId}`} 
+           title="YouTube Video" frameBorder="0" 
+           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+           allowFullScreen
+           style={{ objectFit: 'cover', borderRadius: '8px' }}
+         ></iframe>
+       );
+    }
+
+    if (isFacebook) {
+       return (
+         <iframe 
+           src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(src)}&show_text=false&width=500`} 
+           width="100%" height="100%" 
+           style={{ border: 'none', overflow: 'hidden', borderRadius: '8px' }} 
+           scrolling="no" frameBorder="0" 
+           allowFullScreen={true} 
+           allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+         ></iframe>
+       );
+    }
+
+    if (src.includes('.mp4') || src.includes('.mov') || src.includes('.webm') || src.startsWith('data:video')) {
+       return <video src={src} controls loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}/>;
+    }
+    
+    return <img src={src} alt="Media" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />;
   };
 
   if (loading) {
@@ -179,28 +241,35 @@ export const OccasionDetails = () => {
 
       <div className="gallery-grid">
          {isOwner && occasion.media.length < 50 && (
-           <label className="gallery-item" style={{ border: '2px dashed var(--accent-primary)', background: 'var(--accent-light)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)', gap: '0.5rem' }}>
-             {uploading ? <Loader2 size={32} className="loader" style={{ border: 'none', background: 'transparent' }} /> : (
-               <>
-                 <ImagePlus size={32} />
-                 <span style={{ fontWeight: 600 }}>Add Media</span>
-                 <input type="file" multiple accept="image/*,video/*" style={{ display: 'none' }} onChange={handleFileUpload} />
-               </>
-             )}
-           </label>
+           <>
+             <label className="gallery-item" style={{ border: '2px dashed var(--accent-primary)', background: 'var(--accent-light)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)', gap: '0.5rem' }}>
+               {uploading ? <Loader2 size={32} className="loader" style={{ border: 'none', background: 'transparent' }} /> : (
+                 <>
+                   <ImagePlus size={32} />
+                   <span style={{ fontWeight: 600, textAlign: 'center' }}>Upload Image/Video</span>
+                   <input type="file" multiple accept="image/*,video/*" style={{ display: 'none' }} onChange={handleFileUpload} />
+                 </>
+               )}
+             </label>
+
+             <button onClick={handleAddExternalLink} className="gallery-item" style={{ border: '2px dashed #cd201f', background: '#ffe6e6', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#cd201f', gap: '0.5rem', appearance: 'none' }}>
+               <div style={{ display: 'flex', gap: '8px' }}>
+                 <Youtube size={32} />
+                 <Facebook size={32} color="#1877F2" />
+               </div>
+               <span style={{ fontWeight: 600, textAlign: 'center' }}>Add YouTube / FB Link</span>
+             </button>
+           </>
          )}
 
          {occasion.media?.map((src, i) => (
-            <div key={i} className="gallery-item" style={{ background: 'var(--bg-tertiary)', position: 'relative' }}>
-              {src.startsWith('data:image') || src.startsWith('http') ? (
-                <img src={src} alt={`Media ${i+1}`} loading="lazy" />
-              ) : (
-                <video src={src} controls loading="lazy" />
-              )}
+            <div key={i} className="gallery-item" style={{ background: 'var(--bg-tertiary)', position: 'relative', overflow: 'hidden' }}>
+              {renderMedia(src)}
+              
               {isOwner && (
                 <button 
                   onClick={() => handleDeleteMedia(i)} 
-                  style={{ position: 'absolute', top: '8px', right: '8px', background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', opacity: 0.8 }}
+                  style={{ position: 'absolute', top: '8px', right: '8px', background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', opacity: 0.9, zIndex: 10 }}
                 >
                   <Trash2 size={16} />
                 </button>

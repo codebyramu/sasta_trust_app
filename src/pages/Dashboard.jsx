@@ -159,10 +159,33 @@ export const Dashboard = () => {
                       <Link to={`/occasion/${occ.id}`} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: 0, overflow: 'hidden', textDecoration: 'none', color: 'inherit' }}>
                          {hasMedia ? (
                             <div style={{ height: '200px', width: '100%', background: 'var(--bg-tertiary)' }}>
-                               {occ.media[0].startsWith('data:image') || occ.media[0].startsWith('http') ? 
-                                 <img src={occ.media[0]} alt={occ.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> :
-                                 <video src={occ.media[0]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                               }
+{(() => {
+   const src = occ.media[0];
+   if (!src) return null;
+   const isYoutube = src.includes('youtube.com') || src.includes('youtu.be');
+   const isFacebook = src.includes('facebook.com') || src.includes('fb.watch');
+
+   if (isYoutube) {
+      let videoId = '';
+      if (src.includes('v=')) videoId = src.split('v=')[1].split('&')[0];
+      else if (src.includes('youtu.be/')) videoId = src.split('youtu.be/')[1].split('?')[0];
+      return <img src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`} alt="YouTube Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />;
+   }
+
+   if (isFacebook) {
+      return (
+         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#e4ebf5', color: '#1877F2' }}>
+           <span style={{ fontWeight: 600 }}>Facebook Video</span>
+         </div>
+      );
+   }
+
+   if (src.includes('.mp4') || src.includes('.mov') || src.includes('.webm') || src.startsWith('data:video')) {
+      return <video src={src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />;
+   }
+
+   return <img src={src} alt={occ.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />;
+})()}
                             </div>
                          ) : (
                             <div style={{ height: '200px', width: '100%', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)' }}>
