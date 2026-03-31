@@ -139,12 +139,19 @@ export const deleteMediaFromOccasion = async (occasionId, mediaUrl) => {
     
     if (error) throw error;
     
+    // Return updated occasion for FE
     const all = await getOccasions();
     return all.find(o => String(o.id) === String(occasionId));
 };
 
 // --- RECEIPTS ---
 
+/**
+ * Standardize Receipt structure for Frontend:
+ * {
+ *   id, name, amount, details, contactType, contactValue, date, createdAt
+ * }
+ */
 export const getReceipts = async () => {
     try {
         if (!supabase) return [];
@@ -154,39 +161,51 @@ export const getReceipts = async () => {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
+        
         return (data || []).map(r => ({
-            ...r,
             id: String(r.id),
             name: r.donor_name,
+            amount: r.amount,
             details: r.purpose,
-            contactValue: r.contact, 
             contactType: r.via,
+            contactValue: r.contact, 
+            date: r.date,
             createdAt: r.created_at
         }));
     } catch (e) {
-        console.error(e);
+        console.error("Supabase getReceipts error:", e);
         return [];
     }
 };
 
 export const addReceipt = async (receiptData) => {
     if (!supabase) return null;
+    
     const { data, error } = await supabase
         .from('receipts')
         .insert([{
             donor_name: receiptData.name,
             amount: receiptData.amount,
             purpose: receiptData.details,
-            via: receiptData.contact_type,
-            contact: receiptData.contact_value,
-            sent_to_email: receiptData.email || null,
-            date: receiptData.payDate || new Date().toISOString().split('T')[0]
+            via: receiptData.contactType,
+            contact: receiptData.contactValue,
+            date: receiptData.date || new Date().toISOString().split('T')[0]
         }])
         .select()
         .single();
 
     if (error) throw error;
-    return { ...data, id: String(data.id), name: data.donor_name, details: data.purpose };
+    
+    return { 
+        id: String(data.id), 
+        name: data.donor_name, 
+        amount: data.amount,
+        details: data.purpose,
+        contactType: data.via,
+        contactValue: data.contact,
+        date: data.date,
+        createdAt: data.created_at
+    };
 };
 
 // STORAGE

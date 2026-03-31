@@ -1,91 +1,241 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Phone, MapPin, ArrowRight, Volume2, VolumeX, Landmark, Users, Home, UtensilsCrossed, Mountain, Flower2, HeartHandshake, Heart } from 'lucide-react';
+import { ArrowRight, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, useGLTF, Environment, Center, ContactShadows, Html, Text3D, GradientTexture, Float, Hud, PerspectiveCamera } from '@react-three/drei';
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+// Module-level flags — persist across React re-renders and navigation
+let sessionSplashSeen = false;
+
+class GLBErrorCatcher extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() { return this.state.hasError ? this.props.fallback : this.props.children; }
+}
+
+// Slow continuous rotation temple model
+const TempleModel = () => {
+  const group = useRef();
+  const gltf = useGLTF('/glb_view/temple.glb');
+  useFrame((state, delta) => {
+    if (group.current) {
+      group.current.rotation.y += delta * 0.12; // very slow, majestic
+    }
+  });
+  return (
+    <group ref={group}>
+      <Center>
+        <primitive object={gltf.scene} scale={1.5} />
+      </Center>
+    </group>
+  );
 };
 
-const videoFilesMap = import.meta.glob('/public/videos_to_play/*.{mp4,webm,mov}', { eager: true, query: '?url', import: 'default' });
-// Removed local videoList usage as it's global now
+const PlaceholderTemple = () => {
+  const group = useRef();
+  useFrame((state, delta) => {
+    if (group.current) {
+      group.current.rotation.y += delta * 0.12;
+    }
+  });
+  return (
+    <group ref={group}>
+      <Center>
+        <mesh>
+          <boxGeometry args={[3, 3, 3]} />
+          <meshStandardMaterial color="#6B3FA0" wireframe />
+        </mesh>
+        <Html center position={[0, -2.5, 0]}>
+          <div style={{ whiteSpace: 'nowrap', background: '#1A0A2E', color: '#D4AF37', padding: '8px 16px', borderRadius: '8px', border: '1px solid #D4AF37', fontWeight: 'bold', fontFamily: 'Cinzel, serif' }}>
+            Add /glb_view/temple.glb
+          </div>
+        </Html>
+      </Center>
+    </group>
+  );
+};
 
-// Removed local sevaItems list to consolidate on Donations page
+// Floating lotus particle
+const LotusParticle = ({ delay, x }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 100, x: x, rotate: 0 }}
+    animate={{ opacity: [0, 0.6, 0.3, 0], y: -200, rotate: 360 }}
+    transition={{ duration: 8 + Math.random() * 4, delay, repeat: Infinity, ease: 'linear' }}
+    style={{
+      position: 'absolute', bottom: 0, left: `${20 + Math.random() * 60}%`,
+      fontSize: '1.2rem', pointerEvents: 'none', zIndex: 5,
+      filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.4))'
+    }}
+  >
+    ✦
+  </motion.div>
+);
+
+// Sweeping light to create a slanting mirror-like reflection sweep left-to-right across the 3D text
+const MovingShineLight = () => {
+  const lightRef = useRef();
+  useFrame(({ clock }) => {
+    if (lightRef.current) {
+      // Progress from 0 to 1 over 2.5 seconds, repeating
+      const progress = (clock.getElapsedTime() / 2.5) % 1; 
+      
+      // Starts completely left (-8), moves to completely right (+8)
+      lightRef.current.position.x = -8 + (progress * 16);
+      
+      // Slants downwards from top (+3) to bottom (-3)
+      lightRef.current.position.y = 3 - (progress * 6);
+    }
+  });
+  return <pointLight ref={lightRef} position={[-8, 3, 1.5]} intensity={40} distance={20} decay={1.5} color="#FFFFFF" />;
+};
+
+// Sasta Trust Text inside HUD layer
+const FixedSastaText = () => {
+  const [hovered, setHovered] = useState(false);
+  const targetScale = hovered ? 1.05 : 1;
+  const group = useRef();
+
+  useFrame((state, delta) => {
+    if (group.current) {
+      group.current.scale.lerp({ x: targetScale, y: targetScale, z: targetScale }, delta * 8);
+    }
+  });
+
+  useEffect(() => {
+    document.body.style.cursor = hovered ? 'pointer' : 'auto';
+    return () => { document.body.style.cursor = 'auto'; };
+  }, [hovered]);
+
+  return (
+    <Center>
+      {/* Continuously floating up and down */}
+      <Float speed={3.5} rotationIntensity={0.05} floatIntensity={1.5}>
+        <group ref={group}>
+          <Text3D
+            font="https://unpkg.com/three@0.77.0/examples/fonts/helvetiker_bold.typeface.json"
+            size={1.2} height={0.3} curveSegments={12}
+            bevelEnabled bevelThickness={0.06} bevelSize={0.04} bevelOffset={0} bevelSegments={5}
+            onPointerOver={() => setHovered(true)}
+            onPointerOut={() => setHovered(false)}
+          >
+            Sasta Trust
+            {/* Front Face: Totally yellow only, mirror-like so the sweeping light reflects sharply */}
+            <meshStandardMaterial attach="material-0" color="#FFEA00" roughness={0.05} metalness={0.95} emissive="#554400" emissiveIntensity={0.2} />
+            {/* Sides/Bevel: Red shade completely */}
+            <meshStandardMaterial attach="material-1" color="#FF0000" roughness={0.3} metalness={0.8} emissive="#AA0000" emissiveIntensity={0.5} />
+          </Text3D>
+        </group>
+      </Float>
+    </Center>
+  );
+};
 
 
 export const Landing = () => {
-  const [splashState, setSplashState] = useState(() => {
-    return sessionStorage.getItem('sasta_splash_seen') ? 2 : 0;
-  });
-  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
-  // Removed local video state
+  // If splash already seen this session, skip entirely (state starts at 2)
+  const [splashState, setSplashState] = useState(() => sessionSplashSeen ? 2 : 0);
 
   useEffect(() => {
-    if (splashState === 2) return;
+    if (sessionSplashSeen || splashState === 2) return;
     const t1 = setTimeout(() => setSplashState(1), 2200);
     const t2 = setTimeout(() => {
       setSplashState(2);
-      sessionStorage.setItem('sasta_splash_seen', 'true');
-    }, 4000);
+      sessionSplashSeen = true;
+    }, 4500);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [splashState]);
 
-  const handlePointerMove = (e) => {
-    setMousePos({ x: e.clientX, y: e.clientY });
-  };
-  // Removed toggleMute and handleVideoEnd
-
   return (
-    <div onPointerMove={handlePointerMove}>
-
-      {/* Video BG is now handled globally in BackgroundManager.jsx */}
-
-
-      {/* === SPLASH OVERLAY === */}
+    <div>
+      {/* SPLASH OVERLAY — only shown on very first visit */}
       <AnimatePresence>
         {splashState < 2 && (
           <motion.div
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.8 } }}
-            style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#ffffff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+            exit={{ opacity: 0, transition: { duration: 1 } }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'linear-gradient(135deg, #1A0A2E 0%, #2D1B69 50%, #1A0A2E 100%)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden'
+            }}
           >
+            {/* Decorative particles */}
+            {[...Array(12)].map((_, i) => (
+              <motion.div key={i}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: [0, 0.5, 0], scale: [0, 1, 0] }}
+                transition={{ duration: 3, delay: i * 0.3, repeat: Infinity }}
+                style={{
+                  position: 'absolute',
+                  top: `${10 + Math.random() * 80}%`,
+                  left: `${10 + Math.random() * 80}%`,
+                  width: 4, height: 4, borderRadius: '50%',
+                  background: '#D4AF37',
+                  boxShadow: '0 0 10px rgba(212,175,55,0.6)'
+                }}
+              />
+            ))}
+
             {splashState === 0 && (
               <motion.div
                 initial={{ scale: 0.2, opacity: 0, rotate: -30, filter: 'blur(10px)' }}
                 animate={{ scale: [1, 1.1, 1], opacity: 1, rotate: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 1.2, ease: 'backOut', times: [0, 0.6, 1] }}
-                style={{ width: 150, height: 150, borderRadius: '50%', background: '#2E3192', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 40px rgba(46,49,146,0.6), 0 0 100px rgba(46,49,146,0.2)', overflow: 'hidden', border: '3px solid rgba(255,255,255,0.8)' }}
+                style={{
+                  width: 130, height: 130, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #D4AF37, #F4D03F)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 0 60px rgba(212,175,55,0.5), 0 0 120px rgba(212,175,55,0.2)',
+                  overflow: 'hidden', border: '3px solid rgba(255,255,255,0.3)'
+                }}
               >
-                <img src="/sasta_logo.png" alt="Sasta Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = 'https://ui-avatars.com/api/?name=Sasta+Trust&background=2e3192&color=fff'; }} />
+                <img src="/sasta_logo.png" alt="Sasta Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://ui-avatars.com/api/?name=Sasta+Trust&background=D4AF37&color=1A0A2E'; }} />
               </motion.div>
             )}
 
             {splashState === 1 && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
                 <motion.div
                   initial={{ scale: 1, opacity: 1 }}
-                  animate={{ scale: 0.8, y: -40, opacity: 0 }}
+                  animate={{ scale: 0.6, y: -40, opacity: 0 }}
                   transition={{ duration: 0.6, ease: 'anticipate' }}
-                  style={{ width: 100, height: 100, borderRadius: '50%', background: '#2E3192', overflow: 'hidden' }}
+                  style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, #D4AF37, #F4D03F)', overflow: 'hidden' }}
                 >
-                  <img src="/sasta_logo.png" alt="Sasta Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = 'https://ui-avatars.com/api/?name=Sasta+Trust&background=2e3192&color=fff'; }} />
+                  <img src="/sasta_logo.png" alt="Sasta Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://ui-avatars.com/api/?name=Sasta+Trust&background=D4AF37&color=1A0A2E'; }} />
                 </motion.div>
+
                 <motion.h1
                   initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
                   animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                   transition={{ duration: 0.8 }}
-                  style={{ fontSize: '4rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginTop: '-2rem', background: 'linear-gradient(135deg, #2E3192, var(--accent-primary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+                  style={{
+                    fontFamily: 'Cinzel, serif', fontSize: 'clamp(2rem, 8vw, 4rem)', fontWeight: 900,
+                    marginTop: '-1rem', letterSpacing: '0.08em',
+                    background: 'linear-gradient(135deg, #D4AF37 0%, #F4D03F 40%, #D4AF37 60%, #FFF8E7 80%, #D4AF37 100%)',
+                    backgroundSize: '200% auto',
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                    animation: 'shimmer 3s linear infinite'
+                  }}
                 >
                   SASTA TRUST
                 </motion.h1>
+
                 <motion.p
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: 'auto' }}
-                  transition={{ delay: 0.3, duration: 1 }}
-                  style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', borderTop: '2px solid rgba(46,49,146,0.2)', paddingTop: '0.5rem', marginTop: '0.5rem' }}
+                  transition={{ delay: 0.3, duration: 1.2 }}
+                  style={{
+                    fontFamily: 'Crimson Pro, serif', fontStyle: 'italic',
+                    fontSize: 'clamp(0.9rem, 3vw, 1.2rem)', color: 'rgba(212,175,55,0.8)',
+                    letterSpacing: '0.06em', whiteSpace: 'nowrap', overflow: 'hidden',
+                    borderTop: '1px solid rgba(212,175,55,0.3)', paddingTop: '0.75rem', marginTop: '0.75rem'
+                  }}
                 >
-                  A journey towards tradition
+                  A Journey Towards Spiritual Enlightenment
                 </motion.p>
               </div>
             )}
@@ -93,117 +243,187 @@ export const Landing = () => {
         )}
       </AnimatePresence>
 
-      {/* === HERO SECTION === */}
+      {/* ====== HERO SECTION with 3D ====== */}
       <motion.div
-        className="container"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: splashState === 2 ? 1 : 0, y: splashState === 2 ? 0 : 40 }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', maxWidth: '800px', margin: '0 auto', minHeight: '100vh', padding: '4rem 24px', position: 'relative', zIndex: 10 }}
+        initial={{ opacity: sessionSplashSeen ? 1 : 0 }}
+        animate={{ opacity: splashState === 2 ? 1 : 0 }}
+        transition={{ duration: sessionSplashSeen ? 0 : 1, delay: sessionSplashSeen ? 0 : 0.2 }}
+        style={{
+          position: 'relative', width: '100%', minHeight: '100vh',
+          background: 'linear-gradient(180deg, #1A0A2E 0%, #2D1B69 30%, #1A0A2E 100%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          zIndex: 10, overflow: 'hidden'
+        }}
       >
-        <motion.div variants={fadeIn} initial="hidden" animate={splashState === 2 ? 'visible' : 'hidden'} style={{ marginBottom: '2rem' }}>
-          <div style={{ width: 120, height: 120, borderRadius: '50%', background: '#2E3192', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '4px solid rgba(255,255,255,0.6)', boxShadow: '0 10px 30px rgba(46,49,146,0.3)', margin: '0 auto' }}>
-            <img src="/sasta_logo.png" alt="Sasta Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = 'https://ui-avatars.com/api/?name=ST&background=2e3192&color=fff'; }} />
-          </div>
-        </motion.div>
+        {/* Floating lotus particles */}
+        {[...Array(6)].map((_, i) => (
+          <LotusParticle key={i} delay={i * 1.5} x={Math.random() * 20 - 10} />
+        ))}
 
-        <motion.h1 variants={fadeIn} initial="hidden" animate={splashState === 2 ? 'visible' : 'hidden'}
-          style={{ fontSize: 'clamp(3rem, 8vw, 5rem)', fontWeight: 800, letterSpacing: '-0.04em', background: 'linear-gradient(135deg, #2E3192, #5c6bc0)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '1rem', lineHeight: 1.1 }}
+        {/* Mandala bg glow */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          width: '80vmin', height: '80vmin', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(212,175,55,0.05) 0%, rgba(45,27,105,0.02) 50%, transparent 70%)',
+          pointerEvents: 'none'
+        }} />
+
+        {/* 3D Canvas — temple model only */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+          <Suspense fallback={
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="loader" style={{ width: 60, height: 60 }} />
+            </div>
+          }>
+            <Canvas camera={{ position: [0, 2, 8], fov: 45 }}>
+              <ambientLight intensity={0.4} />
+              <directionalLight position={[10, 10, 5]} intensity={1.2} color="#FFF8E7" />
+              <pointLight position={[-5, 5, -5]} intensity={0.5} color="#D4AF37" />
+              <Environment preset="sunset" />
+              <GLBErrorCatcher fallback={<PlaceholderTemple />}>
+                <TempleModel />
+              </GLBErrorCatcher>
+              
+              <OrbitControls enableZoom={true} minDistance={3} maxDistance={15} enablePan={false} autoRotate={false} makeDefault />
+              <ContactShadows position={[0, -2.5, 0]} opacity={0.4} scale={20} blur={2.5} far={4} color="#1A0A2E" />
+
+              {/* FIXED HUD LAYER — Always in front, ignores background OrbitControls */}
+              <Hud renderPriority={1}>
+                <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={45} />
+                <ambientLight intensity={0.4} />
+                <Environment preset="city" /> {/* Critical for mirror-like reflections on metal */}
+                <directionalLight position={[10, 10, 10]} intensity={2} color="#FFF8E7" />
+                <MovingShineLight /> {/* The sweeping "mirror shine" animation */}
+                <FixedSastaText />
+              </Hud>
+            </Canvas>
+          </Suspense>
+        </div>
+
+        {/* CTA Buttons */}
+        <motion.div
+          initial={{ scale: 0.9, opacity: sessionSplashSeen ? 1 : 0, y: sessionSplashSeen ? 0 : 50 }}
+          animate={{ scale: splashState === 2 ? 1 : 0.9, opacity: splashState === 2 ? 1 : 0, y: splashState === 2 ? 0 : 50 }}
+          transition={{ delay: sessionSplashSeen ? 0 : 1.5, duration: 0.8, type: 'spring' }}
+          style={{
+            position: 'absolute', bottom: 'clamp(4%, 6vh, 10%)',
+            display: 'flex', gap: 'clamp(0.75rem, 2vw, 1.5rem)',
+            justifyContent: 'center', flexWrap: 'wrap', zIndex: 12,
+            background: 'rgba(26, 10, 46, 0.6)', padding: 'clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 3vw, 2.5rem)',
+            borderRadius: '50px', backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(212,175,55,0.2)',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}
         >
-          Sasta Trust
-        </motion.h1>
-
-        <motion.p variants={fadeIn} initial="hidden" animate={splashState === 2 ? 'visible' : 'hidden'}
-          style={{ fontSize: '1.2rem', color: '#333', marginBottom: '3rem', maxWidth: '580px', lineHeight: 1.7, textShadow: '0 1px 3px rgba(255,255,255,0.8)', fontWeight: 500 }}
-        >
-          A spiritual journey celebrating Indian festivals, occasions, and heartfelt devotion — serving with simplicity & grace.
-        </motion.p>
-
-        <motion.div variants={fadeIn} initial="hidden" animate={splashState === 2 ? 'visible' : 'hidden'} style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link to="/dashboard" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.05rem', borderRadius: '30px', boxShadow: '0 8px 20px rgba(46,49,146,0.4)' }}>
+          <Link to="/dashboard" style={{
+            padding: 'clamp(0.6rem, 1.5vw, 0.9rem) clamp(1rem, 3vw, 2rem)',
+            fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', borderRadius: '30px',
+            background: 'linear-gradient(135deg, #D4AF37, #F4D03F)', color: '#1A0A2E',
+            fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem',
+            textDecoration: 'none', fontFamily: 'DM Sans, sans-serif',
+            letterSpacing: '0.05em', textTransform: 'uppercase',
+            boxShadow: '0 4px 20px rgba(212,175,55,0.4)',
+            transition: 'all 0.3s ease'
+          }}>
             Explore Festivals <ArrowRight size={18} />
           </Link>
-          <Link to="/donate" className="btn btn-outline" style={{ padding: '1rem 2.5rem', fontSize: '1.05rem', borderRadius: '30px', background: 'white', boxShadow: '0 4px 15px rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Link to="/donate" style={{
+            padding: 'clamp(0.6rem, 1.5vw, 0.9rem) clamp(1rem, 3vw, 2rem)',
+            fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', borderRadius: '30px',
+            background: 'transparent', color: '#D4AF37',
+            border: '2px solid rgba(212,175,55,0.5)',
+            fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem',
+            textDecoration: 'none', fontFamily: 'DM Sans, sans-serif',
+            letterSpacing: '0.05em', textTransform: 'uppercase',
+            transition: 'all 0.3s ease'
+          }}>
             <Heart size={18} /> Support the Cause
           </Link>
         </motion.div>
       </motion.div>
 
-      {/* === ABOUT + CONTACT SECTION (scrollable below hero) === */}
-      <div style={{ position: 'relative', zIndex: 10, background: 'rgba(255,255,255,0.35)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderTop: '1px solid rgba(255,255,255,0.3)' }}>
-        <div className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '5rem 24px' }}>
+      {/* ====== ABOUT + CONTACT SECTION ====== */}
+      <div className="sacred-border" style={{ background: 'var(--bg-primary)' }}>
+        <div className="container" style={{ maxWidth: 900, margin: '0 auto', padding: 'clamp(2.5rem, 5vw, 5rem) clamp(16px, 4vw, 24px)' }}>
 
-          {/* About headline */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            style={{ textAlign: 'center', marginBottom: '3.5rem' }}
+            transition={{ duration: 0.6 }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(2rem, 4vw, 4rem)', alignItems: 'center', marginBottom: 'clamp(2.5rem, 5vw, 5rem)' }}
           >
-            <span style={{ display: 'inline-block', background: 'var(--accent-light)', color: 'var(--accent-primary)', fontWeight: 700, fontSize: '0.85rem', padding: '0.4rem 1rem', borderRadius: '20px', letterSpacing: '0.08em', marginBottom: '1rem', textTransform: 'uppercase' }}>
-              About Sasta Trust
-            </span>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem', lineHeight: 1.2 }}>
-              Anna Prasadam Seva<br />
-              <span style={{ color: 'var(--accent-primary)' }}>14th Consecutive Year</span>
-            </h2>
-            <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', maxWidth: '650px', margin: '0 auto', lineHeight: 1.8 }}>
-              Thousands of pilgrims are blessed with Anna Prasadam on the sacred trekking route near Azhudha River, Mundakayam Pambavalley Rd, Kerala. We serve with love and devotion every single year.
-            </p>
+            <div>
+              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold-primary)', fontWeight: 600, marginBottom: '0.75rem' }}>
+                Est. — 14th Year of Seva
+              </p>
+              <h2 style={{ fontFamily: 'Cinzel, serif', fontSize: 'clamp(1.3rem, 3vw, 2rem)', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.03em', margin: '0 0 1.25rem', lineHeight: 1.3 }}>
+                Anna Prasadam Seva
+              </h2>
+              <p style={{ fontFamily: 'Crimson Pro, serif', fontStyle: 'italic', fontSize: 'clamp(0.9rem, 2vw, 1.05rem)', color: 'var(--text-secondary)', lineHeight: 1.9, margin: 0 }}>
+                Thousands of pilgrims are blessed with Anna Prasadam on the sacred trekking route near the Azhudha River, Mundakayam Pambavalley Road, Kerala. We serve with love and devotion every single year, without fail.
+              </p>
+            </div>
+            <div style={{
+              padding: 'clamp(1.5rem, 3vw, 2.5rem)', background: 'linear-gradient(135deg, var(--purple-dark), var(--purple-royal))',
+              borderRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden'
+            }}>
+              <div style={{
+                position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: 80, height: 4, background: 'linear-gradient(90deg, #D4AF37, #F4D03F)', borderRadius: '0 0 4px 4px'
+              }} />
+              <p style={{ fontFamily: 'Cinzel, serif', fontSize: 'clamp(1.1rem, 3vw, 1.5rem)', fontWeight: 700, color: '#D4AF37', margin: '0 0 0.75rem', lineHeight: 1.4, letterSpacing: '0.04em' }}>
+                Swamy Sharanam Ayyappa
+              </p>
+              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.82rem', color: 'rgba(212,175,55,0.7)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, margin: '0 0 1rem' }}>
+                Seva is Worship · Service is Tradition
+              </p>
+              <div style={{ height: 1, background: 'rgba(212,175,55,0.2)', marginBottom: '1rem' }} />
+              <p style={{ fontFamily: 'Crimson Pro, serif', fontStyle: 'italic', fontSize: '0.95rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, margin: 0 }}>
+                With the blessings of Lord Dharma Sasta, Sasta Trust continues its humble journey of devotion and service to all.
+              </p>
+            </div>
           </motion.div>
 
-          {/* Seva Grid removed - consolidated on Donations page */}
-
-
-          {/* Spiritual Quote */}
+          {/* Contact */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            style={{ textAlign: 'center', padding: '2.5rem', background: 'linear-gradient(135deg, var(--accent-light), rgba(92,107,192,0.1))', borderRadius: '20px', marginBottom: '5rem', border: '1px solid rgba(46,49,146,0.12)' }}
+            transition={{ duration: 0.6 }}
           >
-            <p style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>
-              Swamy Sharanam Ayyappa!
-            </p>
-            <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontStyle: 'italic', fontWeight: 600, letterSpacing: '1px', marginBottom: '1rem' }}>
-              SEVA IS WORSHIP — SERVICE IS TRADITION
-            </p>
-            <p style={{ fontSize: '0.95rem', color: 'var(--text-tertiary)', margin: 0 }}>
-              With blessings of Lord Dharma Sasta, Sasta Trust continues its humble journey of devotion and service.
-            </p>
-          </motion.div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
+              <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, transparent, var(--gold-primary), transparent)' }} />
+              <p style={{ fontFamily: 'Cinzel, serif', fontSize: '0.82rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold-dark)', fontWeight: 700, margin: 0, whiteSpace: 'nowrap' }}>
+                Get In Touch
+              </p>
+              <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, transparent, var(--gold-primary), transparent)' }} />
+            </div>
 
-          {/* Contact Us */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            style={{ textAlign: 'center' }}
-          >
-            <h3 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Contact Us</h3>
-            <p style={{ color: 'var(--text-tertiary)', marginBottom: '2rem' }}>
-              G-04, Sai Nilayam Apartments, Saptarishi Nagar, Pet Pujari Road, Hyderabad – 500 088, Telangana
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', justifyContent: 'center' }}>
-              <a href="mailto:sastatrust@gmail.com" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500, padding: '0.9rem 1.75rem', background: 'var(--bg-secondary)', borderRadius: '14px', textDecoration: 'none', border: '1px solid var(--bg-tertiary)', transition: 'all 0.2s' }}
-                onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.08)'; }}
-                onMouseOut={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
-              >
-                <Mail size={20} color="var(--accent-primary)" /> sastatrust@gmail.com
-              </a>
-              <a href="tel:+919391672398" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500, padding: '0.9rem 1.75rem', background: 'var(--bg-secondary)', borderRadius: '14px', textDecoration: 'none', border: '1px solid var(--bg-tertiary)', transition: 'all 0.2s' }}
-                onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.08)'; }}
-                onMouseOut={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
-              >
-                <Phone size={20} color="var(--accent-primary)" /> +91 93916 72398
-              </a>
-              <a href="https://maps.google.com/?q=Saptarishi+Nagar+Hyderabad" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500, padding: '0.9rem 1.75rem', background: 'var(--bg-secondary)', borderRadius: '14px', textDecoration: 'none', border: '1px solid var(--bg-tertiary)', transition: 'all 0.2s' }}
-                onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.08)'; }}
-                onMouseOut={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
-              >
-                <MapPin size={20} color="var(--accent-primary)" /> Near Azhudha River, Kerala
-              </a>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              {[
+                { label: 'Email', value: 'sastatrust@gmail.com', href: 'mailto:sastatrust@gmail.com' },
+                { label: 'Phone', value: '+91 93916 72398', href: 'tel:+919391672398' },
+                { label: 'Location', value: 'Near Azhudha River, Kerala', href: 'https://maps.google.com/?q=Azhudha+River+Kerala' },
+              ].map(c => (
+                <a key={c.label} href={c.href} target={c.label === 'Location' ? '_blank' : undefined} rel="noreferrer"
+                  style={{
+                    display: 'block', padding: '1.25rem 1.25rem', background: 'white',
+                    border: '1px solid var(--bg-tertiary)', borderRadius: 'var(--radius-md)',
+                    borderBottom: '3px solid transparent',
+                    textDecoration: 'none', transition: 'all 0.2s'
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.borderBottomColor = 'var(--gold-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-gold)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseOut={e => { e.currentTarget.style.borderBottomColor = 'transparent'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-tertiary)', fontWeight: 600, margin: '0 0 0.4rem' }}>
+                    {c.label}
+                  </p>
+                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 'clamp(0.78rem, 2vw, 0.9rem)', color: 'var(--purple-royal)', fontWeight: 600, margin: 0, wordBreak: 'break-word' }}>
+                    {c.value}
+                  </p>
+                </a>
+              ))}
             </div>
           </motion.div>
 
