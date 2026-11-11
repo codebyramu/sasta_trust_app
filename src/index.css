@@ -971,3 +971,49 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
   .trust-loading-track span { animation-duration: 2s; }
   .trust-navigation-inner, .trust-navigation-inner img { transition: none; }
 }
+
+/* Crossfade slides while keeping the outgoing photo visible during the move. */
+.trust-photo-carousel-image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.trust-photo-slide-current.slide-next { z-index: 2; animation: trust-photo-in-next 1.5s cubic-bezier(.22,.61,.36,1) both; }
+.trust-photo-slide-current.slide-previous { z-index: 2; animation: trust-photo-in-previous 1.5s cubic-bezier(.22,.61,.36,1) both; }
+.trust-photo-slide-old.slide-next { z-index: 1; animation: trust-photo-out-next 1.5s cubic-bezier(.22,.61,.36,1) both; }
+.trust-photo-slide-old.slide-previous { z-index: 1; animation: trust-photo-out-previous 1.5s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes trust-photo-in-next { from { opacity: .58; transform: translateX(5%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes trust-photo-out-next { from { opacity: 1; transform: translateX(0); } to { opacity: .22; transform: translateX(-3%); } }
+@keyframes trust-photo-in-previous { from { opacity: .58; transform: translateX(-5%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes trust-photo-out-previous { from { opacity: 1; transform: translateX(0); } to { opacity: .22; transform: translateX(3%); } }
+
+/* The compact header keeps the brand, menu, and primary action usable on phones. */
+.trust-nav-donate { display: inline-flex !important; align-items: center; justify-content: center; min-height: 36px; padding: 0 15px !important; border: 1px solid #d7ad5d !important; border-radius: 4px !important; background: #e8bb65 !important; color: #14253d !important; font-size: .78rem !important; font-weight: 700 !important; text-decoration: none; white-space: nowrap; }
+.trust-nav-donate:hover { background: #f0cb80 !important; }
+.trust-events-support { border: 1px solid #d7ad5d; border-radius: 4px; background: #e8bb65; color: #14253d; font-weight: 700; transition: background .18s ease, transform .18s ease; }
+.trust-events-support:hover { background: #f0cb80; transform: translateY(-1px); }
+.trust-hero, #manifesto, #devotee-voice { scroll-margin-top: 76px; }
+
+@media (max-width: 650px) {
+  .trust-navigation-inner { min-height: 54px; padding: 8px 14px !important; gap: 8px; }
+  .trust-site-nav-compact .trust-navigation-inner { min-height: 42px; padding-top: 4px !important; padding-bottom: 4px !important; }
+  .trust-navigation-inner > a { flex-shrink: 1; min-width: 0; gap: 8px !important; }
+  .trust-navigation-inner > a img { width: 30px !important; height: 30px !important; }
+  .trust-brand-caption { display: block !important; white-space: nowrap; font-size: .94rem !important; }
+  .trust-nav-subtitle { display: none !important; }
+  .trust-navigation-inner .trust-mobile-menu-toggle { flex: 0 0 36px; width: 36px; height: 36px; margin-left: auto; }
+  .trust-navigation-actions { flex: 0 0 auto; gap: 0 !important; }
+  .trust-nav-notifications, .trust-nav-auth-options [data-nav-login], .trust-nav-profile { display: none !important; }
+  .trust-nav-donate { min-height: 34px !important; padding: 0 11px !important; font-size: .75rem !important; }
+  .trust-site-nav-compact .trust-nav-donate { min-height: 30px !important; }
+  .trust-site-nav-compact .trust-navigation-inner .trust-mobile-menu-toggle { height: 32px; }
+  .trust-events-heading { padding-bottom: 22px; }
+  .trust-events-support { min-height: 40px; }
+}
+
+@media (max-width: 360px) {
+  .trust-navigation-inner { padding-inline: 10px !important; }
+  .trust-navigation-inner > a img { width: 27px !important; height: 27px !important; }
+  .trust-brand-caption { font-size: .86rem !important; }
+  .trust-nav-donate { min-height: 32px !important; padding-inline: 8px !important; font-size: .7rem !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trust-photo-slide-current, .trust-photo-slide-old { animation: none !important; }
+}

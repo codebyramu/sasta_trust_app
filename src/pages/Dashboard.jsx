@@ -54,7 +54,7 @@ export const Dashboard = () => {
             <h1>Events &amp; occasions</h1>
             <p>Temple occasions and community service updates from the trust.</p>
           </div>
-          <Link to="/donations" className="trust-events-support">Support our work <ArrowRight size={16} /></Link>
+          <Link to="/donations" className="trust-events-support"><span>Donate</span><ArrowRight size={16} /></Link>
         </header>
 
         <section aria-label="Trust events">

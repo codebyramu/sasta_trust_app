@@ -143,9 +143,10 @@ export const Navigation = () => {
           <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
             Home
           </Link>
+          <a href="/#manifesto" className="nav-link">About</a>
           <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Calendar size={14} color="#d97706" />
-            <span>Dashboard &amp; Festivals</span>
+            <span>Events</span>
           </Link>
           <Link to="/donations" className={`nav-link ${isActive('/donations') ? 'active' : ''}`}>
             Ways to Contribute
@@ -222,9 +223,9 @@ export const Navigation = () => {
         </button>
 
         {/* Right CTA / Auth / Notifications */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div className="trust-navigation-actions" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           {/* Notifications bell */}
-          <div style={{ position: 'relative' }} ref={notifyRef}>
+          <div className="trust-nav-notifications" style={{ position: 'relative' }} ref={notifyRef}>
             <button
               onClick={toggleNotifications}
               style={{
@@ -367,10 +368,11 @@ export const Navigation = () => {
 
           {/* User Auth or Donate Pill */}
           {!user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="trust-nav-auth-options" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button
                 onClick={() => loginWithGoogle()}
                 className="pill-btn pill-btn-outline pill-btn-sm"
+                data-nav-login="true"
                 style={{ fontSize: '0.82rem', padding: '8px 16px' }}
               >
                 <LogIn size={14} /> Login
@@ -378,23 +380,23 @@ export const Navigation = () => {
 
               <Link
                 to="/donations"
-                className="pill-btn pill-btn-black pill-btn-sm"
+                className="pill-btn pill-btn-black pill-btn-sm trust-nav-donate"
                 style={{ fontSize: '0.82rem', padding: '8px 18px' }}
               >
-                Donate & Receipts →
+                Donate
               </Link>
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="trust-nav-auth-options" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Link
                 to="/donations"
-                className="pill-btn pill-btn-black pill-btn-sm"
+                className="pill-btn pill-btn-black pill-btn-sm trust-nav-donate"
                 style={{ fontSize: '0.82rem', padding: '8px 18px' }}
               >
-                Donate & Receipts →
+                Donate
               </Link>
 
-              <div style={{
+              <div className="trust-nav-profile" style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -426,10 +428,13 @@ export const Navigation = () => {
       {isMobileMenuOpen && (
         <nav className="trust-mobile-menu" aria-label="Mobile navigation">
           <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-          <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Calendar &amp; events</Link>
+          <a href="/#manifesto" onClick={() => setIsMobileMenuOpen(false)}>About</a>
+          <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Events &amp; occasions</Link>
           <Link to="/donations" onClick={() => setIsMobileMenuOpen(false)}>Ways to contribute</Link>
           <Link to="/donate" onClick={() => setIsMobileMenuOpen(false)}>My receipts</Link>
           <a href="/#devotee-voice" onClick={() => setIsMobileMenuOpen(false)}>Devotee voice</a>
+          {user?.role === 'owner' && <><Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>Manage occasions</Link><Link to="/admin/receipt" onClick={() => setIsMobileMenuOpen(false)}>Send receipt</Link></>}
+          {user ? <button type="button" onClick={() => { logout(); setIsMobileMenuOpen(false); }}>Sign out</button> : <button type="button" onClick={() => { loginWithGoogle(); setIsMobileMenuOpen(false); }}>Sign in</button>}
         </nav>
       )}
 
@@ -505,10 +510,25 @@ export const Navigation = () => {
             font-size: .88rem;
           }
           .trust-mobile-menu a:hover { background: rgba(255,255,255,.08); }
+          .trust-mobile-menu button {
+            margin-top: 4px;
+            padding: 11px 12px;
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 3px;
+            background: transparent;
+            color: #fff;
+            text-align: left;
+            font: 500 .88rem 'Inter', sans-serif;
+          }
         }
         @media (max-width: 650px) {
           .trust-navigation-inner { padding: 10px 16px !important; }
-          .trust-brand-caption { display: none; }
+          .trust-navigation-inner > a { flex-shrink: 0; gap: 8px !important; }
+          .trust-brand-caption { display: block; white-space: nowrap; font-size: .94rem !important; }
+          .trust-nav-subtitle { display: none !important; }
+          .trust-nav-notifications, .trust-nav-auth-options [data-nav-login], .trust-nav-profile { display: none !important; }
+          .trust-navigation-actions { gap: 0 !important; }
+          .trust-nav-donate { display: inline-flex !important; min-height: 36px !important; padding: 0 13px !important; border-radius: 4px !important; background: #e8bb65 !important; color: #14253d !important; font-size: .78rem !important; font-weight: 700 !important; }
         }
       `}</style>
     </header>

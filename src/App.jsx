@@ -16,8 +16,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 const PageTransition = ({ children }) => {
   const location = useLocation();
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [location.pathname]);
+    if (location.hash) {
+      const targetId = decodeURIComponent(location.hash.slice(1));
+      window.requestAnimationFrame(() => {
+        document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [location.pathname, location.hash]);
 
   return (
     <AnimatePresence mode="wait">

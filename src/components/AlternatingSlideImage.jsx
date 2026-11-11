@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+
+const SLIDE_INTERVAL_MS = 6000;
+const SLIDE_DURATION_MS = 1500;
 
 export const AlternatingSlideImage = ({
   images = [],
@@ -10,15 +13,32 @@ export const AlternatingSlideImage = ({
   style = {},
 }) => {
   const [current, setCurrent] = useState(0);
+  const [previous, setPrevious] = useState(null);
+  const [direction, setDirection] = useState(1);
+  const currentRef = useRef(0);
+  const clearTransitionRef = useRef(null);
   const total = images.length;
+
+  const changeTo = useCallback((nextIndex, moveDirection) => {
+    if (total < 2 || nextIndex === currentRef.current) return;
+    setPrevious(currentRef.current);
+    setDirection(moveDirection);
+    currentRef.current = nextIndex;
+    setCurrent(nextIndex);
+    window.clearTimeout(clearTransitionRef.current);
+    clearTransitionRef.current = window.setTimeout(() => setPrevious(null), SLIDE_DURATION_MS);
+  }, [total]);
 
   useEffect(() => {
     if (total < 2) return undefined;
     const interval = window.setInterval(() => {
-      setCurrent(index => (index + 1) % total);
-    }, 3000);
-    return () => window.clearInterval(interval);
-  }, [total]);
+      changeTo((currentRef.current + 1) % total, 1);
+    }, SLIDE_INTERVAL_MS);
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(clearTransitionRef.current);
+    };
+  }, [changeTo, total]);
 
   if (!total) return null;
 
@@ -26,13 +46,15 @@ export const AlternatingSlideImage = ({
     if (total < 2) return;
     const { left, width } = event.currentTarget.getBoundingClientRect();
     const clickedLeftSide = event.clientX - left < width / 2;
-    setCurrent(index => (index + (clickedLeftSide ? -1 : 1) + total) % total);
+    const moveDirection = clickedLeftSide ? -1 : 1;
+    changeTo((currentRef.current + moveDirection + total) % total, moveDirection);
   };
 
   const handleKeyDown = (event) => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
-    setCurrent(index => (index + (event.key === 'ArrowLeft' ? -1 : 1) + total) % total);
+    const moveDirection = event.key === 'ArrowLeft' ? -1 : 1;
+    changeTo((currentRef.current + moveDirection + total) % total, moveDirection);
   };
 
   return (
@@ -45,11 +67,20 @@ export const AlternatingSlideImage = ({
       onKeyDown={handleKeyDown}
       style={{ '--photo-height': height, borderRadius, ...style }}
     >
+      {previous !== null && <img
+        key={`previous-${previous}`}
+        src={images[previous]}
+        alt=""
+        aria-hidden="true"
+        className={`trust-photo-carousel-image trust-photo-slide-old ${direction > 0 ? 'slide-next' : 'slide-previous'}`}
+        style={{ objectFit }}
+        onError={event => { event.currentTarget.style.visibility = 'hidden'; }}
+      />}
       <img
-        key={current}
+        key={`current-${current}`}
         src={images[current]}
         alt={`${alt}, image ${current + 1} of ${total}`}
-        className="trust-photo-carousel-image trust-photo-fade"
+        className={`trust-photo-carousel-image trust-photo-slide-current ${direction > 0 ? 'slide-next' : 'slide-previous'}`}
         style={{ objectFit }}
         onError={event => { event.currentTarget.style.visibility = 'hidden'; }}
       />
