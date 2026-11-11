@@ -118,8 +118,6 @@ export const Landing = () => {
     <div style={{ backgroundColor: '#ffffff', color: '#000000', overflowX: 'hidden' }}>
 
       <section id="home" className="trust-hero">
-        <div className="trust-hero-photo" aria-hidden="true" />
-        <div className="trust-hero-shade" />
         <div className="trust-hero-content">
           <p className="trust-eyebrow"><span /> Pilgrim support · Azhudha River, Kerala</p>
           <h1>Meals and care<br /><em>for every pilgrim.</em></h1>
@@ -130,7 +128,10 @@ export const Landing = () => {
           </div>
           <div className="trust-hero-proof"><span className="trust-proof-mark"><CheckCircle2 size={18} /></span><span><strong>Free service for pilgrims</strong><small>Supported by volunteers and donors</small></span></div>
         </div>
-        <div className="trust-hero-location"><MapPin size={15} /> Azhudha River · Kerala</div>
+        <figure className="trust-hero-visual">
+          <img src="/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM.jpeg" alt="Sasta Trust volunteers serving pilgrims at the Azhudha River camp" />
+          <figcaption><MapPin size={15} /> Anna Prasadam seva · Azhudha River</figcaption>
+        </figure>
       </section>
 
       <section className="trust-impact-strip" aria-label="Sasta Trust at a glance">
@@ -163,9 +164,9 @@ export const Landing = () => {
 
 
       {/* =========================================================================
-          SECTION 3: PANORAMIC STRIP BANNER WITH INTERACTIVE IMAGE SLIDER
-          (Displays large image, mouse left = left arrow, mouse right = right arrow,
-           smooth sliding, small dots at bottom, cursor follower, auto-loops every 3s)
+          SECTION 3: SERVICE PHOTOGRAPHS
+          Photos advance smoothly every three seconds. Clicking either half moves
+          backward or forward without adding controls over the image.
           ========================================================================= */}
       <section style={{ width: '100%', marginTop: '90px' }}>
         <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 5%' }}>

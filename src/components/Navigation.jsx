@@ -14,15 +14,19 @@ export const Navigation = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [compactHomeBar, setCompactHomeBar] = useState(location.pathname === '/');
   const notifyRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
+      const heroHeight = document.getElementById('home')?.offsetHeight || window.innerHeight;
+      setCompactHomeBar(location.pathname === '/' && window.scrollY < heroHeight - 24);
     };
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -83,7 +87,7 @@ export const Navigation = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header style={{
+    <header className={`trust-site-nav${compactHomeBar ? ' trust-site-nav-compact' : ''}`} style={{
       position: 'sticky',
       top: 0,
       zIndex: 1000,
@@ -105,6 +109,7 @@ export const Navigation = () => {
           <img
             src="/sasta_logo.png"
             alt="Sasta Trust"
+            className="trust-nav-logo"
             style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }}
             onError={(e) => { e.target.style.display = 'none'; }}
           />
@@ -120,7 +125,7 @@ export const Navigation = () => {
             }}>
               Sasta Trust
             </span>
-            <span style={{
+            <span className="trust-nav-subtitle" style={{
               fontFamily: 'Inter, sans-serif',
               fontSize: '0.68rem',
               color: 'rgba(255,255,255,.66)',

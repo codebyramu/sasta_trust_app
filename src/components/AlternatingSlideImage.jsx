@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 export const AlternatingSlideImage = ({
   images = [],
@@ -7,48 +6,53 @@ export const AlternatingSlideImage = ({
   borderRadius = '8px',
   alt = 'Sasta Trust community service',
   objectFit = 'cover',
-  showDots = true,
   className = '',
   style = {},
 }) => {
   const [current, setCurrent] = useState(0);
-  if (!images.length) return null;
+  const total = images.length;
 
-  const move = (direction) => setCurrent(index => (index + direction + images.length) % images.length);
+  useEffect(() => {
+    if (total < 2) return undefined;
+    const interval = window.setInterval(() => {
+      setCurrent(index => (index + 1) % total);
+    }, 3000);
+    return () => window.clearInterval(interval);
+  }, [total]);
+
+  if (!total) return null;
+
+  const handleImageClick = (event) => {
+    if (total < 2) return;
+    const { left, width } = event.currentTarget.getBoundingClientRect();
+    const clickedLeftSide = event.clientX - left < width / 2;
+    setCurrent(index => (index + (clickedLeftSide ? -1 : 1) + total) % total);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    setCurrent(index => (index + (event.key === 'ArrowLeft' ? -1 : 1) + total) % total);
+  };
 
   return (
     <div
       className={`trust-photo-carousel ${className}`.trim()}
-      role="region"
-      aria-roledescription="carousel"
-      aria-label={alt}
+      role="group"
+      aria-label={`${alt}. Click the left half for the previous photo, or the right half for the next photo.`}
+      tabIndex={0}
+      onClick={handleImageClick}
+      onKeyDown={handleKeyDown}
       style={{ '--photo-height': height, borderRadius, ...style }}
     >
       <img
+        key={current}
         src={images[current]}
-        alt={`${alt}, image ${current + 1} of ${images.length}`}
-        className="trust-photo-carousel-image"
+        alt={`${alt}, image ${current + 1} of ${total}`}
+        className="trust-photo-carousel-image trust-photo-fade"
         style={{ objectFit }}
         onError={event => { event.currentTarget.style.visibility = 'hidden'; }}
       />
-      {images.length > 1 && <>
-        <button type="button" className="photo-click-zone photo-click-zone-left" onClick={() => move(-1)} aria-label="Previous photo">
-          <span className="photo-click-cue"><ChevronLeft size={18} /></span>
-        </button>
-        <button type="button" className="photo-click-zone photo-click-zone-right" onClick={() => move(1)} aria-label="Next photo">
-          <span className="photo-click-cue"><ChevronRight size={18} /></span>
-        </button>
-        {showDots && <div className="photo-carousel-dots" aria-label="Choose photo">
-          {images.map((_, index) => <button
-            key={index}
-            type="button"
-            onClick={() => setCurrent(index)}
-            aria-label={`Show photo ${index + 1}`}
-            aria-current={index === current ? 'true' : undefined}
-            className={index === current ? 'active' : ''}
-          />)}
-        </div>}
-      </>}
     </div>
   );
 };
