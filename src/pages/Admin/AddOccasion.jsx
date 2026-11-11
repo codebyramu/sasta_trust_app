@@ -3,7 +3,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { addOccasion, uploadMedia, addMediaToOccasion } from '../../services/db';
 import { useNavigate } from 'react-router-dom';
-import { Save, ImagePlus } from 'lucide-react';
+import { Save, ImagePlus, ArrowLeft } from 'lucide-react';
 
 const modules = {
   toolbar: [
@@ -43,8 +43,12 @@ export const AddOccasion = () => {
       }
       alert('Occasion Created Successfully!');
       navigate('/dashboard');
-    } catch (err) { console.error(err); alert('Failed to save occasion'); }
-    finally { setSaving(false); }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to save occasion');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -52,61 +56,126 @@ export const AddOccasion = () => {
   };
 
   return (
-    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh' }}>
-      {/* Header */}
-      <div className="sacred-border" style={{ background: 'linear-gradient(135deg, var(--purple-dark), var(--purple-royal))', padding: '2.5rem 0' }}>
-        <div className="container" style={{ maxWidth: 800 }}>
-          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(212,175,55,0.5)', fontWeight: 600, marginBottom: '0.5rem' }}>
-            Admin Panel
+    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
+      <section style={{ padding: '60px 6% 40px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
+        <div style={{ maxWidth: '850px', margin: '0 auto' }}>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="pill-btn pill-btn-outline pill-btn-sm"
+            style={{ marginBottom: '20px' }}
+          >
+            <ArrowLeft size={14} /> Back to Calendar
+          </button>
+          <p className="kicker" style={{ color: '#888', marginBottom: '8px' }}>
+            Admin Panel · Occasion Management
           </p>
-          <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: 'clamp(1.4rem, 3vw, 1.8rem)', fontWeight: 700, color: '#D4AF37', margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem', letterSpacing: '0.04em' }}>
-            <Save size={24} /> Create Occasion / Festival
+          <h1 style={{ fontFamily: 'Libre Baskerville, serif', fontSize: '2.4rem', fontWeight: 700, color: '#000' }}>
+            Create New Occasion
           </h1>
         </div>
-      </div>
+      </section>
 
-      <div className="container" style={{ padding: '2.5rem 24px', maxWidth: '800px' }}>
-        <div className="card" style={{ borderRadius: 'var(--radius-xl)' }}>
-          <form onSubmit={handleSubmit}>
-            <div className="input-group">
-              <label className="input-label">Occasion Title</label>
-              <input type="text" className="input-field" placeholder="e.g. Maha Shivaratri 2024" value={title} onChange={(e) => setTitle(e.target.value)} required />
+      <div style={{ maxWidth: '850px', margin: '0 auto', padding: '50px 6%' }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            background: '#ffffff',
+            borderRadius: '24px',
+            border: '1px solid #eee',
+            padding: '40px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px'
+          }}
+        >
+          <div>
+            <label style={{ display: 'block', fontFamily: 'Inter', fontSize: '0.88rem', fontWeight: 600, marginBottom: '8px', color: '#222' }}>
+              Occasion Title *
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Mandala Mahotsavam & Special Anna Prasadam Camp"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px',
+                borderRadius: '12px',
+                border: '1px solid #d1d5db',
+                fontFamily: 'Inter',
+                fontSize: '0.95rem',
+                outline: 'none'
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontFamily: 'Inter', fontSize: '0.88rem', fontWeight: 600, marginBottom: '8px', color: '#222' }}>
+              Auspicious Date *
+            </label>
+            <input
+              type="date"
+              required
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px',
+                borderRadius: '12px',
+                border: '1px solid #d1d5db',
+                fontFamily: 'Inter',
+                fontSize: '0.95rem',
+                outline: 'none'
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontFamily: 'Inter', fontSize: '0.88rem', fontWeight: 600, marginBottom: '8px', color: '#222' }}>
+              Cover Image (Optional)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '12px',
+                border: '1px solid #d1d5db',
+                fontFamily: 'Inter',
+                fontSize: '0.9rem'
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontFamily: 'Inter', fontSize: '0.88rem', fontWeight: 600, marginBottom: '8px', color: '#222' }}>
+              Occasion Description & Details *
+            </label>
+            <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #d1d5db' }}>
+              <ReactQuill
+                theme="snow"
+                value={content}
+                onChange={setContent}
+                modules={modules}
+                formats={formats}
+                placeholder="Share sacred timings, seva arrangements, location directions, and prasadam schedules..."
+              />
             </div>
+          </div>
 
-            <div className="input-group">
-              <label className="input-label">Date</label>
-              <input type="date" className="input-field" value={date} onChange={(e) => setDate(e.target.value)} required />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Thumbnail / Cover Image (Optional)</label>
-              <label className="input-field" style={{
-                display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer',
-                justifyContent: 'center', borderStyle: 'dashed',
-                borderColor: coverFile ? 'var(--gold-primary)' : 'var(--bg-tertiary)',
-                background: coverFile ? 'rgba(212,175,55,0.05)' : 'transparent',
-                transition: 'all 0.2s'
-              }}>
-                <ImagePlus size={20} color="var(--gold-primary)" />
-                {coverFile ? <span style={{ color: 'var(--success)', fontWeight: 700 }}>{coverFile.name} (Ready)</span> : "Click to Upload Cover Image"}
-                <input type="file" accept="image/*,video/*" style={{ display: 'none' }} onChange={handleFileChange} />
-              </label>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginTop: '0.5rem', fontFamily: 'DM Sans, sans-serif' }}>This image will be shown as the primary thumbnail.</p>
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Rich Description</label>
-              <ReactQuill theme="snow" value={content} onChange={setContent} modules={modules} formats={formats} placeholder="Write a beautiful description for the occasion..." style={{ minHeight: '150px' }} />
-            </div>
-
-            <button type="submit" className="btn btn-primary" style={{
-              width: '100%', marginTop: '2rem', padding: '1.15rem', fontSize: '1rem',
-              borderRadius: 'var(--radius-full)'
-            }} disabled={saving}>
-              {saving ? 'Creating...' : 'Publish Occasion'}
-            </button>
-          </form>
-        </div>
+          <button
+            type="submit"
+            disabled={saving}
+            className="pill-btn pill-btn-black"
+            style={{ padding: '16px 32px', alignSelf: 'flex-start', marginTop: '10px' }}
+          >
+            <Save size={16} /> {saving ? 'Publishing Occasion...' : 'Publish Occasion'}
+          </button>
+        </form>
       </div>
     </div>
   );

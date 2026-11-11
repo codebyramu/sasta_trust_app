@@ -1,19 +1,28 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, LogOut, Menu, Bell, Calendar, Receipt, X, ChevronRight, Dot, Crown } from 'lucide-react';
+import { LogIn, LogOut, Menu, Bell, Calendar, Receipt, X, ChevronRight, Crown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getReceipts, getOccasions } from '../services/db';
 
 export const Navigation = () => {
   const { user, loginWithGoogle, logout } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotifyOpen, setIsNotifyOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
   const notifyRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -29,17 +38,34 @@ export const Navigation = () => {
         const [receiptsData, occasionsData] = await Promise.all([getReceipts(), getOccasions()]);
         let combined = [];
         occasionsData.forEach(occ => {
-          combined.push({ type: 'occasion', id: occ.id, title: occ.title, date: new Date(occ.createdAt), link: `/occasion/${occ.id}`, icon: <Calendar size={16} color="var(--gold-primary)" /> });
+          combined.push({
+            type: 'occasion',
+            id: occ.id,
+            title: occ.title,
+            date: new Date(occ.createdAt || Date.now()),
+            link: `/occasion/${occ.id}`,
+            icon: <Calendar size={15} color="#000" />
+          });
         });
         const myReceipts = user?.role === 'owner' ? receiptsData : receiptsData.filter(r => r.contactValue === user?.email);
         myReceipts.forEach(rcpt => {
-          combined.push({ type: 'receipt', id: rcpt.id, title: user?.role === 'owner' ? `Receipt generated for ${rcpt.name}` : 'Your official receipt is ready!', amount: rcpt.amount, date: new Date(rcpt.createdAt), link: '/donations', icon: <Receipt size={16} color="var(--success)" /> });
+          combined.push({
+            type: 'receipt',
+            id: rcpt.id,
+            title: user?.role === 'owner' ? `Receipt for ${rcpt.name}` : 'Official donation receipt issued',
+            amount: rcpt.amount,
+            date: new Date(rcpt.createdAt || Date.now()),
+            link: '/donations',
+            icon: <Receipt size={15} color="#0ca678" />
+          });
         });
         combined.sort((a, b) => b.date - a.date);
         setNotifications(combined.slice(0, 15));
         const lastSeen = parseInt(localStorage.getItem(`sasta_last_notify_${user?.email || 'guest'}`) || '0');
         setUnreadCount(combined.filter(n => n.date.getTime() > lastSeen).length);
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        console.error(e);
+      }
     };
     fetchUpdates();
     const interval = setInterval(fetchUpdates, 30000);
@@ -57,59 +83,97 @@ export const Navigation = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav style={{
-      padding: '0.75rem 0',
-      background: 'rgba(26, 10, 46, 0.85)',
-      backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-      position: 'sticky', top: 0, zIndex: 1000,
-      borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
-      boxShadow: '0 4px 30px rgba(0, 0, 0, 0.2)'
+    <header style={{
+      position: 'sticky',
+      top: 0,
+      zIndex: 1000,
+      background: '#14253d',
+      borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+      transition: 'box-shadow 0.3s ease',
+      boxShadow: scrolled ? '0 5px 18px rgba(10, 24, 42, 0.2)' : 'none'
     }}>
-      <div className="container justify-between items-center flex">
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', textDecoration: 'none' }}>
-          <div style={{
-            padding: '3px', borderRadius: '50%',
-            background: 'linear-gradient(135deg, #D4AF37, #F4D03F, #D4AF37)',
-            boxShadow: '0 0 20px rgba(212, 175, 55, 0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}>
-            <div style={{ borderRadius: '50%', overflow: 'hidden', width: 36, height: 36 }}>
-              <img src="/sasta_logo.png" alt="Sasta Trust Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
+      <div style={{
+        maxWidth: '1440px',
+        margin: '0 auto',
+        padding: '14px 4%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }} className="trust-navigation-inner">
+        {/* Brand */}
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
+          <img
+            src="/sasta_logo.png"
+            alt="Sasta Trust"
+            style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }}
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
+          <div>
+            <span className="trust-brand-caption" style={{
+              fontFamily: 'Libre Baskerville, serif',
+              fontWeight: 700,
+              fontSize: '1.15rem',
+              color: '#ffffff',
+              letterSpacing: '-0.01em',
+              display: 'block',
+              lineHeight: 1.2
+            }}>
+              Sasta Trust
+            </span>
+            <span style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '0.68rem',
+              color: 'rgba(255,255,255,.66)',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              display: 'block'
+            }}>
+              Azhudha River · Kerala
+            </span>
           </div>
-          <span style={{
-            fontFamily: 'Cinzel, serif', fontWeight: 800, fontSize: '1.2rem', letterSpacing: '0.06em',
-            background: 'linear-gradient(135deg, #D4AF37, #F4D03F)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-          }}>Sasta Trust</span>
         </Link>
 
-        {/* DESKTOP NAV */}
-        <div className="desktop-nav" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-          {[
-            { path: '/', label: 'Home' },
-            { path: '/dashboard', label: 'Occasions' },
-            { path: '/donations', label: 'Donate & Receipts' },
-          ].map(nav => (
-            <Link key={nav.path} to={nav.path} className="nav-link" data-active={isActive(nav.path)}>
-              {nav.label}
-            </Link>
-          ))}
+        {/* Center Nav Links (Museum / Editorial Style) */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '28px' }} className="nav-links-desktop">
+          <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
+            Home
+          </Link>
+          <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Calendar size={14} color="#d97706" />
+            <span>Dashboard &amp; Festivals</span>
+          </Link>
+          <Link to="/donations" className={`nav-link ${isActive('/donations') ? 'active' : ''}`}>
+            Ways to Contribute
+          </Link>
+          <a href="/#devotee-voice" className="nav-link">
+            Devotee Voice
+          </a>
+          <Link to="/donate" className={`nav-link ${isActive('/donate') ? 'active' : ''}`}>
+            My Receipts
+          </Link>
 
           {user?.role === 'owner' && (
             <div style={{ position: 'relative' }}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 style={{
-                  background: 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))',
-                  border: '1px solid rgba(212,175,55,0.3)', borderRadius: 'var(--radius-full)',
-                  cursor: 'pointer', fontWeight: 700, color: '#D4AF37',
-                  display: 'flex', alignItems: 'center', gap: '0.4rem',
-                  padding: '0.4rem 1rem', fontFamily: 'DM Sans, sans-serif',
-                  fontSize: '0.82rem', letterSpacing: '0.04em', textTransform: 'uppercase'
+                  background: '#f3f4f6',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '30px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  color: '#000',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 14px',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.02em',
+                  textTransform: 'uppercase'
                 }}
               >
-                <Crown size={14} /> Admin <Menu size={14} />
+                <Crown size={14} color="#D4AF37" /> Admin <Menu size={14} />
               </button>
               <AnimatePresence>
                 {isDropdownOpen && (
@@ -118,166 +182,330 @@ export const Navigation = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     style={{
-                      position: 'absolute', top: '100%', right: 0, marginTop: '8px',
-                      background: 'var(--purple-dark)', borderRadius: 'var(--radius-lg)',
-                      boxShadow: '0 15px 40px rgba(0,0,0,0.4)', padding: '8px',
-                      minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '4px',
-                      border: '1px solid rgba(212,175,55,0.2)'
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      marginTop: '8px',
+                      background: '#ffffff',
+                      borderRadius: '12px',
+                      boxShadow: '0 15px 35px rgba(0,0,0,0.15)',
+                      padding: '8px',
+                      minWidth: '200px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      border: '1px solid #eee'
                     }}
                     onClick={() => setIsDropdownOpen(false)}
                   >
-                    <Link to="/admin" className="dropdown-item">Manage Occasions</Link>
-                    <Link to="/admin/receipt" className="dropdown-item">Send Receipt</Link>
+                    <Link to="/admin" className="dropdown-link">Manage Occasions</Link>
+                    <Link to="/admin/receipt" className="dropdown-link">Send Receipt</Link>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
           )}
+        </nav>
 
+        <button
+          className="trust-mobile-menu-toggle"
+          onClick={() => setIsMobileMenuOpen(open => !open)}
+          aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={isMobileMenuOpen}
+        >
+          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+
+        {/* Right CTA / Auth / Notifications */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          {/* Notifications bell */}
           <div style={{ position: 'relative' }} ref={notifyRef}>
-            <button onClick={toggleNotifications} style={{
-              position: 'relative', background: 'rgba(212,175,55,0.1)',
-              border: '1px solid rgba(212,175,55,0.2)', borderRadius: '50%',
-              width: '40px', height: '40px', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s'
-            }}>
-              <Bell size={18} color={unreadCount > 0 ? '#D4AF37' : 'rgba(255,255,255,0.5)'} />
+            <button
+              onClick={toggleNotifications}
+              style={{
+                position: 'relative',
+                background: '#f5f5f7',
+                border: 'none',
+                borderRadius: '50%',
+                width: '38px',
+                height: '38px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'background 0.2s'
+              }}
+              title="Recent Updates"
+            >
+              <Bell size={17} color="#333" />
               {unreadCount > 0 && (
-                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} style={{
-                  position: 'absolute', top: '-4px', right: '-4px',
-                  background: 'linear-gradient(135deg, #D4AF37, #F4D03F)', color: '#1A0A2E',
-                  borderRadius: '50%', width: '20px', height: '20px', fontSize: '0.7rem',
-                  fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  border: '2px solid var(--purple-dark)'
-                }}>{unreadCount}</motion.span>
+                <span style={{
+                  position: 'absolute',
+                  top: '-2px',
+                  right: '-2px',
+                  background: '#000000',
+                  color: '#ffffff',
+                  borderRadius: '50%',
+                  width: '18px',
+                  height: '18px',
+                  fontSize: '0.65rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {unreadCount}
+                </span>
               )}
             </button>
 
-            {/* NOTIFICATION POPOVER */}
+            {/* Notification Popover */}
             <AnimatePresence>
               {isNotifyOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                  initial={{ opacity: 0, y: 10, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.96 }}
                   style={{
-                    position: 'absolute', top: '100%', right: -60, marginTop: '12px',
-                    width: '340px', background: 'var(--purple-dark)', borderRadius: 'var(--radius-xl)',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-                    border: '1px solid rgba(212,175,55,0.15)', overflow: 'hidden'
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: '12px',
+                    width: '320px',
+                    background: '#ffffff',
+                    borderRadius: '16px',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.18)',
+                    border: '1px solid #eee',
+                    overflow: 'hidden',
+                    zIndex: 1100
                   }}
                 >
                   <div style={{
-                    padding: '1.25rem', borderBottom: '1px solid rgba(212,175,55,0.1)',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    background: 'rgba(212,175,55,0.05)'
+                    padding: '14px 18px',
+                    borderBottom: '1px solid #eee',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: '#fafafa'
                   }}>
-                    <h4 style={{ margin: 0, color: '#D4AF37', fontFamily: 'Cinzel, serif', fontSize: '0.95rem' }}>Latest Updates</h4>
-                    <button onClick={() => setIsNotifyOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)' }}><X size={18} /></button>
+                    <h4 style={{ margin: 0, color: '#000', fontFamily: 'Libre Baskerville, serif', fontSize: '0.92rem' }}>
+                      Recent Updates
+                    </h4>
+                    <button
+                      onClick={() => setIsNotifyOpen(false)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#999' }}
+                    >
+                      <X size={16} />
+                    </button>
                   </div>
-                  <div style={{ maxHeight: '400px', overflowY: 'auto', padding: '0.5rem' }}>
+                  <div style={{ maxHeight: '350px', overflowY: 'auto', padding: '6px' }}>
                     {notifications.length > 0 ? notifications.map((n, i) => (
-                      <Link key={i} to={n.link} onClick={() => setIsNotifyOpen(false)}
+                      <Link
+                        key={i}
+                        to={n.link}
+                        onClick={() => setIsNotifyOpen(false)}
                         style={{
-                          display: 'flex', gap: '1rem', padding: '1rem', borderRadius: 'var(--radius-lg)',
-                          textDecoration: 'none', transition: 'all 0.2s',
-                          borderBottom: i === notifications.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.05)'
+                          display: 'flex',
+                          gap: '12px',
+                          padding: '10px 12px',
+                          borderRadius: '10px',
+                          textDecoration: 'none',
+                          borderBottom: i === notifications.length - 1 ? 'none' : '1px solid #f5f5f5',
+                          transition: 'background 0.15s'
                         }}
-                        onMouseOver={e => e.currentTarget.style.background = 'rgba(212,175,55,0.08)'}
-                        onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+                        onMouseEnter={e => e.currentTarget.style.background = '#f7f7f9'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                       >
-                        <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(212,175,55,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          background: '#f0f0f4',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
                           {n.icon}
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem', fontWeight: 600, lineHeight: 1.4, marginBottom: '0.25rem' }}>{n.title}</div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)' }}>{n.date.toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
-                            <ChevronRight size={14} color="rgba(212,175,55,0.5)" />
+                          <div style={{ color: '#222', fontSize: '0.82rem', fontWeight: 600, lineHeight: 1.35 }}>
+                            {n.title}
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                            <span style={{ fontSize: '0.72rem', color: '#888' }}>
+                              {n.date.toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                            </span>
+                            <ChevronRight size={13} color="#aaa" />
                           </div>
                         </div>
                       </Link>
                     )) : (
-                      <div style={{ padding: '3rem 1rem', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
-                        <Dot size={48} style={{ margin: '0 auto', opacity: 0.2 }} />
-                        <p style={{ fontSize: '0.9rem' }}>No recent updates</p>
+                      <div style={{ padding: '2.5rem 1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
+                        No recent updates
                       </div>
                     )}
                   </div>
-                  <div style={{ padding: '1rem', textAlign: 'center', background: 'rgba(212,175,55,0.05)', borderTop: '1px solid rgba(212,175,55,0.1)' }}>
-                    <Link to="/dashboard" onClick={() => setIsNotifyOpen(false)} style={{ fontSize: '0.85rem', color: '#D4AF37', fontWeight: 700, textDecoration: 'none', fontFamily: 'Cinzel, serif' }}>View All Festivals</Link>
+                  <div style={{ padding: '10px', textAlign: 'center', background: '#fafafa', borderTop: '1px solid #eee' }}>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsNotifyOpen(false)}
+                      style={{ fontSize: '0.82rem', color: '#000', fontWeight: 600, textDecoration: 'none' }}
+                    >
+                      View All Occasions →
+                    </Link>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          <div style={{ height: '24px', width: '1px', background: 'rgba(212,175,55,0.2)' }} />
-
+          {/* User Auth or Donate Pill */}
           {!user ? (
-            <button onClick={() => loginWithGoogle()} className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.82rem', borderRadius: 'var(--radius-full)' }}>
-              <LogIn size={16} /> Login
-            </button>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: '0.6rem',
-                padding: '0.35rem 0.85rem', background: 'rgba(212,175,55,0.08)',
-                borderRadius: 'var(--radius-full)', border: '1px solid rgba(212,175,55,0.15)'
-              }}>
-                <img src={user.picture || 'https://ui-avatars.com/api/?name=User'} alt="Profile" style={{ width: 26, height: 26, borderRadius: '50%', border: '2px solid rgba(212,175,55,0.3)' }} />
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.85)', fontFamily: 'DM Sans, sans-serif' }}>{user.name?.split(' ')[0]}</span>
-              </div>
-              <button onClick={logout} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: '5px' }} title="Logout">
-                <LogOut size={18} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={() => loginWithGoogle()}
+                className="pill-btn pill-btn-outline pill-btn-sm"
+                style={{ fontSize: '0.82rem', padding: '8px 16px' }}
+              >
+                <LogIn size={14} /> Login
               </button>
+
+              <Link
+                to="/donations"
+                className="pill-btn pill-btn-black pill-btn-sm"
+                style={{ fontSize: '0.82rem', padding: '8px 18px' }}
+              >
+                Donate & Receipts →
+              </Link>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Link
+                to="/donations"
+                className="pill-btn pill-btn-black pill-btn-sm"
+                style={{ fontSize: '0.82rem', padding: '8px 18px' }}
+              >
+                Donate & Receipts →
+              </Link>
+
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '4px 10px',
+                background: '#f3f4f6',
+                borderRadius: '30px'
+              }}>
+                <img
+                  src={user.picture || 'https://ui-avatars.com/api/?name=User'}
+                  alt="Profile"
+                  style={{ width: 24, height: 24, borderRadius: '50%' }}
+                />
+                <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#222' }}>
+                  {user.name?.split(' ')[0]}
+                </span>
+                <button
+                  onClick={logout}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#777', padding: '2px', display: 'flex' }}
+                  title="Logout"
+                >
+                  <LogOut size={15} />
+                </button>
+              </div>
             </div>
           )}
         </div>
       </div>
 
+      {isMobileMenuOpen && (
+        <nav className="trust-mobile-menu" aria-label="Mobile navigation">
+          <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+          <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Calendar &amp; events</Link>
+          <Link to="/donations" onClick={() => setIsMobileMenuOpen(false)}>Ways to contribute</Link>
+          <Link to="/donate" onClick={() => setIsMobileMenuOpen(false)}>My receipts</Link>
+          <a href="/#devotee-voice" onClick={() => setIsMobileMenuOpen(false)}>Devotee voice</a>
+        </nav>
+      )}
+
       <style>{`
         .nav-link {
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-weight: 500;
-          font-size: 0.82rem;
-          color: rgba(255,255,255,0.55);
+          font-size: 0.88rem;
+          color: rgba(255,255,255,.82);
           text-decoration: none;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          padding: 6px 0;
+          letter-spacing: -0.01em;
+          transition: color 0.2s ease;
           position: relative;
-          transition: color 0.3s;
         }
-        .nav-link::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: linear-gradient(90deg, #D4AF37, #F4D03F);
-          border-radius: 2px;
-          transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .nav-btn-link {
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
         }
-        .nav-link:hover { color: #D4AF37; }
-        .nav-link:hover::after, .nav-link[data-active="true"]::after { width: 100%; }
-        .nav-link[data-active="true"] { color: #D4AF37; font-weight: 700; }
-        .dropdown-item {
-          padding: 10px 16px;
-          border-radius: var(--radius-md);
-          color: rgba(255,255,255,0.7);
+        .nav-link:hover, .nav-link.active {
+          color: #f0c36a;
+          font-weight: 600;
+        }
+        .dropdown-link {
+          padding: 8px 14px;
+          border-radius: 8px;
+          color: #333;
           text-decoration: none;
-          font-family: 'DM Sans', sans-serif;
+          font-size: 0.84rem;
           font-weight: 500;
-          font-size: 0.82rem;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          transition: background 0.2s, color 0.2s;
-          display: block;
+          transition: background 0.15s;
         }
-        .dropdown-item:hover { background: rgba(212,175,55,0.1); color: #D4AF37; }
+        .dropdown-link:hover {
+          background: #f4f4f5;
+          color: #000;
+        }
+        .trust-mobile-menu-toggle, .trust-mobile-menu { display: none; }
+        @media (max-width: 960px) {
+          .nav-links-desktop {
+            display: none !important;
+          }
+          .trust-mobile-menu-toggle {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            margin-left: auto;
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 4px;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+          }
+          .trust-mobile-menu {
+            position: absolute;
+            top: 100%;
+            right: 16px;
+            left: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 8px;
+            border: 1px solid rgba(255,255,255,.14);
+            border-radius: 5px;
+            background: #14253d;
+            box-shadow: 0 12px 24px rgba(10,24,42,.22);
+          }
+          .trust-mobile-menu a {
+            padding: 11px 12px;
+            border-radius: 3px;
+            color: rgba(255,255,255,.9);
+            font-size: .88rem;
+          }
+          .trust-mobile-menu a:hover { background: rgba(255,255,255,.08); }
+        }
+        @media (max-width: 650px) {
+          .trust-navigation-inner { padding: 10px 16px !important; }
+          .trust-brand-caption { display: none; }
+        }
       `}</style>
-    </nav>
+    </header>
   );
 };

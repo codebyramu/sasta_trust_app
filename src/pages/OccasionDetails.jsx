@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getOccasions, addMediaToOccasion, uploadMedia, deleteOccasion, deleteMediaFromOccasion, updateOccasion } from '../services/db';
 import { useAuth } from '../context/AuthContext';
-import { ImagePlus, ArrowLeft, Loader2, Trash2, Edit2, Save, X, Youtube, Facebook } from 'lucide-react';
+import { ImagePlus, ArrowLeft, Trash2, Edit2, Save, X, Share2, Calendar, MapPin } from 'lucide-react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -37,7 +37,9 @@ export const OccasionDetails = () => {
   const [editForm, setEditForm] = useState({ title: '', date: '', content: '' });
   const [savingEdit, setSavingEdit] = useState(false);
 
-  useEffect(() => { loadData(); }, [id]);
+  useEffect(() => {
+    loadData();
+  }, [id]);
 
   const loadData = async () => {
     try {
@@ -45,8 +47,11 @@ export const OccasionDetails = () => {
       const data = await getOccasions();
       const occ = data.find(o => o.id === id);
       if (occ) setOccasion(occ);
-    } catch (e) { console.error(e); }
-    finally { setLoading(false); }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const startEditing = () => {
@@ -61,189 +66,302 @@ export const OccasionDetails = () => {
       const updated = await updateOccasion(id, editForm);
       setOccasion({ ...updated });
       setIsEditing(false);
-    } catch (e) { alert("Failed to update."); }
-    finally { setSavingEdit(false); }
+    } catch (e) {
+      alert("Failed to update.");
+    } finally {
+      setSavingEdit(false);
+    }
   };
 
   const handleDeleteOccasion = async () => {
-    if (window.confirm("Are you sure you want to delete this occasion?\n\nWARNING: This is permanent.")) {
-      try { await deleteOccasion(id); navigate('/dashboard'); }
-      catch (e) { alert("Failed to delete."); }
+    if (window.confirm("Are you sure you want to delete this occasion?")) {
+      try {
+        await deleteOccasion(id);
+        navigate('/dashboard');
+      } catch (e) {
+        alert("Failed to delete.");
+      }
     }
   };
 
   const handleDeleteMedia = async (mediaUrl) => {
     if (window.confirm("Delete this media item permanently?")) {
-      try { const updated = await deleteMediaFromOccasion(id, mediaUrl); setOccasion({ ...updated }); }
-      catch (e) { alert("Failed to delete media."); }
+      try {
+        const updated = await deleteMediaFromOccasion(id, mediaUrl);
+        setOccasion({ ...updated });
+      } catch (e) {
+        alert("Failed to delete media.");
+      }
     }
   };
 
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    if (occasion.media.length + files.length > 50) { alert("Cannot exceed 50 media limit."); return; }
     try {
       setUploading(true);
       const mediaArray = await Promise.all(files.map(f => uploadMedia(f)));
       const updated = await addMediaToOccasion(id, mediaArray);
       setOccasion({ ...updated });
-    } catch (err) { alert(err.message || 'Error uploading files'); }
-    finally { setUploading(false); }
+    } catch (err) {
+      alert(err.message || 'Error uploading files');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleAddExternalLink = async () => {
-    const link = window.prompt("Paste YouTube or Facebook Video Link:");
+    const link = window.prompt("Paste YouTube or Video Link:");
     if (!link) return;
-    if (occasion.media.length + 1 > 50) { alert("Cannot exceed 50 media limit."); return; }
     try {
       setUploading(true);
       const updated = await addMediaToOccasion(id, [link]);
       setOccasion({ ...updated });
-    } catch (err) { alert(err.message || 'Error saving link'); }
-    finally { setUploading(false); }
+    } catch (err) {
+      alert(err.message || 'Error saving link');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const renderMedia = (src) => {
     if (!src) return null;
     const isYoutube = src.includes('youtube.com') || src.includes('youtu.be');
-    const isFacebook = src.includes('facebook.com') || src.includes('fb.watch');
     if (isYoutube) {
       let videoId = '';
       if (src.includes('v=')) videoId = src.split('v=')[1].split('&')[0];
       else if (src.includes('youtu.be/')) videoId = src.split('youtu.be/')[1].split('?')[0];
-      return <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${videoId}`} title="YouTube Video" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />;
+      return (
+        <iframe
+          width="100%"
+          height="100%"
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title="YouTube Video"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          style={{ objectFit: 'cover', borderRadius: '16px' }}
+        />
+      );
     }
-    if (isFacebook) {
-      return <iframe src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(src)}&show_text=false&width=500`} width="100%" height="100%" style={{ border: 'none', overflow: 'hidden', borderRadius: 'var(--radius-md)' }} scrolling="no" frameBorder="0" allowFullScreen={true} allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" />;
+    if (src.includes('.mp4') || src.includes('.mov') || src.includes('.webm')) {
+      return (
+        <video src={src} controls style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} />
+      );
     }
-    if (src.includes('.mp4') || src.includes('.mov') || src.includes('.webm') || src.startsWith('data:video')) {
-      return <video src={src} controls loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />;
-    }
-    return <img src={src} alt="Media" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />;
+    return (
+      <img src={src} alt="Media" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} />
+    );
   };
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1rem' }}>
-        <div className="loader" style={{ width: 48, height: 48 }} />
-        <p style={{ color: 'var(--gold-primary)', fontFamily: 'Cinzel, serif', letterSpacing: '0.1em', fontSize: '0.8rem', textTransform: 'uppercase' }}>Loading Details</p>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <p style={{ fontFamily: 'Inter', color: '#666' }}>Loading occasion details...</p>
       </div>
     );
   }
 
   if (!occasion) {
-    return <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}><h2 style={{ color: 'var(--text-tertiary)' }}>Occasion not found</h2></div>;
+    return (
+      <div style={{ padding: '80px 20px', textAlign: 'center' }}>
+        <h2 style={{ fontFamily: 'Libre Baskerville' }}>Occasion not found</h2>
+        <button onClick={() => navigate('/dashboard')} className="pill-btn pill-btn-black pill-btn-sm" style={{ marginTop: '20px' }}>
+          Back to Calendar
+        </button>
+      </div>
+    );
   }
 
   const isOwner = user?.role === 'owner';
 
   return (
-    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh' }}>
-      <div className="container" style={{ padding: '2rem 24px', maxWidth: '850px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-          <button onClick={() => navigate(-1)} className="btn btn-secondary" style={{ borderRadius: 'var(--radius-full)' }}>
-            <ArrowLeft size={16} /> Back
+    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '50px 6%' }}>
+        {/* Navigation & Controls */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <button
+            onClick={() => navigate(-1)}
+            className="pill-btn pill-btn-outline pill-btn-sm"
+          >
+            <ArrowLeft size={14} /> Back
           </button>
+
           {isOwner && !isEditing && (
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button onClick={startEditing} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: 'var(--radius-full)' }}>
-                <Edit2 size={16} /> Edit
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={startEditing} className="pill-btn pill-btn-outline pill-btn-sm">
+                <Edit2 size={14} /> Edit
               </button>
-              <button onClick={handleDeleteOccasion} className="btn" style={{ background: 'var(--danger)', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: 'var(--radius-full)' }}>
-                <Trash2 size={16} /> Delete
+              <button
+                onClick={handleDeleteOccasion}
+                className="pill-btn pill-btn-sm"
+                style={{ backgroundColor: '#e02424', color: '#fff' }}
+              >
+                <Trash2 size={14} /> Delete
               </button>
             </div>
           )}
         </div>
 
-        <div className="card" style={{ marginBottom: '2rem', position: 'relative', borderRadius: 'var(--radius-xl)' }}>
+        {/* Content Card */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '24px',
+          border: '1px solid #eee',
+          padding: '40px',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.04)',
+          marginBottom: '40px'
+        }}>
           {isEditing ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <input type="text" className="input-field" value={editForm.title} onChange={e => setEditForm({...editForm, title: e.target.value})} placeholder="Occasion Title" />
-              <input type="date" className="input-field" value={editForm.date} onChange={e => setEditForm({...editForm, date: e.target.value})} />
-              <ReactQuill theme="snow" value={editForm.content} onChange={val => setEditForm({...editForm, content: val})} modules={modules} formats={formats} />
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <button onClick={handleSaveEdit} className="btn btn-primary" style={{ flex: 1, borderRadius: 'var(--radius-full)' }} disabled={savingEdit}>
-                  {savingEdit ? 'Saving...' : <><Save size={18}/> Save Changes</>}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <input
+                type="text"
+                value={editForm.title}
+                onChange={e => setEditForm({ ...editForm, title: e.target.value })}
+                placeholder="Occasion Title"
+                style={{
+                  padding: '12px',
+                  borderRadius: '10px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Inter',
+                  fontSize: '1rem'
+                }}
+              />
+              <input
+                type="date"
+                value={editForm.date}
+                onChange={e => setEditForm({ ...editForm, date: e.target.value })}
+                style={{
+                  padding: '12px',
+                  borderRadius: '10px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Inter'
+                }}
+              />
+              <ReactQuill
+                theme="snow"
+                value={editForm.content}
+                onChange={val => setEditForm({ ...editForm, content: val })}
+                modules={modules}
+                formats={formats}
+              />
+              <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                <button
+                  onClick={handleSaveEdit}
+                  className="pill-btn pill-btn-black pill-btn-sm"
+                  disabled={savingEdit}
+                >
+                  <Save size={14} /> {savingEdit ? 'Saving...' : 'Save Changes'}
                 </button>
-                <button onClick={() => setIsEditing(false)} className="btn btn-secondary" style={{ flex: 1, borderRadius: 'var(--radius-full)' }} disabled={savingEdit}>
-                  <X size={18}/> Cancel
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="pill-btn pill-btn-outline pill-btn-sm"
+                  disabled={savingEdit}
+                >
+                  <X size={14} /> Cancel
                 </button>
               </div>
             </div>
           ) : (
-            <>
-              <h1 style={{
-                fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', marginBottom: '0.75rem',
-                background: 'linear-gradient(135deg, var(--purple-royal), var(--gold-primary))',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                letterSpacing: '0.03em'
-              }}>{occasion.title}</h1>
-              <p style={{ color: 'var(--gold-dark)', marginBottom: '2rem', fontWeight: 600, fontFamily: 'DM Sans, sans-serif', fontSize: '0.9rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                {new Date(occasion.date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            <div>
+              <p className="kicker" style={{ color: '#888', marginBottom: '8px' }}>
+                SACRED OCCASION · {occasion.date ? new Date(occasion.date).toLocaleDateString('en-IN', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Continuous Seva'}
               </p>
-              <div style={{ height: 1, background: 'linear-gradient(90deg, var(--gold-primary), transparent)', marginBottom: '2rem', opacity: 0.2 }} />
-              <div className="occasion-content" dangerouslySetInnerHTML={{ __html: occasion.content }} style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', lineHeight: 1.9, fontFamily: 'Crimson Pro, serif' }} />
-            </>
-          )}
-        </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.3rem' }}>
-            Media Gallery <span style={{ color: 'var(--gold-primary)', fontSize: '0.9rem' }}>({occasion.media?.length || 0}/50)</span>
-          </h2>
-        </div>
-
-        <div className="gallery-grid">
-          {isOwner && occasion.media.length < 50 && (
-            <>
-              <label className="gallery-item" style={{
-                border: '2px dashed var(--gold-primary)', background: 'rgba(212,175,55,0.05)',
-                cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center', color: 'var(--gold-primary)', gap: '0.5rem',
-                transition: 'all 0.3s'
+              <h1 style={{
+                fontFamily: 'Libre Baskerville, serif',
+                fontSize: 'clamp(2rem, 4vw, 2.8rem)',
+                fontWeight: 700,
+                color: '#000000',
+                marginBottom: '20px',
+                lineHeight: 1.2
               }}>
-                {uploading ? <div className="loader" style={{ width: 32, height: 32 }} /> : (
-                  <>
-                    <ImagePlus size={32} />
-                    <span style={{ fontWeight: 600, textAlign: 'center', fontFamily: 'DM Sans, sans-serif', fontSize: '0.85rem' }}>Upload Media</span>
-                    <input type="file" multiple accept="image/*,video/*" style={{ display: 'none' }} onChange={handleFileUpload} />
-                  </>
-                )}
-              </label>
+                {occasion.title || occasion.name}
+              </h1>
 
-              <button onClick={handleAddExternalLink} className="gallery-item" style={{
-                border: '2px dashed var(--purple-light)', background: 'rgba(107,63,160,0.05)',
-                cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center', color: 'var(--purple-light)', gap: '0.5rem', appearance: 'none'
-              }}>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <Youtube size={28} />
-                  <Facebook size={28} />
-                </div>
-                <span style={{ fontWeight: 600, textAlign: 'center', fontFamily: 'DM Sans, sans-serif', fontSize: '0.85rem' }}>Add Video Link</span>
-              </button>
-            </>
-          )}
-
-          {occasion.media?.map((src, i) => (
-            <div key={i} className="gallery-item" style={{ position: 'relative', overflow: 'hidden' }}>
-              {renderMedia(src)}
-              {isOwner && (
-                <button onClick={() => handleDeleteMedia(src)} style={{
-                  position: 'absolute', top: '8px', right: '8px',
-                  background: 'var(--danger)', color: 'white', border: 'none',
-                  borderRadius: '50%', width: '32px', height: '32px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', opacity: 0.9, zIndex: 10,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
-                }}>
-                  <Trash2 size={14} />
-                </button>
-              )}
+              <div
+                style={{
+                  fontFamily: 'Inter',
+                  fontSize: '1.05rem',
+                  lineHeight: 1.8,
+                  color: '#333333'
+                }}
+                dangerouslySetInnerHTML={{ __html: occasion.content || occasion.description }}
+              />
             </div>
-          ))}
+          )}
+        </div>
+
+        {/* Media Attachments */}
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ fontFamily: 'Libre Baskerville, serif', fontSize: '1.4rem', color: '#000' }}>
+              Media & Attachments
+            </h3>
+
+            {isOwner && (
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <label className="pill-btn pill-btn-outline pill-btn-sm" style={{ cursor: 'pointer' }}>
+                  <ImagePlus size={14} /> Upload Photos
+                  <input type="file" multiple accept="image/*,video/*" onChange={handleFileUpload} style={{ display: 'none' }} />
+                </label>
+                <button onClick={handleAddExternalLink} className="pill-btn pill-btn-outline pill-btn-sm">
+                  + Add Video Link
+                </button>
+              </div>
+            )}
+          </div>
+
+          {occasion.media && occasion.media.length > 0 ? (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '20px'
+            }}>
+              {occasion.media.map((item, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    height: '240px',
+                    borderRadius: '16px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    border: '1px solid #eee',
+                    background: '#000'
+                  }}
+                >
+                  {renderMedia(item)}
+                  {isOwner && (
+                    <button
+                      onClick={() => handleDeleteMedia(item)}
+                      style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        background: 'rgba(224,36,36,0.9)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: 30,
+                        height: 30,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                      title="Delete media"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ fontFamily: 'Inter', color: '#888', fontSize: '0.92rem' }}>
+              No additional photos attached to this occasion.
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -1,434 +1,843 @@
-import React, { useState, useEffect, useRef, Suspense } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Heart } from 'lucide-react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, useGLTF, Environment, Center, ContactShadows, Html, Text3D, GradientTexture, Float, Hud, PerspectiveCamera } from '@react-three/drei';
+import {
+  ArrowRight,
+  ArrowUp,
+  Star,
+  CheckCircle2,
+  MapPin,
+  Heart,
+  Calendar,
+} from 'lucide-react';
+import { InteractiveImageSlider } from '../components/InteractiveImageSlider';
+import { AlternatingSlideImage } from '../components/AlternatingSlideImage';
+import emailjs from '@emailjs/browser';
 
-// Module-level flags — persist across React re-renders and navigation
-let sessionSplashSeen = false;
+const SECTION3_IMAGES = [
+  '/gallery/azhudha_river_misty_valley.jpg',
+  '/gallery/anna_prasadam_cooking.jpg',
+  '/gallery/pilgrims_azhudha_trek.jpg',
+  '/gallery/heritage_temple_restoration.jpg',
+  '/gallery/anna_prasadam_service_camp.jpg',
+];
 
-class GLBErrorCatcher extends React.Component {
-  constructor(props) { super(props); this.state = { hasError: false }; }
-  static getDerivedStateFromError() { return { hasError: true }; }
-  render() { return this.state.hasError ? this.props.fallback : this.props.children; }
-}
+const SECTION4_IMAGES = [
+  '/gallery/pilgrims_azhudha_trek.jpg',
+  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM (2).jpeg',
+  '/gallery/anna_prasadam_service_camp.jpg',
+  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM.jpeg',
+];
 
-// Slow continuous rotation temple model
-const TempleModel = () => {
-  const group = useRef();
-  const gltf = useGLTF('/glb_view/temple.glb');
-  useFrame((state, delta) => {
-    if (group.current) {
-      group.current.rotation.y += delta * 0.12; // very slow, majestic
-    }
-  });
-  return (
-    <group ref={group}>
-      <Center>
-        <primitive object={gltf.scene} scale={1.5} />
-      </Center>
-    </group>
-  );
-};
+const SECTION5_IMAGES = [
+  '/gallery/heritage_temple_restoration.jpg',
+  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.18 PM.jpeg',
+  '/gallery/anna_prasadam_cooking.jpg',
+  '/flower/collage.jpg',
+];
 
-const PlaceholderTemple = () => {
-  const group = useRef();
-  useFrame((state, delta) => {
-    if (group.current) {
-      group.current.rotation.y += delta * 0.12;
-    }
-  });
-  return (
-    <group ref={group}>
-      <Center>
-        <mesh>
-          <boxGeometry args={[3, 3, 3]} />
-          <meshStandardMaterial color="#6B3FA0" wireframe />
-        </mesh>
-        <Html center position={[0, -2.5, 0]}>
-          <div style={{ whiteSpace: 'nowrap', background: '#1A0A2E', color: '#D4AF37', padding: '8px 16px', borderRadius: '8px', border: '1px solid #D4AF37', fontWeight: 'bold', fontFamily: 'Cinzel, serif' }}>
-            Add /glb_view/temple.glb
-          </div>
-        </Html>
-      </Center>
-    </group>
-  );
-};
+const CARD1_IMAGES = [
+  '/gallery/anna_prasadam_cooking.jpg',
+  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM.jpeg',
+  '/gallery/anna_prasadam_service_camp.jpg',
+];
 
-// Floating lotus particle
-const LotusParticle = ({ delay, x }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 100, x: x, rotate: 0 }}
-    animate={{ opacity: [0, 0.6, 0.3, 0], y: -200, rotate: 360 }}
-    transition={{ duration: 8 + Math.random() * 4, delay, repeat: Infinity, ease: 'linear' }}
-    style={{
-      position: 'absolute', bottom: 0, left: `${20 + Math.random() * 60}%`,
-      fontSize: '1.2rem', pointerEvents: 'none', zIndex: 5,
-      filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.4))'
-    }}
-  >
-    ✦
-  </motion.div>
-);
+const CARD2_IMAGES = [
+  '/gallery/heritage_temple_restoration.jpg',
+  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.18 PM.jpeg',
+  '/flower/collage.jpg',
+];
 
-// Sweeping light to create a slanting mirror-like reflection sweep left-to-right across the 3D text
-const MovingShineLight = () => {
-  const lightRef = useRef();
-  useFrame(({ clock }) => {
-    if (lightRef.current) {
-      // Progress from 0 to 1 over 2.5 seconds, repeating
-      const progress = (clock.getElapsedTime() / 2.5) % 1; 
-      
-      // Starts completely left (-8), moves to completely right (+8)
-      lightRef.current.position.x = -8 + (progress * 16);
-      
-      // Slants downwards from top (+3) to bottom (-3)
-      lightRef.current.position.y = 3 - (progress * 6);
-    }
-  });
-  return <pointLight ref={lightRef} position={[-8, 3, 1.5]} intensity={40} distance={20} decay={1.5} color="#FFFFFF" />;
-};
-
-// Sasta Trust Text inside HUD layer
-const FixedSastaText = () => {
-  const [hovered, setHovered] = useState(false);
-  const targetScale = hovered ? 1.05 : 1;
-  const group = useRef();
-
-  useFrame((state, delta) => {
-    if (group.current) {
-      group.current.scale.lerp({ x: targetScale, y: targetScale, z: targetScale }, delta * 8);
-    }
-  });
-
-  useEffect(() => {
-    document.body.style.cursor = hovered ? 'pointer' : 'auto';
-    return () => { document.body.style.cursor = 'auto'; };
-  }, [hovered]);
-
-  return (
-    <Center>
-      {/* Continuously floating up and down */}
-      <Float speed={3.5} rotationIntensity={0.05} floatIntensity={1.5}>
-        <group ref={group}>
-          <Text3D
-            font="https://unpkg.com/three@0.77.0/examples/fonts/helvetiker_bold.typeface.json"
-            size={1.2} height={0.3} curveSegments={12}
-            bevelEnabled bevelThickness={0.06} bevelSize={0.04} bevelOffset={0} bevelSegments={5}
-            onPointerOver={() => setHovered(true)}
-            onPointerOut={() => setHovered(false)}
-          >
-            Sasta Trust
-            {/* Front Face: Totally yellow only, mirror-like so the sweeping light reflects sharply */}
-            <meshStandardMaterial attach="material-0" color="#FFEA00" roughness={0.05} metalness={0.95} emissive="#554400" emissiveIntensity={0.2} />
-            {/* Sides/Bevel: Red shade completely */}
-            <meshStandardMaterial attach="material-1" color="#FF0000" roughness={0.3} metalness={0.8} emissive="#AA0000" emissiveIntensity={0.5} />
-          </Text3D>
-        </group>
-      </Float>
-    </Center>
-  );
-};
-
+const CARD3_IMAGES = [
+  '/gallery/anna_prasadam_service_camp.jpg',
+  '/gallery/pilgrims_azhudha_trek.jpg',
+  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM (1).jpeg',
+];
 
 export const Landing = () => {
-  // If splash already seen this session, skip entirely (state starts at 2)
-  const [splashState, setSplashState] = useState(() => sessionSplashSeen ? 2 : 0);
+  const [starRating, setStarRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [willReturn, setWillReturn] = useState('Yes');
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    seva: '',
+    message: ''
+  });
 
-  useEffect(() => {
-    if (sessionSplashSeen || splashState === 2) return;
-    const t1 = setTimeout(() => setSplashState(1), 2200);
-    const t2 = setTimeout(() => {
-      setSplashState(2);
-      sessionSplashSeen = true;
-    }, 4500);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [splashState]);
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name) {
+      alert('Please enter your name.');
+      return;
+    }
+    setSubmitting(true);
+
+    try {
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+      if (serviceId && templateId && publicKey) {
+        try {
+          await emailjs.send(
+            serviceId,
+            templateId,
+            {
+              from_name: formData.name,
+              from_email: formData.email || 'devotee@sastatrust.org',
+              phone: formData.phone,
+              rating: starRating,
+              likelihood: willReturn,
+              seva_interest: formData.seva,
+              message: formData.message
+            },
+            publicKey
+          );
+        } catch (mailErr) {
+          console.warn('EmailJS skipped:', mailErr);
+        }
+      }
+
+      setFormSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      setFormSubmitted(true);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
-    <div>
-      {/* SPLASH OVERLAY — only shown on very first visit */}
-      <AnimatePresence>
-        {splashState < 2 && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 1 } }}
-            style={{
-              position: 'fixed', inset: 0, zIndex: 9999,
-              background: 'linear-gradient(135deg, #1A0A2E 0%, #2D1B69 50%, #1A0A2E 100%)',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              overflow: 'hidden'
-            }}
-          >
-            {/* Decorative particles */}
-            {[...Array(12)].map((_, i) => (
-              <motion.div key={i}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: [0, 0.5, 0], scale: [0, 1, 0] }}
-                transition={{ duration: 3, delay: i * 0.3, repeat: Infinity }}
-                style={{
-                  position: 'absolute',
-                  top: `${10 + Math.random() * 80}%`,
-                  left: `${10 + Math.random() * 80}%`,
-                  width: 4, height: 4, borderRadius: '50%',
-                  background: '#D4AF37',
-                  boxShadow: '0 0 10px rgba(212,175,55,0.6)'
-                }}
-              />
-            ))}
+    <div style={{ backgroundColor: '#ffffff', color: '#000000', overflowX: 'hidden' }}>
 
-            {splashState === 0 && (
-              <motion.div
-                initial={{ scale: 0.2, opacity: 0, rotate: -30, filter: 'blur(10px)' }}
-                animate={{ scale: [1, 1.1, 1], opacity: 1, rotate: 0, filter: 'blur(0px)' }}
-                transition={{ duration: 1.2, ease: 'backOut', times: [0, 0.6, 1] }}
-                style={{
-                  width: 130, height: 130, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #D4AF37, #F4D03F)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 0 60px rgba(212,175,55,0.5), 0 0 120px rgba(212,175,55,0.2)',
-                  overflow: 'hidden', border: '3px solid rgba(255,255,255,0.3)'
-                }}
-              >
-                <img src="/sasta_logo.png" alt="Sasta Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://ui-avatars.com/api/?name=Sasta+Trust&background=D4AF37&color=1A0A2E'; }} />
-              </motion.div>
-            )}
+      <section id="home" className="trust-hero">
+        <div className="trust-hero-photo" aria-hidden="true" />
+        <div className="trust-hero-shade" />
+        <div className="trust-hero-content">
+          <p className="trust-eyebrow"><span /> Pilgrim support · Azhudha River, Kerala</p>
+          <h1>Meals and care<br /><em>for every pilgrim.</em></h1>
+          <p className="trust-hero-copy">Sasta Trust serves free meals and drinking water to pilgrims travelling the Sabarimala route. This work is made possible by volunteers and public support.</p>
+          <div className="trust-hero-actions">
+            <Link to="/donations" className="trust-button trust-button-gold">Support the seva <ArrowRight size={17} /></Link>
+            <Link to="/dashboard" className="trust-button trust-button-light"><Calendar size={17} /> Festival calendar</Link>
+          </div>
+          <div className="trust-hero-proof"><span className="trust-proof-mark"><CheckCircle2 size={18} /></span><span><strong>Free service for pilgrims</strong><small>Supported by volunteers and donors</small></span></div>
+        </div>
+        <div className="trust-hero-location"><MapPin size={15} /> Azhudha River · Kerala</div>
+      </section>
 
-            {splashState === 1 && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
-                <motion.div
-                  initial={{ scale: 1, opacity: 1 }}
-                  animate={{ scale: 0.6, y: -40, opacity: 0 }}
-                  transition={{ duration: 0.6, ease: 'anticipate' }}
-                  style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, #D4AF37, #F4D03F)', overflow: 'hidden' }}
-                >
-                  <img src="/sasta_logo.png" alt="Sasta Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://ui-avatars.com/api/?name=Sasta+Trust&background=D4AF37&color=1A0A2E'; }} />
-                </motion.div>
+      <section className="trust-impact-strip" aria-label="Sasta Trust at a glance">
+        <div><strong>Since 2012</strong><span>Serving pilgrims</span></div>
+        <div><strong>Free meals</strong><span>Prepared and served at the camp</span></div>
+        <div><strong>Drinking water</strong><span>Support along the pilgrimage route</span></div>
+        <Link to="/dashboard">Upcoming events <ArrowRight size={16} /></Link>
+      </section>
 
-                <motion.h1
-                  initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.8 }}
-                  style={{
-                    fontFamily: 'Cinzel, serif', fontSize: 'clamp(2rem, 8vw, 4rem)', fontWeight: 900,
-                    marginTop: '-1rem', letterSpacing: '0.08em',
-                    background: 'linear-gradient(135deg, #D4AF37 0%, #F4D03F 40%, #D4AF37 60%, #FFF8E7 80%, #D4AF37 100%)',
-                    backgroundSize: '200% auto',
-                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    animation: 'shimmer 3s linear infinite'
-                  }}
-                >
-                  SASTA TRUST
-                </motion.h1>
+      {/* =========================================================================
+          SECTION 2: EDITORIAL TITLE & MANIFESTO
+          ========================================================================= */}
+      <section id="manifesto" className="landing-section landing-pad-top-lg">
+        <div>
+          <h2 className="landing-title">
+            <span className="line-left">Practical care for</span>
+            <span className="line-indented">pilgrims on the route</span>
+          </h2>
 
-                <motion.p
-                  initial={{ opacity: 0, width: 0 }}
-                  animate={{ opacity: 1, width: 'auto' }}
-                  transition={{ delay: 0.3, duration: 1.2 }}
-                  style={{
-                    fontFamily: 'Crimson Pro, serif', fontStyle: 'italic',
-                    fontSize: 'clamp(0.9rem, 3vw, 1.2rem)', color: 'rgba(212,175,55,0.8)',
-                    letterSpacing: '0.06em', whiteSpace: 'nowrap', overflow: 'hidden',
-                    borderTop: '1px solid rgba(212,175,55,0.3)', paddingTop: '0.75rem', marginTop: '0.75rem'
-                  }}
-                >
-                  A Journey Towards Spiritual Enlightenment
-                </motion.p>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ====== HERO SECTION with 3D ====== */}
-      <motion.div
-        initial={{ opacity: sessionSplashSeen ? 1 : 0 }}
-        animate={{ opacity: splashState === 2 ? 1 : 0 }}
-        transition={{ duration: sessionSplashSeen ? 0 : 1, delay: sessionSplashSeen ? 0 : 0.2 }}
-        style={{
-          position: 'relative', width: '100%', minHeight: '100vh',
-          background: 'linear-gradient(180deg, #1A0A2E 0%, #2D1B69 30%, #1A0A2E 100%)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          zIndex: 10, overflow: 'hidden'
-        }}
-      >
-        {/* Floating lotus particles */}
-        {[...Array(6)].map((_, i) => (
-          <LotusParticle key={i} delay={i * 1.5} x={Math.random() * 20 - 10} />
-        ))}
-
-        {/* Mandala bg glow */}
-        <div style={{
-          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          width: '80vmin', height: '80vmin', borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(212,175,55,0.05) 0%, rgba(45,27,105,0.02) 50%, transparent 70%)',
-          pointerEvents: 'none'
-        }} />
-
-        {/* 3D Canvas — temple model only */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-          <Suspense fallback={
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div className="loader" style={{ width: 60, height: 60 }} />
-            </div>
-          }>
-            <Canvas camera={{ position: [0, 2, 8], fov: 45 }}>
-              <ambientLight intensity={0.4} />
-              <directionalLight position={[10, 10, 5]} intensity={1.2} color="#FFF8E7" />
-              <pointLight position={[-5, 5, -5]} intensity={0.5} color="#D4AF37" />
-              <Environment preset="sunset" />
-              <GLBErrorCatcher fallback={<PlaceholderTemple />}>
-                <TempleModel />
-              </GLBErrorCatcher>
-              
-              <OrbitControls enableZoom={true} minDistance={3} maxDistance={15} enablePan={false} autoRotate={false} makeDefault />
-              <ContactShadows position={[0, -2.5, 0]} opacity={0.4} scale={20} blur={2.5} far={4} color="#1A0A2E" />
-
-              {/* FIXED HUD LAYER — Always in front, ignores background OrbitControls */}
-              <Hud renderPriority={1}>
-                <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={45} />
-                <ambientLight intensity={0.4} />
-                <Environment preset="city" /> {/* Critical for mirror-like reflections on metal */}
-                <directionalLight position={[10, 10, 10]} intensity={2} color="#FFF8E7" />
-                <MovingShineLight /> {/* The sweeping "mirror shine" animation */}
-                <FixedSastaText />
-              </Hud>
-            </Canvas>
-          </Suspense>
+          <div className="landing-sub-kicker">
+            PILGRIM SUPPORT<br />
+            AT AZHUDHA RIVER
+          </div>
         </div>
 
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ scale: 0.9, opacity: sessionSplashSeen ? 1 : 0, y: sessionSplashSeen ? 0 : 50 }}
-          animate={{ scale: splashState === 2 ? 1 : 0.9, opacity: splashState === 2 ? 1 : 0, y: splashState === 2 ? 0 : 50 }}
-          transition={{ delay: sessionSplashSeen ? 0 : 1.5, duration: 0.8, type: 'spring' }}
-          style={{
-            position: 'absolute', bottom: 'clamp(4%, 6vh, 10%)',
-            display: 'flex', gap: 'clamp(0.75rem, 2vw, 1.5rem)',
-            justifyContent: 'center', flexWrap: 'wrap', zIndex: 12,
-            background: 'rgba(26, 10, 46, 0.6)', padding: 'clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 3vw, 2.5rem)',
-            borderRadius: '50px', backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(212,175,55,0.2)',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-          }}
-        >
-          <Link to="/dashboard" style={{
-            padding: 'clamp(0.6rem, 1.5vw, 0.9rem) clamp(1rem, 3vw, 2rem)',
-            fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', borderRadius: '30px',
-            background: 'linear-gradient(135deg, #D4AF37, #F4D03F)', color: '#1A0A2E',
-            fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem',
-            textDecoration: 'none', fontFamily: 'DM Sans, sans-serif',
-            letterSpacing: '0.05em', textTransform: 'uppercase',
-            boxShadow: '0 4px 20px rgba(212,175,55,0.4)',
-            transition: 'all 0.3s ease'
-          }}>
-            Explore Festivals <ArrowRight size={18} />
-          </Link>
-          <Link to="/donate" style={{
-            padding: 'clamp(0.6rem, 1.5vw, 0.9rem) clamp(1rem, 3vw, 2rem)',
-            fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', borderRadius: '30px',
-            background: 'transparent', color: '#D4AF37',
-            border: '2px solid rgba(212,175,55,0.5)',
-            fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem',
-            textDecoration: 'none', fontFamily: 'DM Sans, sans-serif',
-            letterSpacing: '0.05em', textTransform: 'uppercase',
-            transition: 'all 0.3s ease'
-          }}>
-            <Heart size={18} /> Support the Cause
-          </Link>
-        </motion.div>
-      </motion.div>
+        <h3 className="landing-heading-secondary">
+          Volunteers prepare and serve meals, provide drinking water, and help pilgrims rest during their journey.
+        </h3>
+      </section>
 
-      {/* ====== ABOUT + CONTACT SECTION ====== */}
-      <div className="sacred-border" style={{ background: 'var(--bg-primary)' }}>
-        <div className="container" style={{ maxWidth: 900, margin: '0 auto', padding: 'clamp(2.5rem, 5vw, 5rem) clamp(16px, 4vw, 24px)' }}>
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(2rem, 4vw, 4rem)', alignItems: 'center', marginBottom: 'clamp(2.5rem, 5vw, 5rem)' }}
-          >
-            <div>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold-primary)', fontWeight: 600, marginBottom: '0.75rem' }}>
-                Est. — 14th Year of Seva
+      {/* =========================================================================
+          SECTION 3: PANORAMIC STRIP BANNER WITH INTERACTIVE IMAGE SLIDER
+          (Displays large image, mouse left = left arrow, mouse right = right arrow,
+           smooth sliding, small dots at bottom, cursor follower, auto-loops every 3s)
+          ========================================================================= */}
+      <section style={{ width: '100%', marginTop: '90px' }}>
+        <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 5%' }}>
+          <InteractiveImageSlider
+            images={SECTION3_IMAGES}
+            height="500px"
+            borderRadius="18px"
+          />
+        </div>
+
+        <div className="landing-section">
+          {/* Top-Right Caption Underneath Banner */}
+          <div className="landing-caption-right">
+            <p className="landing-caption-text">
+              Seva Camp: Mundakayam Pambavalley Road, Near Azhudha River, Kerala.<br />
+              Photography &amp; Archive: Sasta Trust Devotee Samiti, 2026
+            </p>
+          </div>
+
+          {/* Left Narrative and Action */}
+          <div className="editorial-paragraphs">
+            <p>
+              Sasta Trust restages the sacred tradition of Anna Prasadam on the Sabarimala trekking corridor as an immersive devotional service — blending spiritual reverence with transparent stewardship. Fourteen unbroken years of selfless service along the Azhudha River corridor stand as testament to the collective will of thousands of devotees.
+            </p>
+
+            <p>
+              Pilgrims trekking through the rugged forest terrain of Kerala are blessed with freshly prepared wholesome meals, pure drinking water, and sacred respite at every step of their journey. No devotee is turned away. No act of service is too small.
+            </p>
+
+            <Link
+              to="/donations"
+              className="pill-base pill-black"
+              style={{ marginTop: '16px' }}
+            >
+              Explore the panorama <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+
+      {/* =========================================================================
+          SECTION 4: 14 YEARS OF SACRED SERVICE
+          ========================================================================= */}
+      <section className="landing-section landing-pad-top-lg">
+        <div className="editorial-grid-2col">
+          <div>
+            <h2 className="editorial-heading">
+              Fourteen Unbroken Years of Devoted Service
+            </h2>
+
+            <div className="editorial-paragraphs" style={{ maxWidth: '100%' }}>
+              <p>
+                With the divine blessings of Lord Dharma Sasta, Sasta Trust has maintained an unbroken chain of devotional service since 2012. Founded on the conviction that <em>"Seva is Worship — Service is Tradition"</em>, the trust established a permanent camp along the arduous trekking route near the Azhudha River, Kerala.
               </p>
-              <h2 style={{ fontFamily: 'Cinzel, serif', fontSize: 'clamp(1.3rem, 3vw, 2rem)', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.03em', margin: '0 0 1.25rem', lineHeight: 1.3 }}>
-                Anna Prasadam Seva
-              </h2>
-              <p style={{ fontFamily: 'Crimson Pro, serif', fontStyle: 'italic', fontSize: 'clamp(0.9rem, 2vw, 1.05rem)', color: 'var(--text-secondary)', lineHeight: 1.9, margin: 0 }}>
-                Thousands of pilgrims are blessed with Anna Prasadam on the sacred trekking route near the Azhudha River, Mundakayam Pambavalley Road, Kerala. We serve with love and devotion every single year, without fail.
+
+              <p>
+                From humble beginnings under simple rain shelters, the seva has grown into a comprehensive operation nourishing tens of thousands of pilgrims during each Mandala-Makaravilakku season. Every meal is prepared fresh, with wholesome ingredients, and offered with sacred reverence as prasadam of the Lord.
               </p>
             </div>
-            <div style={{
-              padding: 'clamp(1.5rem, 3vw, 2.5rem)', background: 'linear-gradient(135deg, var(--purple-dark), var(--purple-royal))',
-              borderRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden'
+          </div>
+
+          <div>
+            <AlternatingSlideImage
+              images={SECTION4_IMAGES}
+              height="420px"
+              borderRadius="16px"
+              alt="Lord Dharma Sasta Seva Camp at Azhudha River"
+            />
+            <p style={{
+              fontFamily: 'Inter',
+              fontSize: '13px',
+              fontStyle: 'italic',
+              color: '#666666',
+              marginTop: '12px'
             }}>
-              <div style={{
-                position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
-                width: 80, height: 4, background: 'linear-gradient(90deg, #D4AF37, #F4D03F)', borderRadius: '0 0 4px 4px'
-              }} />
-              <p style={{ fontFamily: 'Cinzel, serif', fontSize: 'clamp(1.1rem, 3vw, 1.5rem)', fontWeight: 700, color: '#D4AF37', margin: '0 0 0.75rem', lineHeight: 1.4, letterSpacing: '0.04em' }}>
-                Swamy Sharanam Ayyappa
-              </p>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.82rem', color: 'rgba(212,175,55,0.7)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, margin: '0 0 1rem' }}>
-                Seva is Worship · Service is Tradition
-              </p>
-              <div style={{ height: 1, background: 'rgba(212,175,55,0.2)', marginBottom: '1rem' }} />
-              <p style={{ fontFamily: 'Crimson Pro, serif', fontStyle: 'italic', fontSize: '0.95rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, margin: 0 }}>
-                With the blessings of Lord Dharma Sasta, Sasta Trust continues its humble journey of devotion and service to all.
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Contact */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
-              <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, transparent, var(--gold-primary), transparent)' }} />
-              <p style={{ fontFamily: 'Cinzel, serif', fontSize: '0.82rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold-dark)', fontWeight: 700, margin: 0, whiteSpace: 'nowrap' }}>
-                Get In Touch
-              </p>
-              <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, transparent, var(--gold-primary), transparent)' }} />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-              {[
-                { label: 'Email', value: 'sastatrust@gmail.com', href: 'mailto:sastatrust@gmail.com' },
-                { label: 'Phone', value: '+91 93916 72398', href: 'tel:+919391672398' },
-                { label: 'Location', value: 'Near Azhudha River, Kerala', href: 'https://maps.google.com/?q=Azhudha+River+Kerala' },
-              ].map(c => (
-                <a key={c.label} href={c.href} target={c.label === 'Location' ? '_blank' : undefined} rel="noreferrer"
-                  style={{
-                    display: 'block', padding: '1.25rem 1.25rem', background: 'white',
-                    border: '1px solid var(--bg-tertiary)', borderRadius: 'var(--radius-md)',
-                    borderBottom: '3px solid transparent',
-                    textDecoration: 'none', transition: 'all 0.2s'
-                  }}
-                  onMouseOver={e => { e.currentTarget.style.borderBottomColor = 'var(--gold-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-gold)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                  onMouseOut={e => { e.currentTarget.style.borderBottomColor = 'transparent'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)'; }}
-                >
-                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-tertiary)', fontWeight: 600, margin: '0 0 0.4rem' }}>
-                    {c.label}
-                  </p>
-                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 'clamp(0.78rem, 2vw, 0.9rem)', color: 'var(--purple-royal)', fontWeight: 600, margin: 0, wordBreak: 'break-word' }}>
-                    {c.value}
-                  </p>
-                </a>
-              ))}
-            </div>
-          </motion.div>
-
+              Lord Dharma Sasta Seva Camp — Pilgrims receiving Anna Prasadam along the Azhudha River trekking route, Kerala.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
+
+
+      {/* =========================================================================
+          SECTION 5: TEMPLE RESTORATION & HERITAGE REVIVAL
+          ========================================================================= */}
+      <section className="landing-section landing-pad-top-lg">
+        <div className="editorial-grid-2col">
+          <div>
+            <AlternatingSlideImage
+              images={SECTION5_IMAGES}
+              height="420px"
+              borderRadius="16px"
+              alt="Heritage Temple Restoration and Sacred Mahaprasadam"
+            />
+            <p style={{
+              fontFamily: 'Inter',
+              fontSize: '13px',
+              fontStyle: 'italic',
+              color: '#666666',
+              marginTop: '12px'
+            }}>
+              Restoration of ancient heritage temples &amp; continuous sacred rituals &copy; Sasta Trust Seva Samiti
+            </p>
+          </div>
+
+          <div>
+            <h2 className="editorial-heading">
+              Heritage Temple Restoration &amp; Dharma-Sevak Support
+            </h2>
+
+            <div className="editorial-paragraphs" style={{ maxWidth: '100%' }}>
+              <p>
+                <strong>Ancient Temple Maintenance &amp; Restoration:</strong> Sasta Trust is deeply committed to preserving heritage shrines and neglected sacred sanctuaries. We restore ancient structures, rebuild sacred sanctums, and ensure continuous daily pujas in communities that have lost access to consistent ritual care.
+              </p>
+
+              <p>
+                <strong>Monthly Remunerations for Temple Dharma-Sevaks:</strong> Devoted priests, traditional musicians, and temple caretakers who uphold ancient Vedic traditions receive dignified, consistent sustenance — so that sacred rituals may continue without interruption for generations to come.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* =========================================================================
+          SECTION 6: THE SEVEN SACRED CAUSES
+          ========================================================================= */}
+      <section id="seva-causes" className="landing-section landing-pad-top-lg">
+        <div className="landing-sub-kicker" style={{ marginTop: 0, marginBottom: '20px' }}>
+          SEVEN CAUSES OF DEVOTION
+        </div>
+
+        <h2 style={{
+          fontFamily: 'Libre Baskerville, serif',
+          fontSize: 'clamp(2.8rem, 6.5vw, 5.2rem)',
+          fontWeight: 400,
+          lineHeight: 1.1,
+          letterSpacing: '-0.02em',
+          color: '#000000',
+          marginBottom: '35px'
+        }}>
+          The <span style={{ fontStyle: 'italic' }}>sacred</span> causes<br />
+          of the seva
+        </h2>
+
+        <div className="editorial-paragraphs">
+          <p>
+            From the misty banks of the Azhudha River in Kerala to heritage shrines across southern India, Sasta Trust guides a comprehensive journey of devotion, dignity, and humanitarian service. Devotees worldwide may participate directly, sponsor Prasadam services, or contribute to elderly welfare and pilgrimage support.
+          </p>
+
+          <p>
+            For enquiries and participation: <a href="mailto:sastatrust@gmail.com" style={{ textDecoration: 'underline' }}>sastatrust@gmail.com</a> &middot; <a href="tel:+919391672398" style={{ textDecoration: 'underline' }}>+91 93916 72398</a><br />
+            Seva Location: Near Azhudha River, Mundakayam Pambavalley Road, Kerala.
+          </p>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '30px' }}>
+            <Link
+              to="/donations"
+              className="pill-base pill-black"
+            >
+              View all seva causes <ArrowRight size={16} />
+            </Link>
+            <span style={{ fontFamily: 'Inter', fontSize: '15px', color: '#666' }}>
+              7 Sacred Causes
+            </span>
+          </div>
+        </div>
+      </section>
+
+
+      {/* =========================================================================
+          SECTION 7: THREE PRINCIPAL SEVA PROGRAMS
+          ========================================================================= */}
+      <section id="calendar-exhibition" className="landing-section landing-pad-top-md">
+        <h2 style={{
+          fontFamily: 'Libre Baskerville, serif',
+          fontSize: 'clamp(2rem, 3.8vw, 2.8rem)',
+          fontWeight: 400,
+          color: '#000000'
+        }}>
+          Principal Seva Programmes
+        </h2>
+
+        <div className="cards-grid-3col">
+          {/* Card 1 */}
+          <div>
+            <AlternatingSlideImage
+              images={CARD1_IMAGES}
+              height="220px"
+              borderRadius="12px"
+              style={{ marginBottom: '18px' }}
+              alt="Anna Prasadam Seva"
+            />
+            <div className="story-card-num">1.</div>
+            <h3 className="story-card-title">
+              Yearly Anna Prasadam Seva — Kerala
+            </h3>
+            <p className="story-card-desc">
+              Thousands of pilgrims are blessed with Anna Prasadam on the sacred trekking route near the Azhudha River, Mundakayam Pambavalley Road, Kerala. Served with devotion without fail, every single year.
+            </p>
+
+            <Link
+              to="/donations"
+              className="pill-base pill-black"
+              style={{ padding: '8px 18px', fontSize: '14px', marginBottom: '24px' }}
+            >
+              <Heart size={12} /> &nbsp;Contribute to this Seva
+            </Link>
+
+            <div className="story-card-chapter">
+              <span>1.1. Anna Prasadam on the Azhudha Trekking Route</span>
+              <ArrowRight size={14} color="#666" />
+            </div>
+            <div className="story-card-chapter">
+              <span>1.2. Devotee Meal Sponsorship</span>
+              <ArrowRight size={14} color="#666" />
+            </div>
+          </div>
+
+          {/* Card 2 */}
+          <div>
+            <AlternatingSlideImage
+              images={CARD2_IMAGES}
+              height="220px"
+              borderRadius="12px"
+              style={{ marginBottom: '18px' }}
+              alt="Heritage Temple Restoration"
+            />
+            <div className="story-card-num">2.</div>
+            <h3 className="story-card-title">
+              Heritage Temple Restoration &amp; Dharma-Sevak Support
+            </h3>
+            <p className="story-card-desc">
+              Preserving and revitalizing heritage temples for future generations. Supporting dharma-sevaks with monthly remunerations so ancient Vedic rituals continue uninterrupted.
+            </p>
+
+            <Link
+              to="/donations"
+              className="pill-base pill-black"
+              style={{ padding: '8px 18px', fontSize: '14px', marginBottom: '24px' }}
+            >
+              <Heart size={12} /> &nbsp;Contribute to this Seva
+            </Link>
+
+            <div className="story-card-chapter">
+              <span>2.1. Ancient Shrine Restoration</span>
+              <ArrowRight size={14} color="#666" />
+            </div>
+            <div className="story-card-chapter">
+              <span>2.2. Dharma-Sevak Monthly Remuneration</span>
+              <ArrowRight size={14} color="#666" />
+            </div>
+          </div>
+
+          {/* Card 3 */}
+          <div>
+            <AlternatingSlideImage
+              images={CARD3_IMAGES}
+              height="220px"
+              borderRadius="12px"
+              style={{ marginBottom: '18px' }}
+              alt="Pilgrimage & Humanitarian Care"
+            />
+            <div className="story-card-num">3.</div>
+            <h3 className="story-card-title">
+              Pilgrimage Sponsorship, Elderly Care &amp; Kanyadanam
+            </h3>
+            <p className="story-card-desc">
+              Ensuring no devotee is deprived of Sabarimala darshan due to financial constraints. Dedicated care for the elderly and Kanyadanam in honour of daughters of needy Vedic families.
+            </p>
+
+            <Link
+              to="/donations"
+              className="pill-base pill-black"
+              style={{ padding: '8px 18px', fontSize: '14px', marginBottom: '24px' }}
+            >
+              <Heart size={12} /> &nbsp;Contribute to this Seva
+            </Link>
+
+            <div className="story-card-chapter">
+              <span>3.1. Sabarimala Pilgrimage Sponsorship</span>
+              <ArrowRight size={14} color="#666" />
+            </div>
+            <div className="story-card-chapter">
+              <span>3.2. Elderly Welfare &amp; Kanyadanam</span>
+              <ArrowRight size={14} color="#666" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* =========================================================================
+          SECTION 8: CONTACT FORM + FOOTER WRAPPER
+          White card overlapping dark navy footer
+          ========================================================================= */}
+      <section id="contact" style={{ marginTop: '130px' }}>
+        <div className="feedback-card-wrapper">
+          <div className="feedback-card">
+            <h2 className="feedback-card-title">
+              Connect with Sasta Trust
+            </h2>
+            <p className="feedback-card-sub">
+              Share your message of devotion, enquire about seva participation, or offer your counsel.
+            </p>
+
+            {formSubmitted ? (
+              <div style={{
+                textAlign: 'center',
+                padding: '40px 20px',
+                background: '#f0fdf4',
+                borderRadius: '16px',
+                border: '1px solid #bbf7d0'
+              }}>
+                <CheckCircle2 size={44} color="#16a34a" style={{ margin: '0 auto 12px' }} />
+                <h3 style={{ fontFamily: 'Libre Baskerville', color: '#166534', fontSize: '1.35rem', marginBottom: '6px' }}>
+                  Swamy Sharanam! Message Received.
+                </h3>
+                <p style={{ fontFamily: 'Inter', color: '#15803d', fontSize: '0.95rem' }}>
+                  Your message has been received with gratitude. The Sasta Trust team will respond at the earliest.
+                </p>
+                <button
+                  onClick={() => setFormSubmitted(false)}
+                  className="pill-base pill-black"
+                  style={{ marginTop: '16px', padding: '8px 20px', fontSize: '14px' }}
+                >
+                  Send Another Message
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleContactSubmit}>
+                {/* Devotion Rating */}
+                <div style={{ marginBottom: '28px' }}>
+                  <label style={{ display: 'block', fontFamily: 'Inter', fontSize: '15px', color: '#333333', marginBottom: '10px' }}>
+                    How would you rate your experience with Sasta Trust? *
+                  </label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setStarRating(star)}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
+                      >
+                        <Star
+                          size={32}
+                          fill={(hoverRating || starRating) >= star ? '#FBBF24' : 'none'}
+                          color={(hoverRating || starRating) >= star ? '#FBBF24' : '#D1D5DB'}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Seva Interest & Return Likelihood */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: '24px',
+                  marginBottom: '24px'
+                }}>
+                  <div>
+                    <textarea
+                      placeholder="Which seva cause interests you most? (Anna Prasadam, Temple Restoration, Pilgrimage Sponsorship…)"
+                      rows={4}
+                      value={formData.seva}
+                      onChange={(e) => setFormData({ ...formData, seva: e.target.value })}
+                      className="input-box"
+                      style={{ resize: 'vertical' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontFamily: 'Inter', fontSize: '15px', color: '#333333', marginBottom: '12px' }}>
+                      Would you like to receive seva updates?
+                    </label>
+                    {['Yes', 'No', 'Perhaps'].map((opt) => (
+                      <label
+                        key={opt}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          marginBottom: '10px',
+                          cursor: 'pointer',
+                          fontFamily: 'Inter',
+                          fontSize: '15px',
+                          color: '#444444'
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="willReturn"
+                          value={opt}
+                          checked={willReturn === opt}
+                          onChange={() => setWillReturn(opt)}
+                          style={{ accentColor: '#101625', width: 16, height: 16 }}
+                        />
+                        {opt}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Name */}
+                <div style={{ marginBottom: '24px' }}>
+                  <input
+                    type="text"
+                    placeholder="Your Name *"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="input-box"
+                  />
+                </div>
+
+                <p style={{ fontFamily: 'Inter', fontSize: '15px', color: '#666666', marginBottom: '12px' }}>
+                  Leave your contact details for a personal response.
+                </p>
+
+                {/* Email & Phone */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                  gap: '20px',
+                  marginBottom: '24px'
+                }}>
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="input-box"
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="input-box"
+                  />
+                </div>
+
+                {/* Message */}
+                <div style={{ marginBottom: '28px' }}>
+                  <textarea
+                    placeholder="Your message, prayer, or enquiry…"
+                    rows={4}
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="input-box"
+                    style={{ resize: 'vertical' }}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="pill-base"
+                  style={{
+                    backgroundColor: '#101625',
+                    color: '#ffffff',
+                    padding: '14px 32px'
+                  }}
+                >
+                  {submitting ? 'Sending\u2026' : 'Send Message \u2192'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+
+
+        {/* =========================================================================
+            SECTION 9: MASTER FOOTER WITH ARCHITECTURAL SVG BACKGROUND
+            Exact Holmenkollen360.com style with geometric facets & sacred geometry SVG
+            ========================================================================= */}
+        <footer id="footer-credits" className="navy-footer">
+          {/* Architectural SVG Background — Geometric Aperture Facets, Topographic River Curves & Sacred Geometry */}
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 1440 800"
+              preserveAspectRatio="xMidYMid slice"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+            >
+              <defs>
+                <linearGradient id="facetGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" stopOpacity="0.06" />
+                  <stop offset="100%" stopColor="#ffffff" stopOpacity="0.01" />
+                </linearGradient>
+                <linearGradient id="facetGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#d4af37" stopOpacity="0.08" />
+                  <stop offset="100%" stopColor="#d4af37" stopOpacity="0" />
+                </linearGradient>
+                <pattern id="sacredGrid" width="64" height="64" patternUnits="userSpaceOnUse">
+                  <path d="M 64 0 L 0 0 0 64" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="1" />
+                  <circle cx="32" cy="32" r="1.5" fill="rgba(212,175,55,0.08)" />
+                </pattern>
+              </defs>
+
+              {/* Architectural Dot Grid */}
+              <rect width="100%" height="100%" fill="url(#sacredGrid)" />
+
+              {/* Left-side Geometric Polygon Facets (Exact Reference Style) */}
+              <polygon points="110,80 250,25 370,105 350,265 210,320 70,240" fill="url(#facetGrad1)" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" />
+              <polygon points="140,110 250,65 340,130 320,245 220,285 115,225" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+              <circle cx="230" cy="180" r="75" stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray="4 4" />
+              <circle cx="230" cy="180" r="45" stroke="rgba(212,175,55,0.08)" strokeWidth="1" />
+
+              {/* Right-side Geometric Polygons */}
+              <polygon points="1120,160 1260,90 1400,170 1380,340 1240,410 1100,330" fill="url(#facetGrad2)" stroke="rgba(212,175,55,0.09)" strokeWidth="1.5" />
+              <polygon points="1150,190 1260,130 1370,195 1350,320 1250,375 1140,315" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+              <circle cx="1250" cy="255" r="80" stroke="rgba(212,175,55,0.07)" strokeWidth="1" strokeDasharray="5 5" />
+
+              {/* Central Sacred Yantra Mandala Watermark */}
+              <g transform="translate(720, 440)" opacity="0.055">
+                <circle r="230" stroke="#d4af37" strokeWidth="1.5" />
+                <circle r="190" stroke="#ffffff" strokeWidth="1" strokeDasharray="6 4" />
+                <circle r="150" stroke="#d4af37" strokeWidth="1.5" />
+                <circle r="110" stroke="#ffffff" strokeWidth="1" />
+                <polygon points="0,-150 130,75 -130,75" stroke="#d4af37" strokeWidth="1.5" fill="none" />
+                <polygon points="0,150 130,-75 -130,-75" stroke="#d4af37" strokeWidth="1.5" fill="none" />
+                <polygon points="0,-190 165,95 -165,95" stroke="#ffffff" strokeWidth="1" fill="none" />
+                <polygon points="0,190 165,-95 -165,-95" stroke="#ffffff" strokeWidth="1" fill="none" />
+              </g>
+
+              {/* Flowing Azhudha River Topographic Contours */}
+              <path d="M-50,630 C 300,560 620,700 960,600 C 1220,530 1370,660 1500,620" stroke="rgba(255,255,255,0.04)" strokeWidth="2" fill="none" />
+              <path d="M-50,670 C 280,600 640,740 990,640 C 1240,580 1390,700 1500,660" stroke="rgba(212,175,55,0.05)" strokeWidth="1.5" fill="none" />
+              <path d="M-50,710 C 260,640 660,780 1020,680 C 1260,620 1410,740 1500,700" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
+            </svg>
+          </div>
+
+          {/* Top Banner Statement */}
+          <div className="footer-top-banner" style={{ position: 'relative', zIndex: 1 }}>
+            <h3>
+              All seva is performed locally and<br />
+              sustained by devotion worldwide.
+            </h3>
+          </div>
+
+          {/* 3 Columns */}
+          <div className="footer-columns-wrap">
+
+            {/* Column 1: Brand Mark (vertical, like Holmenkollen logo) + Email Pill */}
+            <div>
+              <div style={{ marginBottom: '28px' }}>
+                <img
+                  src="/sasta_logo.png"
+                  alt="Sasta Trust"
+                  style={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: '50%',
+                    background: '#ffffff',
+                    padding: '3px',
+                    display: 'block',
+                    marginBottom: '16px'
+                  }}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+                <div style={{
+                  fontFamily: 'Inter',
+                  fontWeight: 800,
+                  fontSize: '1.5rem',
+                  letterSpacing: '0.07em',
+                  lineHeight: 1.0,
+                  textTransform: 'uppercase',
+                  color: '#ffffff'
+                }}>
+                  SASTA TRUST
+                </div>
+                <div style={{
+                  fontFamily: 'Inter',
+                  fontSize: '0.72rem',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.5)',
+                  marginTop: '5px'
+                }}>
+                  Est. 2012 — 14th Year of Seva — Kerala
+                </div>
+                <div style={{
+                  fontFamily: 'Libre Baskerville, serif',
+                  fontStyle: 'italic',
+                  fontSize: '0.9rem',
+                  color: 'rgba(255,255,255,0.4)',
+                  marginTop: '8px'
+                }}>
+                  — Azhudha River —
+                </div>
+              </div>
+
+              <p style={{
+                fontFamily: 'Inter',
+                fontSize: '14px',
+                color: 'rgba(255,255,255,0.58)',
+                lineHeight: 1.65,
+                marginBottom: '28px',
+                maxWidth: '340px'
+              }}>
+                Dedicated to sacred Anna Prasadam Seva near Azhudha River, Kerala, and the revitalization of ancient heritage temples.
+              </p>
+
+              {/* Outline Email Pill — exact Holmenkollen style */}
+              <a
+                href="mailto:sastatrust@gmail.com"
+                className="footer-email-pill"
+              >
+                sastatrust@gmail.com
+              </a>
+            </div>
+
+            {/* Column 2: ADDRESS */}
+            <div>
+              <div className="footer-heading">ADDRESS</div>
+              <div style={{ fontFamily: 'Inter', fontSize: '15px', color: 'rgba(255,255,255,0.72)', lineHeight: 1.75 }}>
+                <strong style={{ color: '#ffffff', display: 'block', marginBottom: '2px' }}>Sasta Trust Seva Camp</strong>
+                Mundakayam Pambavalley Road<br />
+                Near Azhudha River, Kerala<br /><br />
+                <strong style={{ color: '#ffffff', display: 'block', marginBottom: '2px' }}>Registered Trust Office:</strong>
+                G-04, Sai Nilayam Apartments<br />
+                Saptarishi Nagar, Hyderabad – 500 088<br /><br />
+                <strong style={{ color: '#ffffff' }}>Phone: </strong>
+                <a href="tel:+919391672398" style={{ color: 'rgba(255,255,255,0.85)', textDecoration: 'underline' }}>
+                  +91 93916 72398
+                </a>
+              </div>
+            </div>
+
+            {/* Column 3: INFORMATION */}
+            <div>
+              <div className="footer-heading">INFORMATION</div>
+              <ul className="footer-links-list">
+                <li><Link to="/dashboard">Festivals &amp; Sacred Calendar</Link></li>
+                <li><Link to="/donations">Support Our Causes</Link></li>
+                <li><a href="mailto:sastatrust@gmail.com">Contact Us</a></li>
+                <li><Link to="/donations">Donation &amp; Receipt Policy</Link></li>
+                <li><Link to="/donations">Seva Participation</Link></li>
+                <li><Link to="/dashboard">About the Trust</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Copyright Bar */}
+          <div className="footer-bottom-bar">
+            <div>
+              <p style={{ fontFamily: 'Inter', fontSize: '13px', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+                &copy; 2025 &ndash; 2026 Sasta Trust &middot; All rights reserved
+              </p>
+              <p style={{ fontFamily: 'Libre Baskerville', fontStyle: 'italic', fontSize: '13px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>
+                &#10022; Swamy Sharanam Ayyappa! &#10022; Seva is Worship &middot; Service is Tradition
+              </p>
+            </div>
+
+            <button
+              onClick={scrollToTop}
+              className="back-to-top-red"
+              title="Back to Top"
+            >
+              <ArrowUp size={20} />
+            </button>
+          </div>
+        </footer>
+      </section>
     </div>
   );
 };
