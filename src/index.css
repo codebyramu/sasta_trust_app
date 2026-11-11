@@ -810,6 +810,7 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
   align-items: center;
   gap: clamp(36px, 6vw, 82px);
   padding: clamp(42px, 6.5vw, 82px) max(6%, calc((100vw - 1200px) / 2));
+  min-height: calc(100svh - 40px);
   overflow: hidden;
   background: #f5f3ed;
   color: var(--trust-navy);
@@ -918,13 +919,16 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
   .trust-hero-actions { margin-top: 21px; }
   .trust-hero-proof { margin-top: 20px; }
   .trust-hero-visual { width: 100%; max-height: 310px; aspect-ratio: 1.5; }
-  .trust-impact-strip { grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 20px 22px; }
-  .trust-impact-strip > div { padding-left: 12px; }
-  .trust-impact-strip > a { justify-self: start; grid-column: 1 / -1; padding-left: 12px; }
+  .trust-impact-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; padding: 18px 12px; }
+  .trust-impact-strip > div { min-width: 0; min-height: 48px; padding: 0 8px; }
+  .trust-impact-strip > div:first-child { padding-left: 4px; }
+  .trust-impact-strip strong { font-size: .85rem; }
+  .trust-impact-strip span { font-size: .64rem; line-height: 1.35; }
+  .trust-impact-strip > a { justify-self: center; grid-column: 1 / -1; margin-top: 14px; padding-left: 0; }
   #manifesto { grid-template-columns: 1fr; gap: 26px; padding: 44px 22px 42px !important; }
   #manifesto .trust-service-photo { grid-row: 2; }
   #manifesto .trust-photo-carousel { height: clamp(230px, 62vw, 340px); }
-  .trust-events-page { padding: 0 18px 48px; }
+  .trust-events-page { min-height: calc(100svh - 56px); padding: 0 18px 48px; }
   .trust-events-heading { align-items: flex-start; flex-direction: column; gap: 15px; }
   .trust-events-controls { align-items: flex-start; flex-direction: column; gap: 10px; }
   .trust-event-row { grid-template-columns: 85px minmax(0,1fr); gap: 13px; padding: 18px 0; }
@@ -933,7 +937,7 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
   .trust-navigation-inner { padding: 10px 16px !important; }
   .trust-brand-caption { display: none; }
   .trust-photo-carousel { height: clamp(220px, 62vw, 340px); }
-  .trust-impact-strip { gap: 12px 8px; }
+  .trust-impact-strip { gap: 0; }
   .trust-impact-strip > div { padding-left: 10px; }
   .landing-heading-secondary { margin-top: 32px; font-size: clamp(1.35rem, 6vw, 2rem); }
   .landing-section { padding-inline: 22px !important; }
@@ -985,9 +989,9 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
 .trust-photo-slide-old.slide-next { z-index: 1; animation: trust-photo-out-next 1.5s cubic-bezier(.22,.61,.36,1) both; }
 .trust-photo-slide-old.slide-previous { z-index: 1; animation: trust-photo-out-previous 1.5s cubic-bezier(.22,.61,.36,1) both; }
 @keyframes trust-photo-in-next { from { opacity: .58; transform: translateX(5%); } to { opacity: 1; transform: translateX(0); } }
-@keyframes trust-photo-out-next { from { opacity: 1; transform: translateX(0); } to { opacity: .22; transform: translateX(-3%); } }
+@keyframes trust-photo-out-next { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-3%); } }
 @keyframes trust-photo-in-previous { from { opacity: .58; transform: translateX(-5%); } to { opacity: 1; transform: translateX(0); } }
-@keyframes trust-photo-out-previous { from { opacity: 1; transform: translateX(0); } to { opacity: .22; transform: translateX(3%); } }
+@keyframes trust-photo-out-previous { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(3%); } }
 
 /* The compact header keeps the brand, menu, and primary action usable on phones. */
 .trust-nav-donate { display: inline-flex !important; align-items: center; justify-content: center; min-height: 36px; padding: 0 15px !important; border: 1px solid #d7ad5d !important; border-radius: 4px !important; background: #e8bb65 !important; color: #14253d !important; font-size: .78rem !important; font-weight: 700 !important; text-decoration: none; white-space: nowrap; }
@@ -1000,6 +1004,7 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
 
 @media (max-width: 650px) {
   .trust-navigation-inner { min-height: 54px; padding: 8px 14px !important; gap: 8px; }
+  .trust-hero { min-height: calc(100svh - 42px); }
   .trust-site-nav-compact .trust-navigation-inner { min-height: 42px; padding-top: 4px !important; padding-bottom: 4px !important; }
   .trust-navigation-inner > a { flex-shrink: 1; min-width: 0; gap: 8px !important; }
   .trust-navigation-inner > a img { width: 30px !important; height: 30px !important; }

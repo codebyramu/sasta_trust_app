@@ -174,7 +174,7 @@ export const Landing = () => {
           <InteractiveImageSlider
             images={SECTION3_IMAGES}
             height="clamp(300px, 35vw, 440px)"
-            borderRadius="12px"
+            borderRadius="16px"
             alt="Sasta Trust volunteers serving Anna Prasadam to pilgrims"
             caption="Anna Prasadam seva · Azhudha River camp"
           />
