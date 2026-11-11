@@ -145,7 +145,7 @@ export const Landing = () => {
           SECTION 2: EDITORIAL TITLE & MANIFESTO
           ========================================================================= */}
       <section id="manifesto" className="landing-section landing-pad-top-lg">
-        <div>
+        <div className="trust-manifesto-copy">
           <h2 className="landing-title">
             <span className="line-left">Practical care for</span>
             <span className="line-indented">pilgrims on the route</span>
@@ -155,11 +155,14 @@ export const Landing = () => {
             PILGRIM SUPPORT<br />
             AT AZHUDHA RIVER
           </div>
+          <h3 className="landing-heading-secondary">
+            Volunteers prepare and serve meals, provide drinking water, and help pilgrims rest during their journey.
+          </h3>
         </div>
-
-        <h3 className="landing-heading-secondary">
-          Volunteers prepare and serve meals, provide drinking water, and help pilgrims rest during their journey.
-        </h3>
+        <figure className="trust-manifesto-image">
+          <img src="/gallery/pilgrims_azhudha_trek.jpg" alt="Pilgrims walking the forest route supported by Sasta Trust volunteers" loading="lazy" />
+          <figcaption><MapPin size={14} /> Service along the Azhudha River pilgrimage route</figcaption>
+        </figure>
       </section>
 
 
