@@ -829,9 +829,10 @@ export const Landing = () => {
             </div>
 
             <button
+              type="button"
               onClick={scrollToTop}
-              className="back-to-top-red"
-              title="Back to Top"
+              className="trust-back-to-top"
+              aria-label="Back to top"
             >
               <ArrowUp size={20} />
             </button>
