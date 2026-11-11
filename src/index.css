@@ -843,11 +843,15 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
 .trust-impact-strip > a { justify-self: end; display: inline-flex; align-items: center; gap: 8px; color: var(--trust-navy); font-size: .8rem; font-weight: 700; white-space: nowrap; }
 
 /* Align service information to a consistent reading width. */
-#manifesto { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.8fr); align-items: center; gap: 48px; max-width: 1200px; margin: 0 auto; padding: 74px 6% 56px !important; }
-#manifesto .landing-title { font-size: clamp(2rem,4vw,3.5rem); line-height: 1.18; }
-#manifesto .landing-title .line-indented { margin-left: clamp(20px,4vw,64px); }
+#manifesto { display: grid; grid-template-columns: minmax(0,.84fr) minmax(0,1.16fr); align-items: center; gap: clamp(32px,5vw,68px); max-width: 1280px; margin: 0 auto; padding: 68px 6% 70px !important; }
+#manifesto .landing-title { font-size: clamp(2rem,3.4vw,3.15rem); line-height: 1.14; }
+#manifesto .landing-title .line-indented { margin-left: clamp(8px,1.5vw,20px); }
 #manifesto .landing-sub-kicker { margin-top: 20px; max-width: none; }
 #manifesto .landing-heading-secondary { margin: 0; color: #536170; font-family: var(--font-sans); font-size: clamp(1rem,1.6vw,1.2rem); line-height: 1.75; }
+.trust-manifesto-copy { max-width: 560px; }
+.trust-service-copy { margin-top: 18px; }
+.trust-service-copy p { font-size: .9rem; line-height: 1.75; }
+.trust-service-photo { min-width: 0; }
 
 /* Shared navy navigation */
 .nav-link { white-space: nowrap; }
@@ -917,7 +921,9 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
   .trust-impact-strip { grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 20px 22px; }
   .trust-impact-strip > div { padding-left: 12px; }
   .trust-impact-strip > a { justify-self: start; grid-column: 1 / -1; padding-left: 12px; }
-  #manifesto { grid-template-columns: 1fr; gap: 18px; padding: 42px 22px 32px !important; }
+  #manifesto { grid-template-columns: 1fr; gap: 26px; padding: 44px 22px 42px !important; }
+  #manifesto .trust-service-photo { grid-row: 2; }
+  #manifesto .trust-photo-carousel { height: clamp(230px, 62vw, 340px); }
   .trust-events-page { padding: 0 18px 48px; }
   .trust-events-heading { align-items: flex-start; flex-direction: column; gap: 15px; }
   .trust-events-controls { align-items: flex-start; flex-direction: column; gap: 10px; }
@@ -990,11 +996,7 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
 .trust-events-support:hover { background: #f0cb80; transform: translateY(-1px); }
 .trust-hero, #manifesto, #devotee-voice { scroll-margin-top: 76px; }
 .trust-manifesto-copy { max-width: 590px; }
-.trust-manifesto-copy .landing-heading-secondary { margin-top: 20px; }
-.trust-manifesto-image { position: relative; min-width: 0; height: clamp(250px, 31vw, 370px); margin: 0; overflow: hidden; border: 1px solid rgba(20,37,61,.08); border-radius: 12px; background: #e7e8e4; }
-.trust-manifesto-image img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 52%; }
-.trust-manifesto-image figcaption { position: absolute; right: 12px; bottom: 12px; left: 12px; width: fit-content; max-width: calc(100% - 24px); display: flex; align-items: center; gap: 7px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.7); border-radius: 5px; background: rgba(255,255,255,.94); color: #465566; font-size: .72rem; }
-.trust-manifesto-image figcaption svg { flex: 0 0 auto; color: #94703b; }
+#manifesto .trust-manifesto-copy .landing-heading-secondary { margin-top: 18px; }
 
 @media (max-width: 650px) {
   .trust-navigation-inner { min-height: 54px; padding: 8px 14px !important; gap: 8px; }
@@ -1011,7 +1013,6 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
   .trust-site-nav-compact .trust-navigation-inner .trust-mobile-menu-toggle { height: 32px; }
   .trust-events-heading { padding-bottom: 22px; }
   .trust-events-support { min-height: 40px; }
-  .trust-manifesto-image { height: clamp(220px, 65vw, 310px); }
   #manifesto .landing-title { font-size: clamp(1.9rem, 9vw, 2.8rem); }
 }
 

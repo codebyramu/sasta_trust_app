@@ -14,11 +14,9 @@ import { AlternatingSlideImage } from '../components/AlternatingSlideImage';
 import emailjs from '@emailjs/browser';
 
 const SECTION3_IMAGES = [
-  '/gallery/azhudha_river_misty_valley.jpg',
-  '/gallery/anna_prasadam_cooking.jpg',
-  '/gallery/pilgrims_azhudha_trek.jpg',
-  '/gallery/heritage_temple_restoration.jpg',
-  '/gallery/anna_prasadam_service_camp.jpg',
+  '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM.jpeg',
+  '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(1).jpeg',
+  '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(2).jpeg',
 ];
 
 const SECTION4_IMAGES = [
@@ -141,10 +139,8 @@ export const Landing = () => {
         <Link to="/dashboard">Upcoming events <ArrowRight size={16} /></Link>
       </section>
 
-      {/* =========================================================================
-          SECTION 2: EDITORIAL TITLE & MANIFESTO
-          ========================================================================= */}
-      <section id="manifesto" className="landing-section landing-pad-top-lg">
+      {/* One clear service story follows the homepage hero: copy alongside a real trust photo. */}
+      <section id="manifesto" className="landing-section trust-service-story">
         <div className="trust-manifesto-copy">
           <h2 className="landing-title">
             <span className="line-left">Practical care for</span>
@@ -158,55 +154,30 @@ export const Landing = () => {
           <h3 className="landing-heading-secondary">
             Volunteers prepare and serve meals, provide drinking water, and help pilgrims rest during their journey.
           </h3>
-        </div>
-        <figure className="trust-manifesto-image">
-          <img src="/gallery/pilgrims_azhudha_trek.jpg" alt="Pilgrims walking the forest route supported by Sasta Trust volunteers" loading="lazy" />
-          <figcaption><MapPin size={14} /> Service along the Azhudha River pilgrimage route</figcaption>
-        </figure>
-      </section>
-
-
-      {/* =========================================================================
-          SECTION 3: SERVICE PHOTOGRAPHS
-          Photos advance smoothly every three seconds. Clicking either half moves
-          backward or forward without adding controls over the image.
-          ========================================================================= */}
-      <section style={{ width: '100%', marginTop: '90px' }}>
-        <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 5%' }}>
-          <InteractiveImageSlider
-            images={SECTION3_IMAGES}
-            height="500px"
-            borderRadius="18px"
-          />
-        </div>
-
-        <div className="landing-section">
-          {/* Top-Right Caption Underneath Banner */}
-          <div className="landing-caption-right">
-            <p className="landing-caption-text">
-              Seva Camp: Mundakayam Pambavalley Road, Near Azhudha River, Kerala.<br />
-              Photography &amp; Archive: Sasta Trust Devotee Samiti, 2026
-            </p>
-          </div>
-
-          {/* Left Narrative and Action */}
-          <div className="editorial-paragraphs">
+          <div className="editorial-paragraphs trust-service-copy">
             <p>
-              Sasta Trust restages the sacred tradition of Anna Prasadam on the Sabarimala trekking corridor as an immersive devotional service — blending spiritual reverence with transparent stewardship. Fourteen unbroken years of selfless service along the Azhudha River corridor stand as testament to the collective will of thousands of devotees.
+              The trust offers Anna Prasadam and practical support to pilgrims travelling the Sabarimala route. Volunteers prepare and serve each meal with care at the Azhudha River camp.
             </p>
-
             <p>
-              Pilgrims trekking through the rugged forest terrain of Kerala are blessed with freshly prepared wholesome meals, pure drinking water, and sacred respite at every step of their journey. No devotee is turned away. No act of service is too small.
+              This is a free service, sustained by community donations and the time of volunteers.
             </p>
-
             <Link
               to="/donations"
               className="pill-base pill-black"
-              style={{ marginTop: '16px' }}
+              style={{ marginTop: '12px' }}
             >
-              Explore the panorama <ArrowRight size={16} />
+              Support the seva <ArrowRight size={16} />
             </Link>
           </div>
+        </div>
+        <div className="trust-service-photo">
+          <InteractiveImageSlider
+            images={SECTION3_IMAGES}
+            height="clamp(300px, 35vw, 440px)"
+            borderRadius="12px"
+            alt="Sasta Trust volunteers serving Anna Prasadam to pilgrims"
+            caption="Anna Prasadam seva · Azhudha River camp"
+          />
         </div>
       </section>
 
