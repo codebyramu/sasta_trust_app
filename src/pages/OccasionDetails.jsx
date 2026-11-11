@@ -176,10 +176,10 @@ export const OccasionDetails = () => {
   const isOwner = user?.role === 'owner';
 
   return (
-    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '50px 6%' }}>
+    <div className="trust-occasion-page" style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
+      <div className="trust-occasion-wrap" style={{ maxWidth: '900px', margin: '0 auto', padding: '50px 6%' }}>
         {/* Navigation & Controls */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <div className="trust-occasion-controls" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
           <button
             onClick={() => navigate(-1)}
             className="pill-btn pill-btn-outline pill-btn-sm"
@@ -204,7 +204,7 @@ export const OccasionDetails = () => {
         </div>
 
         {/* Content Card */}
-        <div style={{
+        <div className="trust-occasion-content" style={{
           background: '#ffffff',
           borderRadius: '24px',
           border: '1px solid #eee',
@@ -294,7 +294,7 @@ export const OccasionDetails = () => {
 
         {/* Media Attachments */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div className="trust-occasion-media-heading" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 style={{ fontFamily: 'Libre Baskerville, serif', fontSize: '1.4rem', color: '#000' }}>
               Media & Attachments
             </h3>
@@ -313,7 +313,7 @@ export const OccasionDetails = () => {
           </div>
 
           {occasion.media && occasion.media.length > 0 ? (
-            <div style={{
+            <div className="trust-occasion-media-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
               gap: '20px'
@@ -321,6 +321,7 @@ export const OccasionDetails = () => {
               {occasion.media.map((item, idx) => (
                 <div
                   key={idx}
+                  className="trust-occasion-media-item"
                   style={{
                     height: '240px',
                     borderRadius: '16px',

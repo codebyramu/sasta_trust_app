@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import {
   Receipt,
   FileSpreadsheet,
-  Heart,
   Copy,
   Landmark,
   HeartHandshake,
@@ -15,61 +14,48 @@ import {
   Users,
   Smartphone,
   Building2,
-  Mail,
-  Phone,
   X,
   Trophy,
-  Download,
   Search,
-  CheckCircle2,
-  QrCode
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as XLSX from 'xlsx';
-import { AlternatingSlideImage } from '../components/AlternatingSlideImage';
 
 const categories = [
   {
     Icon: Landmark,
     title: 'Old Temple Maintenance & Restoration',
-    desc: 'Preserving and revitalizing heritage temples for future generations.',
-    images: ['/gallery/heritage_temple_restoration.jpg', '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.18 PM.jpeg', '/flower/collage.jpg']
+    desc: 'Preserving and revitalizing heritage temples for future generations.'
   },
   {
     Icon: HeartHandshake,
     title: 'Monthly Remunerations for Temple Dharma-Sevaks',
-    desc: 'Supporting those who serve the Lord selflessly every day.',
-    images: ['/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.18 PM.jpeg', '/gallery/heritage_temple_restoration.jpg']
+    desc: 'Supporting those who serve the Lord selflessly every day.'
   },
   {
     Icon: Home,
     title: 'Monthly Maintenance for Needy Families',
-    desc: 'Extending a helping hand to families in financial hardship.',
-    images: ['/gallery/anna_prasadam_service_camp.jpg', '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM (1).jpeg']
+    desc: 'Extending a helping hand to families in financial hardship.'
   },
   {
     Icon: UtensilsCrossed,
     title: 'Yearly Anna Prasadam Seva — Kerala',
-    desc: 'Serving thousands of devotees near Azhudha River every year.',
-    images: ['/gallery/anna_prasadam_cooking.jpg', '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM.jpeg', '/gallery/anna_prasadam_service_camp.jpg']
+    desc: 'Serving thousands of devotees near Azhudha River every year.'
   },
   {
     Icon: Footprints,
     title: 'Sponsoring Pilgrimage to Sabarimala',
-    desc: 'Ensuring no devotee is deprived of darshan due to financial constraints.',
-    images: ['/gallery/pilgrims_azhudha_trek.jpg', '/gallery/azhudha_river_misty_valley.jpg', '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM (2).jpeg']
+    desc: 'Ensuring no devotee is deprived of darshan due to financial constraints.'
   },
   {
     Icon: Flower2,
     title: 'Kanyadanam — Sreshtham & Mahadaan',
-    desc: 'Honoring daughters of poor Vedic practitioners in lifelong dedication.',
-    images: ['/flower/collage.jpg', '/gallery/heritage_temple_restoration.jpg']
+    desc: 'Honoring daughters of poor Vedic practitioners in lifelong dedication.'
   },
   {
     Icon: Users,
     title: 'Care for the Elderly',
-    desc: "Dedicated to the well-being of our community's most experienced members.",
-    images: ['/gallery/anna_prasadam_service_camp.jpg', '/gallery/anna_prasadam_cooking.jpg', '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM (1).jpeg']
+    desc: "Dedicated to the well-being of our community's most experienced members."
   }
 ];
 
@@ -152,9 +138,9 @@ export const UserReceipts = () => {
     });
 
   return (
-    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
+    <div className="trust-donation-page" style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
       {/* Header Banner */}
-      <section style={{
+      <section className="trust-donation-hero" style={{
         padding: '70px 6% 50px',
         borderBottom: '1px solid #eee',
         backgroundColor: '#fafafa'
@@ -185,11 +171,11 @@ export const UserReceipts = () => {
         </div>
       </section>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '60px 6%' }}>
+      <div className="trust-donation-content" style={{ maxWidth: '1200px', margin: '0 auto', padding: '60px 6%' }}>
         {/* =========================================================================
             WAYS TO CONTRIBUTE (7 CAUSES)
             ========================================================================= */}
-        <section style={{ marginBottom: '80px' }}>
+        <section className="trust-donation-causes" style={{ marginBottom: '80px' }}>
           <h2 style={{
             fontFamily: 'Libre Baskerville, serif',
             fontSize: 'clamp(1.8rem, 3.2vw, 2.4rem)',
@@ -200,7 +186,7 @@ export const UserReceipts = () => {
             Ways to Contribute
           </h2>
 
-          <div style={{
+          <div className="trust-donation-causes-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '24px'
@@ -210,6 +196,7 @@ export const UserReceipts = () => {
               return (
                 <div
                   key={i}
+                  className="trust-cause-card"
                   style={{
                     borderRadius: '20px',
                     border: '1px solid #eee',
@@ -220,26 +207,9 @@ export const UserReceipts = () => {
                     overflow: 'hidden',
                     transition: 'transform 0.2s, box-shadow 0.2s'
                   }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'translateY(-3px)';
-                    e.currentTarget.style.boxShadow = '0 16px 36px rgba(0,0,0,0.06)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.03)';
-                  }}
                 >
-                  {cat.images && cat.images.length > 0 && (
-                    <AlternatingSlideImage
-                      images={cat.images}
-                      height="160px"
-                      borderRadius="0"
-                      showDots={false}
-                      alt={cat.title}
-                    />
-                  )}
-                  <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <div style={{
+                  <div className="trust-cause-card-copy" style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <div className="trust-cause-icon" style={{
                       width: 44,
                       height: 44,
                       borderRadius: '12px',
@@ -252,7 +222,7 @@ export const UserReceipts = () => {
                     }}>
                       <IconComponent size={22} />
                     </div>
-                  <h3 style={{
+                  <h3 className="trust-cause-title" style={{
                     fontFamily: 'Libre Baskerville, serif',
                     fontSize: '1.2rem',
                     fontWeight: 700,
@@ -262,7 +232,7 @@ export const UserReceipts = () => {
                   }}>
                     {cat.title}
                   </h3>
-                  <p style={{
+                  <p className="trust-cause-desc" style={{
                     fontFamily: 'Inter',
                     fontSize: '0.92rem',
                     color: '#666666',
@@ -282,13 +252,13 @@ export const UserReceipts = () => {
             PAYMENT MODES: UPI & BANK TRANSFER
             ========================================================================= */}
         <section style={{ marginBottom: '80px' }}>
-          <div style={{
+          <div className="trust-donation-payment-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '30px'
           }}>
             {/* UPI Payment Card */}
-            <div style={{
+            <div className="trust-payment-card trust-upi-card" style={{
               padding: '36px',
               borderRadius: '24px',
               border: '1px solid #eee',
@@ -373,7 +343,7 @@ export const UserReceipts = () => {
             </div>
 
             {/* Bank Transfer Card */}
-            <div style={{
+            <div className="trust-payment-card trust-bank-card" style={{
               padding: '36px',
               borderRadius: '24px',
               border: '1px solid #eee',
@@ -413,19 +383,19 @@ export const UserReceipts = () => {
                 fontSize: '0.92rem',
                 flex: 1
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
+                <div className="trust-bank-row" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
                   <span style={{ color: '#777' }}>A/C Name:</span>
                   <strong style={{ color: '#000' }}>Sasta Trust</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
+                <div className="trust-bank-row" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
                   <span style={{ color: '#777' }}>A/C No:</span>
                   <strong style={{ color: '#000' }}>XXXXXXXXXXXX</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
+                <div className="trust-bank-row" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
                   <span style={{ color: '#777' }}>IFSC:</span>
                   <strong style={{ color: '#000' }}>XXXXX000XXXX</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
+                <div className="trust-bank-row" style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
                   <span style={{ color: '#777' }}>Branch:</span>
                   <strong style={{ color: '#000' }}>Hyderabad / Kerala</strong>
                 </div>
@@ -477,7 +447,7 @@ export const UserReceipts = () => {
           </div>
 
           {topDonors.length > 0 ? (
-            <div style={{
+            <div className="trust-donor-list" style={{
               borderRadius: '20px',
               border: '1px solid #eee',
               overflow: 'hidden',
@@ -586,7 +556,7 @@ export const UserReceipts = () => {
           </p>
 
           {displayedReceipts.length > 0 ? (
-            <div style={{
+            <div className="trust-receipt-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
               gap: '24px'

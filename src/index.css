@@ -1040,6 +1040,78 @@ body { color: var(--trust-ink); background: var(--trust-paper); }
   .trust-middle-section .trust-photo-carousel { height: 240px !important; }
 }
 
+/* Mobile contribution flow: readable causes first, with no oversized photo tiles. */
+@media (max-width: 760px) {
+  .trust-donation-page { padding-bottom: 36px !important; }
+  .trust-donation-hero { padding: 34px 20px 28px !important; }
+  .trust-donation-hero h1 { font-size: clamp(1.9rem, 8vw, 2.45rem) !important; line-height: 1.16 !important; margin-bottom: 10px !important; }
+  .trust-donation-hero p { font-size: .94rem !important; line-height: 1.65; }
+  .trust-donation-content { padding: 30px 16px !important; }
+  .trust-donation-content section { margin-bottom: 48px !important; }
+  .trust-donation-content section > h2 { margin-bottom: 20px !important; font-size: 1.55rem !important; }
+  .trust-donation-causes-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 0 !important; }
+  .trust-cause-card { border: 0 !important; border-bottom: 1px solid #e6e8ea !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important; }
+  .trust-cause-card-copy { display: grid !important; grid-template-columns: 38px minmax(0, 1fr); grid-template-areas: "icon title" "icon desc"; align-items: start; gap: 3px 12px; padding: 15px 0 !important; }
+  .trust-cause-icon { grid-area: icon; width: 36px !important; height: 36px !important; margin: 2px 0 0 !important; border-radius: 10px !important; background: #f0eee8 !important; color: #14253d !important; }
+  .trust-cause-title { grid-area: title; margin: 0 0 3px !important; color: #14253d !important; font-size: .99rem !important; font-weight: 400 !important; line-height: 1.38 !important; }
+  .trust-cause-desc { grid-area: desc; color: #68727d !important; font-size: .78rem !important; line-height: 1.55 !important; }
+  .trust-donation-payment-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 16px !important; }
+  .trust-payment-card { min-width: 0; padding: 22px 17px !important; border-radius: 14px !important; }
+  .trust-payment-card h3 { font-size: 1.25rem !important; }
+  .trust-upi-card > div[title="Click to zoom QR Code"] { padding: 8px !important; margin-bottom: 14px !important; border-radius: 12px !important; }
+  .trust-upi-card img[alt="UPI QR Code"] { width: 148px !important; height: 148px !important; }
+  .trust-bank-row { align-items: flex-start; gap: 8px; font-size: .78rem; }
+  .trust-bank-row strong { max-width: 62%; overflow-wrap: anywhere; text-align: right; }
+  .trust-donor-list { border-radius: 12px !important; }
+  .trust-donor-list > div { gap: 10px; padding: 12px 14px !important; }
+  .trust-donor-list > div > div { min-width: 0; gap: 10px !important; }
+  .trust-donor-list > div > div > span:last-child { overflow-wrap: anywhere; font-size: .88rem !important; }
+  .trust-donor-list > div > strong { flex: 0 0 auto; font-size: .88rem !important; }
+  .trust-receipt-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 14px !important; }
+  #my-receipts > div:first-child { align-items: stretch !important; }
+  .trust-receipt-search { width: 100%; min-width: 0 !important; }
+  .trust-receipt-grid > div { min-width: 0; padding: 17px !important; border-radius: 13px !important; }
+  .trust-receipt-grid > div > div:last-child { gap: 12px; flex-wrap: wrap; }
+  .trust-receipt-grid > div > div:last-child button { white-space: normal; }
+
+  #contact { margin-top: 68px !important; scroll-margin-top: 74px; }
+  .feedback-card-wrapper { margin-bottom: -70px; padding: 0 14px; }
+  .feedback-card { padding: 30px 18px !important; border-radius: 16px; }
+  .feedback-card-title { font-size: clamp(1.55rem, 7vw, 2rem); line-height: 1.25; }
+  .feedback-card-sub { margin-bottom: 26px; font-size: .9rem; line-height: 1.6; }
+  .trust-feedback-fields, .trust-feedback-contact { grid-template-columns: minmax(0, 1fr) !important; gap: 14px !important; }
+  .trust-contact-form .input-box { min-width: 0; font-size: 16px; }
+  .trust-footer-art { display: none !important; }
+  .navy-footer { padding: 116px 0 28px; background: #101d31; }
+  .navy-footer::before { opacity: .12; }
+  .footer-top-banner { padding: 0 20px 30px; }
+  .footer-top-banner h3 { font-size: 1.2rem; line-height: 1.45; }
+  .footer-columns-wrap { grid-template-columns: minmax(0, 1fr); gap: 25px; padding: 28px 20px; }
+  .footer-columns-wrap > div { min-width: 0; padding-bottom: 21px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .footer-columns-wrap > div:last-child { padding-bottom: 0; border-bottom: 0; }
+  .footer-heading { margin-bottom: 12px; font-size: .75rem; }
+  .footer-links-list { gap: 10px; font-size: .86rem; }
+  .footer-bottom-bar { padding: 20px 20px 0; gap: 14px; }
+
+  .trust-occasion-wrap { padding: 24px 16px !important; }
+  .trust-occasion-controls { gap: 10px; flex-wrap: wrap; margin-bottom: 18px !important; }
+  .trust-occasion-controls > div { flex-wrap: wrap; }
+  .trust-occasion-content { padding: 22px 17px !important; border-radius: 14px !important; margin-bottom: 26px !important; }
+  .trust-occasion-content h1 { font-size: 1.8rem !important; line-height: 1.22; }
+  .trust-occasion-content > div:not(.ql-container) { font-size: .94rem !important; line-height: 1.7 !important; overflow-wrap: anywhere; }
+  .trust-occasion-media-heading { align-items: flex-start !important; gap: 12px; flex-direction: column; }
+  .trust-occasion-media-heading > div { display: flex; flex-wrap: wrap; gap: 8px !important; }
+  .trust-occasion-media-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 14px !important; }
+  .trust-occasion-media-item { height: 205px !important; border-radius: 12px !important; }
+}
+
+@media (max-width: 360px) {
+  .trust-donation-content { padding-inline: 14px !important; }
+  .trust-payment-card { padding-inline: 14px !important; }
+  .trust-bank-card > div[style*="background: rgb(255, 255, 255)"] { padding: 14px !important; }
+  .footer-email-pill { max-width: 100%; overflow-wrap: anywhere; padding-inline: 14px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .trust-photo-slide-current, .trust-photo-slide-old { animation: none !important; }
 }

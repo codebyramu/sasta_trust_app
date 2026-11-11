@@ -342,7 +342,7 @@ export const Landing = () => {
           SECTION 8: CONTACT FORM + FOOTER WRAPPER
           White card overlapping dark navy footer
           ========================================================================= */}
-      <section id="contact" style={{ marginTop: '130px' }}>
+      <section id="contact" className="trust-contact-section" style={{ marginTop: '130px' }}>
         <div className="feedback-card-wrapper">
           <div className="feedback-card">
             <h2 className="feedback-card-title">
@@ -376,7 +376,7 @@ export const Landing = () => {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleContactSubmit}>
+              <form className="trust-contact-form" onSubmit={handleContactSubmit}>
                 {/* Devotion Rating */}
                 <div style={{ marginBottom: '28px' }}>
                   <label style={{ display: 'block', fontFamily: 'Inter', fontSize: '15px', color: '#333333', marginBottom: '10px' }}>
@@ -403,7 +403,7 @@ export const Landing = () => {
                 </div>
 
                 {/* Seva Interest & Return Likelihood */}
-                <div style={{
+                <div className="trust-feedback-fields" style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                   gap: '24px',
@@ -469,7 +469,7 @@ export const Landing = () => {
                 </p>
 
                 {/* Email & Phone */}
-                <div style={{
+                <div className="trust-feedback-contact" style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
                   gap: '20px',
@@ -527,7 +527,7 @@ export const Landing = () => {
             ========================================================================= */}
         <footer id="footer-credits" className="navy-footer">
           {/* Architectural SVG Background — Geometric Aperture Facets, Topographic River Curves & Sacred Geometry */}
-          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+          <div className="trust-footer-art" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
             <svg
               width="100%"
               height="100%"
@@ -588,8 +588,7 @@ export const Landing = () => {
           {/* Top Banner Statement */}
           <div className="footer-top-banner" style={{ position: 'relative', zIndex: 1 }}>
             <h3>
-              All seva is performed locally and<br />
-              sustained by devotion worldwide.
+              All seva is performed locally and sustained by devotion worldwide.
             </h3>
           </div>
 
