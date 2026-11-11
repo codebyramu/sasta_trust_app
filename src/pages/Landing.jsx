@@ -6,7 +6,6 @@ import {
   Star,
   CheckCircle2,
   MapPin,
-  Heart,
   Calendar,
 } from 'lucide-react';
 import { InteractiveImageSlider } from '../components/InteractiveImageSlider';
@@ -16,39 +15,16 @@ import emailjs from '@emailjs/browser';
 const SECTION3_IMAGES = [
   '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM.jpeg',
   '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(1).jpeg',
-  '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(2).jpeg',
 ];
 
 const SECTION4_IMAGES = [
-  '/gallery/pilgrims_azhudha_trek.jpg',
-  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM (2).jpeg',
-  '/gallery/anna_prasadam_service_camp.jpg',
-  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM.jpeg',
+  '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM.jpeg',
+  '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(1).jpeg',
 ];
 
 const SECTION5_IMAGES = [
-  '/gallery/heritage_temple_restoration.jpg',
-  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.18 PM.jpeg',
-  '/gallery/anna_prasadam_cooking.jpg',
-  '/flower/collage.jpg',
-];
-
-const CARD1_IMAGES = [
-  '/gallery/anna_prasadam_cooking.jpg',
-  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM.jpeg',
-  '/gallery/anna_prasadam_service_camp.jpg',
-];
-
-const CARD2_IMAGES = [
-  '/gallery/heritage_temple_restoration.jpg',
-  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.18 PM.jpeg',
-  '/flower/collage.jpg',
-];
-
-const CARD3_IMAGES = [
-  '/gallery/anna_prasadam_service_camp.jpg',
-  '/gallery/pilgrims_azhudha_trek.jpg',
-  '/photos_to_play/WhatsApp Image 2026-03-23 at 1.10.17 PM (1).jpeg',
+  '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(1).jpeg',
+  '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM.jpeg',
 ];
 
 export const Landing = () => {
@@ -185,9 +161,10 @@ export const Landing = () => {
       {/* =========================================================================
           SECTION 4: 14 YEARS OF SACRED SERVICE
           ========================================================================= */}
-      <section className="landing-section landing-pad-top-lg">
+      <section className="landing-section landing-pad-top-lg trust-middle-section trust-story-years">
         <div className="editorial-grid-2col">
-          <div>
+          <div className="trust-story-copy">
+            <p className="trust-section-kicker">Our work</p>
             <h2 className="editorial-heading">
               Fourteen Unbroken Years of Devoted Service
             </h2>
@@ -203,20 +180,14 @@ export const Landing = () => {
             </div>
           </div>
 
-          <div>
+          <div className="trust-story-photo">
             <AlternatingSlideImage
               images={SECTION4_IMAGES}
               height="420px"
               borderRadius="16px"
               alt="Lord Dharma Sasta Seva Camp at Azhudha River"
             />
-            <p style={{
-              fontFamily: 'Inter',
-              fontSize: '13px',
-              fontStyle: 'italic',
-              color: '#666666',
-              marginTop: '12px'
-            }}>
+            <p className="trust-photo-caption">
               Lord Dharma Sasta Seva Camp — Pilgrims receiving Anna Prasadam along the Azhudha River trekking route, Kerala.
             </p>
           </div>
@@ -227,27 +198,22 @@ export const Landing = () => {
       {/* =========================================================================
           SECTION 5: TEMPLE RESTORATION & HERITAGE REVIVAL
           ========================================================================= */}
-      <section className="landing-section landing-pad-top-lg">
+      <section className="landing-section landing-pad-top-lg trust-middle-section trust-story-heritage">
         <div className="editorial-grid-2col">
-          <div>
+          <div className="trust-story-photo">
             <AlternatingSlideImage
               images={SECTION5_IMAGES}
               height="420px"
               borderRadius="16px"
-              alt="Heritage Temple Restoration and Sacred Mahaprasadam"
+              alt="Sasta Trust volunteers serving pilgrims at Azhudha River"
             />
-            <p style={{
-              fontFamily: 'Inter',
-              fontSize: '13px',
-              fontStyle: 'italic',
-              color: '#666666',
-              marginTop: '12px'
-            }}>
-              Restoration of ancient heritage temples &amp; continuous sacred rituals &copy; Sasta Trust Seva Samiti
+            <p className="trust-photo-caption">
+              Sasta Trust volunteers supporting pilgrims and community seva
             </p>
           </div>
 
-          <div>
+          <div className="trust-story-copy">
+            <p className="trust-section-kicker">Preserving tradition</p>
             <h2 className="editorial-heading">
               Heritage Temple Restoration &amp; Dharma-Sevak Support
             </h2>
@@ -269,44 +235,23 @@ export const Landing = () => {
       {/* =========================================================================
           SECTION 6: THE SEVEN SACRED CAUSES
           ========================================================================= */}
-      <section id="seva-causes" className="landing-section landing-pad-top-lg">
-        <div className="landing-sub-kicker" style={{ marginTop: 0, marginBottom: '20px' }}>
-          SEVEN CAUSES OF DEVOTION
+      <section id="seva-causes" className="landing-section trust-causes-section">
+        <div className="trust-causes-heading">
+          <p className="trust-section-kicker">Seven causes of devotion</p>
+          <h2>The <em>sacred</em> causes<br />of the seva</h2>
         </div>
-
-        <h2 style={{
-          fontFamily: 'Libre Baskerville, serif',
-          fontSize: 'clamp(2.8rem, 6.5vw, 5.2rem)',
-          fontWeight: 400,
-          lineHeight: 1.1,
-          letterSpacing: '-0.02em',
-          color: '#000000',
-          marginBottom: '35px'
-        }}>
-          The <span style={{ fontStyle: 'italic' }}>sacred</span> causes<br />
-          of the seva
-        </h2>
-
-        <div className="editorial-paragraphs">
-          <p>
-            From the misty banks of the Azhudha River in Kerala to heritage shrines across southern India, Sasta Trust guides a comprehensive journey of devotion, dignity, and humanitarian service. Devotees worldwide may participate directly, sponsor Prasadam services, or contribute to elderly welfare and pilgrimage support.
+        <div className="trust-causes-details">
+          <p className="trust-causes-intro">
+            From the Azhudha River to heritage shrines across southern India, Sasta Trust supports practical service rooted in devotion and dignity. Devotees can participate directly or support prasadam, pilgrimage assistance, and elderly welfare.
           </p>
-
-          <p>
-            For enquiries and participation: <a href="mailto:sastatrust@gmail.com" style={{ textDecoration: 'underline' }}>sastatrust@gmail.com</a> &middot; <a href="tel:+919391672398" style={{ textDecoration: 'underline' }}>+91 93916 72398</a><br />
-            Seva Location: Near Azhudha River, Mundakayam Pambavalley Road, Kerala.
-          </p>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '30px' }}>
-            <Link
-              to="/donations"
-              className="pill-base pill-black"
-            >
-              View all seva causes <ArrowRight size={16} />
-            </Link>
-            <span style={{ fontFamily: 'Inter', fontSize: '15px', color: '#666' }}>
-              7 Sacred Causes
-            </span>
+          <div className="trust-contact-details">
+            <a href="mailto:sastatrust@gmail.com">sastatrust@gmail.com</a>
+            <a href="tel:+919391672398">+91 93916 72398</a>
+            <span>Near Azhudha River, Mundakayam Pambavalley Road, Kerala</span>
+          </div>
+          <div className="trust-causes-actions">
+            <Link to="/donations" className="pill-base pill-black">View seva causes <ArrowRight size={16} /></Link>
+            <span>7 areas of service</span>
           </div>
         </div>
       </section>
@@ -315,121 +260,80 @@ export const Landing = () => {
       {/* =========================================================================
           SECTION 7: THREE PRINCIPAL SEVA PROGRAMS
           ========================================================================= */}
-      <section id="calendar-exhibition" className="landing-section landing-pad-top-md">
-        <h2 style={{
-          fontFamily: 'Libre Baskerville, serif',
-          fontSize: 'clamp(2rem, 3.8vw, 2.8rem)',
-          fontWeight: 400,
-          color: '#000000'
-        }}>
-          Principal Seva Programmes
-        </h2>
+      <section id="calendar-exhibition" className="landing-section trust-programmes-section">
+        <p className="trust-section-kicker">How to take part</p>
+        <h2>Principal Seva Programmes</h2>
+        <p className="trust-programmes-intro">Choose a programme to learn about the trust’s ongoing work and ways to support it.</p>
 
         <div className="cards-grid-3col">
           {/* Card 1 */}
-          <div>
-            <AlternatingSlideImage
-              images={CARD1_IMAGES}
-              height="220px"
-              borderRadius="12px"
-              style={{ marginBottom: '18px' }}
-              alt="Anna Prasadam Seva"
-            />
-            <div className="story-card-num">1.</div>
-            <h3 className="story-card-title">
+          <article className="trust-program-card">
+            <div className="story-card-num trust-program-num">01</div>
+            <h3 className="story-card-title trust-program-title">
               Yearly Anna Prasadam Seva — Kerala
             </h3>
-            <p className="story-card-desc">
+            <p className="story-card-desc trust-program-desc">
               Thousands of pilgrims are blessed with Anna Prasadam on the sacred trekking route near the Azhudha River, Mundakayam Pambavalley Road, Kerala. Served with devotion without fail, every single year.
             </p>
 
             <Link
               to="/donations"
-              className="pill-base pill-black"
-              style={{ padding: '8px 18px', fontSize: '14px', marginBottom: '24px' }}
+              className="pill-base pill-black trust-program-cta"
             >
-              <Heart size={12} /> &nbsp;Contribute to this Seva
+              Support this seva <ArrowRight size={15} />
             </Link>
 
-            <div className="story-card-chapter">
-              <span>1.1. Anna Prasadam on the Azhudha Trekking Route</span>
-              <ArrowRight size={14} color="#666" />
+            <div className="trust-program-details">
+              <div className="story-card-chapter trust-program-detail"><span>Anna Prasadam on the Azhudha route</span><ArrowRight size={14} /></div>
+              <div className="story-card-chapter trust-program-detail"><span>Devotee meal sponsorship</span><ArrowRight size={14} /></div>
             </div>
-            <div className="story-card-chapter">
-              <span>1.2. Devotee Meal Sponsorship</span>
-              <ArrowRight size={14} color="#666" />
-            </div>
-          </div>
+          </article>
 
           {/* Card 2 */}
-          <div>
-            <AlternatingSlideImage
-              images={CARD2_IMAGES}
-              height="220px"
-              borderRadius="12px"
-              style={{ marginBottom: '18px' }}
-              alt="Heritage Temple Restoration"
-            />
-            <div className="story-card-num">2.</div>
-            <h3 className="story-card-title">
+          <article className="trust-program-card">
+            <div className="story-card-num trust-program-num">02</div>
+            <h3 className="story-card-title trust-program-title">
               Heritage Temple Restoration &amp; Dharma-Sevak Support
             </h3>
-            <p className="story-card-desc">
+            <p className="story-card-desc trust-program-desc">
               Preserving and revitalizing heritage temples for future generations. Supporting dharma-sevaks with monthly remunerations so ancient Vedic rituals continue uninterrupted.
             </p>
 
             <Link
               to="/donations"
-              className="pill-base pill-black"
-              style={{ padding: '8px 18px', fontSize: '14px', marginBottom: '24px' }}
+              className="pill-base pill-black trust-program-cta"
             >
-              <Heart size={12} /> &nbsp;Contribute to this Seva
+              Support this seva <ArrowRight size={15} />
             </Link>
 
-            <div className="story-card-chapter">
-              <span>2.1. Ancient Shrine Restoration</span>
-              <ArrowRight size={14} color="#666" />
+            <div className="trust-program-details">
+              <div className="story-card-chapter trust-program-detail"><span>Ancient shrine restoration</span><ArrowRight size={14} /></div>
+              <div className="story-card-chapter trust-program-detail"><span>Dharma-sevak support</span><ArrowRight size={14} /></div>
             </div>
-            <div className="story-card-chapter">
-              <span>2.2. Dharma-Sevak Monthly Remuneration</span>
-              <ArrowRight size={14} color="#666" />
-            </div>
-          </div>
+          </article>
 
           {/* Card 3 */}
-          <div>
-            <AlternatingSlideImage
-              images={CARD3_IMAGES}
-              height="220px"
-              borderRadius="12px"
-              style={{ marginBottom: '18px' }}
-              alt="Pilgrimage & Humanitarian Care"
-            />
-            <div className="story-card-num">3.</div>
-            <h3 className="story-card-title">
+          <article className="trust-program-card">
+            <div className="story-card-num trust-program-num">03</div>
+            <h3 className="story-card-title trust-program-title">
               Pilgrimage Sponsorship, Elderly Care &amp; Kanyadanam
             </h3>
-            <p className="story-card-desc">
+            <p className="story-card-desc trust-program-desc">
               Ensuring no devotee is deprived of Sabarimala darshan due to financial constraints. Dedicated care for the elderly and Kanyadanam in honour of daughters of needy Vedic families.
             </p>
 
             <Link
               to="/donations"
-              className="pill-base pill-black"
-              style={{ padding: '8px 18px', fontSize: '14px', marginBottom: '24px' }}
+              className="pill-base pill-black trust-program-cta"
             >
-              <Heart size={12} /> &nbsp;Contribute to this Seva
+              Support this seva <ArrowRight size={15} />
             </Link>
 
-            <div className="story-card-chapter">
-              <span>3.1. Sabarimala Pilgrimage Sponsorship</span>
-              <ArrowRight size={14} color="#666" />
+            <div className="trust-program-details">
+              <div className="story-card-chapter trust-program-detail"><span>Sabarimala pilgrimage sponsorship</span><ArrowRight size={14} /></div>
+              <div className="story-card-chapter trust-program-detail"><span>Elderly welfare and Kanyadanam</span><ArrowRight size={14} /></div>
             </div>
-            <div className="story-card-chapter">
-              <span>3.2. Elderly Welfare &amp; Kanyadanam</span>
-              <ArrowRight size={14} color="#666" />
-            </div>
-          </div>
+          </article>
         </div>
       </section>
 
