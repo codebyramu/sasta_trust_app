@@ -90,7 +90,7 @@ export const Landing = () => {
   const apertureClip = useTransform(revealScale, (scale) => {
     const progress = Math.max(0, Math.min(1, (scale - 0.55) / (8.1 - 0.55)));
     const radiusX = 4.2 + ((34 - 4.2) * progress);
-    const radiusY = 10 + ((81 - 10) * progress);
+    const radiusY = 9.3 + ((81 - 9.3) * progress);
     return `ellipse(${radiusX}vw ${radiusY}svh at 50% 57%)`;
   });
 
@@ -217,6 +217,19 @@ export const Landing = () => {
               <span className="impact-reveal-word-after">PE</span>
             </motion.div>
           </div>}
+
+          {!skipScrollReveal && <motion.div
+            className="impact-reveal-detail-rail"
+            style={{ opacity: introOpacity }}
+            aria-hidden="true"
+          >
+            <p className="impact-reveal-detail-heading">Care along the pilgrim path</p>
+            <div className="impact-reveal-detail-items">
+              <span><CalendarDays size={15} /> Serving since 2012</span>
+              <span><HeartHandshake size={15} /> Volunteer-led seva</span>
+              <span><MapPin size={15} /> Azhudha River route</span>
+            </div>
+          </motion.div>}
 
           <motion.div
             className="impact-reveal-hero-copy"
