@@ -143,7 +143,7 @@ export const Navigation = () => {
           <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
             Home
           </Link>
-          <a href="/#manifesto" className="nav-link">About</a>
+          <a href="/#impact-story" className="nav-link">About</a>
           <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Calendar size={14} color="#d97706" />
             <span>Events</span>
@@ -151,8 +151,8 @@ export const Navigation = () => {
           <Link to="/donations" className={`nav-link ${isActive('/donations') ? 'active' : ''}`}>
             Ways to Contribute
           </Link>
-          <a href="/#devotee-voice" className="nav-link">
-            Devotee Voice
+          <a href="/#contact" className="nav-link">
+            Contact
           </a>
           <Link to="/donate" className={`nav-link ${isActive('/donate') ? 'active' : ''}`}>
             My Receipts
@@ -428,11 +428,11 @@ export const Navigation = () => {
       {isMobileMenuOpen && (
         <nav className="trust-mobile-menu" aria-label="Mobile navigation">
           <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-          <a href="/#manifesto" onClick={() => setIsMobileMenuOpen(false)}>About</a>
+          <a href="/#impact-story" onClick={() => setIsMobileMenuOpen(false)}>About</a>
           <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Events &amp; occasions</Link>
           <Link to="/donations" onClick={() => setIsMobileMenuOpen(false)}>Ways to contribute</Link>
           <Link to="/donate" onClick={() => setIsMobileMenuOpen(false)}>My receipts</Link>
-          <a href="/#devotee-voice" onClick={() => setIsMobileMenuOpen(false)}>Devotee voice</a>
+          <a href="/#contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</a>
           {user?.role === 'owner' && <><Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>Manage occasions</Link><Link to="/admin/receipt" onClick={() => setIsMobileMenuOpen(false)}>Send receipt</Link></>}
           {user ? <button type="button" onClick={() => { logout(); setIsMobileMenuOpen(false); }}>Sign out</button> : <button type="button" onClick={() => { loginWithGoogle(); setIsMobileMenuOpen(false); }}>Sign in</button>}
         </nav>

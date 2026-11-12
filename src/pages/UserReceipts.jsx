@@ -1,732 +1,102 @@
-import React, { useEffect, useState } from 'react';
-import { getReceipts } from '../services/db';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import {
-  Receipt,
-  FileSpreadsheet,
-  Copy,
-  Landmark,
-  HeartHandshake,
-  Home,
-  UtensilsCrossed,
-  Footprints,
-  Flower2,
-  Users,
-  Smartphone,
-  Building2,
-  X,
-  Trophy,
-  Search,
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { getReceipts } from '../services/db';
+import { ArrowRight, Download, FileText, Heart, Receipt, Search, ShieldCheck, Sparkles } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-const categories = [
-  {
-    Icon: Landmark,
-    title: 'Old Temple Maintenance & Restoration',
-    desc: 'Preserving and revitalizing heritage temples for future generations.'
-  },
-  {
-    Icon: HeartHandshake,
-    title: 'Monthly Remunerations for Temple Dharma-Sevaks',
-    desc: 'Supporting those who serve the Lord selflessly every day.'
-  },
-  {
-    Icon: Home,
-    title: 'Monthly Maintenance for Needy Families',
-    desc: 'Extending a helping hand to families in financial hardship.'
-  },
-  {
-    Icon: UtensilsCrossed,
-    title: 'Yearly Anna Prasadam Seva — Kerala',
-    desc: 'Serving thousands of devotees near Azhudha River every year.'
-  },
-  {
-    Icon: Footprints,
-    title: 'Sponsoring Pilgrimage to Sabarimala',
-    desc: 'Ensuring no devotee is deprived of darshan due to financial constraints.'
-  },
-  {
-    Icon: Flower2,
-    title: 'Kanyadanam — Sreshtham & Mahadaan',
-    desc: 'Honoring daughters of poor Vedic practitioners in lifelong dedication.'
-  },
-  {
-    Icon: Users,
-    title: 'Care for the Elderly',
-    desc: "Dedicated to the well-being of our community's most experienced members."
-  }
-];
+const rupees = (value) => `₹${Number(value || 0).toLocaleString('en-IN')}`;
+const formatDate = (receipt) => {
+  const date = receipt.date ? new Date(`${receipt.date}T00:00:00`) : new Date(receipt.createdAt);
+  return Number.isNaN(date.getTime()) ? 'Date unavailable' : new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+};
 
 export const UserReceipts = () => {
-  const { user } = useAuth();
-  const [receipts, setReceipts] = useState([]);
+  const { user, loginWithGoogle } = useAuth();
   const [allReceipts, setAllReceipts] = useState([]);
-  const [topDonors, setTopDonors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [copiedText, setCopiedText] = useState('');
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
-    loadReceipts();
-  }, [user]);
+    let active = true;
+    getReceipts().then((items) => { if (active) setAllReceipts(items || []); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
 
-  const loadReceipts = async () => {
-    try {
-      setLoading(true);
-      const data = await getReceipts();
-      const validData = data || [];
-      setAllReceipts(validData);
+  const mine = useMemo(() => {
+    if (!user?.email) return [];
+    const email = user.email.trim().toLowerCase();
+    return allReceipts.filter((item) => item.contactValue?.trim().toLowerCase() === email);
+  }, [allReceipts, user?.email]);
+  const visible = useMemo(() => {
+    const records = user?.role === 'owner' ? allReceipts : mine;
+    if (!query.trim()) return records;
+    const value = query.trim().toLowerCase();
+    return records.filter((item) => [item.name, item.details, item.contactValue, item.id].some((part) => String(part || '').toLowerCase().includes(value)));
+  }, [allReceipts, mine, query, user?.role]);
+  const total = (user?.role === 'owner' ? allReceipts : mine).reduce((sum, item) => sum + Number(item.amount || 0), 0);
 
-      // Compute top donors
-      const grouped = {};
-      validData.forEach(r => {
-        if (!grouped[r.name]) grouped[r.name] = 0;
-        grouped[r.name] += Number(r.amount || 0);
-      });
-      const sortedList = Object.entries(grouped)
-        .map(([name, amt]) => ({ name, amt }))
-        .sort((a, b) => b.amt - a.amt)
-        .slice(0, 10);
-      setTopDonors(sortedList);
-
-      const mine = (user?.role === 'owner')
-        ? validData
-        : validData.filter(r => r.contactValue === user?.email || (user?.email && r.name?.toLowerCase().includes(user?.name?.toLowerCase())));
-      setReceipts(mine);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopiedText(text);
-    setTimeout(() => setCopiedText(''), 3000);
-  };
-
-  const exportToExcel = () => {
-    const sorted = [...allReceipts].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    const rows = sorted.map((r, i) => ({
-      'S.No': i + 1,
-      'Name': r.name,
-      'Amount': `₹${Number(r.amount).toLocaleString('en-IN')}`,
-      'Reason / Purpose': r.details,
-      'Date': new Date(r.createdAt).toLocaleDateString('en-IN')
+  const exportReceipts = () => {
+    const rows = [...allReceipts].map((item, index) => ({
+      'S.No': index + 1,
+      'Receipt ID': item.id,
+      'Donor': item.name,
+      'Amount': Number(item.amount || 0),
+      'Purpose': item.details || 'Seva contribution',
+      'Date': formatDate(item),
     }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Receipts');
-    XLSX.writeFile(wb, 'Sasta_Trust_Receipts.xlsx');
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(rows), 'Receipts');
+    XLSX.writeFile(workbook, 'Sasta_Trust_Receipts.xlsx');
   };
-
-  // Filtered for manual search lookup
-  const displayedReceipts = (user?.role === 'owner' ? allReceipts : (receipts.length > 0 ? receipts : allReceipts))
-    .filter(r => {
-      if (!searchQuery) return true;
-      const q = searchQuery.toLowerCase();
-      return (
-        r.name?.toLowerCase().includes(q) ||
-        r.contactValue?.toLowerCase().includes(q) ||
-        r.details?.toLowerCase().includes(q) ||
-        r.id?.includes(q)
-      );
-    });
 
   return (
-    <div className="trust-donation-page" style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
-      {/* Header Banner */}
-      <section className="trust-donation-hero" style={{
-        padding: '70px 6% 50px',
-        borderBottom: '1px solid #eee',
-        backgroundColor: '#fafafa'
-      }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <p className="kicker" style={{ color: '#888', marginBottom: '10px' }}>
-            Donate & Support
-          </p>
-          <h1 style={{
-            fontFamily: 'Libre Baskerville, serif',
-            fontSize: 'clamp(2.4rem, 4.5vw, 3.6rem)',
-            fontWeight: 700,
-            color: '#000000',
-            lineHeight: 1.15,
-            marginBottom: '14px'
-          }}>
-            Support Our Sacred Mission
-          </h1>
-          <p style={{
-            fontFamily: 'Inter',
-            fontSize: '1.1rem',
-            color: '#555',
-            maxWidth: '700px'
-          }}>
-            Your contribution, however small, lights the path of devotion.<br />
-            <strong>✦ Swamy Sharanam Ayyappa! ✦</strong>
-          </p>
-        </div>
+    <main className="receipts-page">
+      <section className="receipts-hero">
+        <div className="receipts-hero-mark"><Receipt size={24} /></div>
+        <p className="impact-kicker">Sasta Trust · Seva records</p>
+        <h1>{user?.role === 'owner' ? 'Donation records' : 'Your giving, gathered in one place.'}</h1>
+        <p>{user?.role === 'owner' ? 'Review and export the trust’s recorded contributions.' : 'Official receipt records linked to your signed-in email appear here.'}</p>
       </section>
 
-      <div className="trust-donation-content" style={{ maxWidth: '1200px', margin: '0 auto', padding: '60px 6%' }}>
-        {/* =========================================================================
-            WAYS TO CONTRIBUTE (7 CAUSES)
-            ========================================================================= */}
-        <section className="trust-donation-causes" style={{ marginBottom: '80px' }}>
-          <h2 style={{
-            fontFamily: 'Libre Baskerville, serif',
-            fontSize: 'clamp(1.8rem, 3.2vw, 2.4rem)',
-            fontWeight: 700,
-            color: '#000000',
-            marginBottom: '40px'
-          }}>
-            Ways to Contribute
-          </h2>
+      <section className="receipts-content">
+        <div className="receipts-summary">
+          <article><span className="receipts-summary-icon"><FileText size={18} /></span><div><small>{user?.role === 'owner' ? 'All records' : 'Your receipts'}</small><strong>{loading ? '—' : (user?.role === 'owner' ? allReceipts.length : mine.length)}</strong></div></article>
+          <article><span className="receipts-summary-icon"><Heart size={18} /></span><div><small>{user?.role === 'owner' ? 'Total recorded' : 'Total contributed'}</small><strong>{loading ? '—' : rupees(total)}</strong></div></article>
+          <div className="receipts-summary-side"><ShieldCheck size={18} /><span>Receipt records are linked to your account email.</span></div>
+        </div>
 
-          <div className="trust-donation-causes-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '24px'
-          }}>
-            {categories.map((cat, i) => {
-              const IconComponent = cat.Icon;
-              return (
-                <div
-                  key={i}
-                  className="trust-cause-card"
-                  style={{
-                    borderRadius: '20px',
-                    border: '1px solid #eee',
-                    background: '#ffffff',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.03)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden',
-                    transition: 'transform 0.2s, box-shadow 0.2s'
-                  }}
-                >
-                  <div className="trust-cause-card-copy" style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <div className="trust-cause-icon" style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: '12px',
-                      background: '#000000',
-                      color: '#ffffff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: '18px'
-                    }}>
-                      <IconComponent size={22} />
-                    </div>
-                  <h3 className="trust-cause-title" style={{
-                    fontFamily: 'Libre Baskerville, serif',
-                    fontSize: '1.2rem',
-                    fontWeight: 700,
-                    color: '#000000',
-                    marginBottom: '10px',
-                    lineHeight: 1.3
-                  }}>
-                    {cat.title}
-                  </h3>
-                  <p className="trust-cause-desc" style={{
-                    fontFamily: 'Inter',
-                    fontSize: '0.92rem',
-                    color: '#666666',
-                    lineHeight: 1.6,
-                    flex: 1
-                  }}>
-                    {cat.desc}
-                  </p>
-                  </div>
-                </div>
-              );
-            })}
+        <div className="receipts-list-heading">
+          <div><p className="impact-kicker">A record of your support</p><h2>{user?.role === 'owner' ? 'All receipts' : 'My receipts'}</h2></div>
+          <div className="receipts-list-actions">
+            {(user?.role === 'owner' || mine.length > 0) && <label className="receipts-search"><Search size={16} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search receipts" aria-label="Search receipts" /></label>}
+            {user?.role === 'owner' && allReceipts.length > 0 && <button className="receipts-export" onClick={exportReceipts}><Download size={16} /> Export</button>}
           </div>
-        </section>
+        </div>
 
-        {/* =========================================================================
-            PAYMENT MODES: UPI & BANK TRANSFER
-            ========================================================================= */}
-        <section style={{ marginBottom: '80px' }}>
-          <div className="trust-donation-payment-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '30px'
-          }}>
-            {/* UPI Payment Card */}
-            <div className="trust-payment-card trust-upi-card" style={{
-              padding: '36px',
-              borderRadius: '24px',
-              border: '1px solid #eee',
-              background: '#fafafa',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center'
-            }}>
-              <div style={{
-                width: 50,
-                height: 50,
-                borderRadius: '50%',
-                background: '#000',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '16px'
-              }}>
-                <Smartphone size={24} />
-              </div>
-              <h3 style={{ fontFamily: 'Libre Baskerville, serif', fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px' }}>
-                UPI Payments
-              </h3>
-              <p style={{ fontFamily: 'Inter', fontSize: '0.9rem', color: '#666', marginBottom: '20px' }}>
-                Scan with any UPI App (GPay, PhonePe, Paytm, BHIM)
-              </p>
-
-              {/* QR Code Preview */}
-              <div
-                onClick={() => setIsQRModalOpen(true)}
-                style={{
-                  padding: '12px',
-                  background: '#ffffff',
-                  borderRadius: '16px',
-                  border: '1px solid #e5e7eb',
-                  cursor: 'pointer',
-                  boxShadow: '0 8px 20px rgba(0,0,0,0.06)',
-                  marginBottom: '20px'
-                }}
-                title="Click to zoom QR Code"
-              >
-                <img
-                  src="/QRcode/QRCode.png"
-                  alt="UPI QR Code"
-                  style={{ width: 170, height: 170, objectFit: 'contain', display: 'block' }}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = 'https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=upi://pay?pa=sastatrust@upi&pn=Sasta%20Trust';
-                  }}
-                />
-              </div>
-
-              {/* UPI ID Pill with Copy */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                background: '#ffffff',
-                border: '1px solid #d1d5db',
-                borderRadius: '30px',
-                padding: '8px 18px'
-              }}>
-                <span style={{ fontFamily: 'Inter', fontWeight: 600, fontSize: '0.95rem', color: '#111' }}>
-                  sastatrust@upi
-                </span>
-                <button
-                  onClick={() => copyToClipboard('sastatrust@upi')}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#555', display: 'flex' }}
-                  title="Copy UPI ID"
-                >
-                  <Copy size={16} />
-                </button>
-              </div>
-
-              {copiedText === 'sastatrust@upi' && (
-                <span style={{ fontFamily: 'Inter', fontSize: '0.78rem', color: '#16a34a', marginTop: '8px' }}>
-                  ✓ Copied to clipboard!
-                </span>
-              )}
-            </div>
-
-            {/* Bank Transfer Card */}
-            <div className="trust-payment-card trust-bank-card" style={{
-              padding: '36px',
-              borderRadius: '24px',
-              border: '1px solid #eee',
-              background: '#fafafa',
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
-              <div style={{
-                width: 50,
-                height: 50,
-                borderRadius: '50%',
-                background: '#000',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '16px'
-              }}>
-                <Building2 size={24} />
-              </div>
-              <h3 style={{ fontFamily: 'Libre Baskerville, serif', fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px' }}>
-                Bank Transfer
-              </h3>
-              <p style={{ fontFamily: 'Inter', fontSize: '0.9rem', color: '#666', marginBottom: '24px' }}>
-                Direct NEFT / RTGS / IMPS donation to Trust account:
-              </p>
-
-              <div style={{
-                background: '#ffffff',
-                borderRadius: '16px',
-                padding: '20px',
-                border: '1px solid #e5e7eb',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '14px',
-                fontFamily: 'Inter',
-                fontSize: '0.92rem',
-                flex: 1
-              }}>
-                <div className="trust-bank-row" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
-                  <span style={{ color: '#777' }}>A/C Name:</span>
-                  <strong style={{ color: '#000' }}>Sasta Trust</strong>
-                </div>
-                <div className="trust-bank-row" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
-                  <span style={{ color: '#777' }}>A/C No:</span>
-                  <strong style={{ color: '#000' }}>XXXXXXXXXXXX</strong>
-                </div>
-                <div className="trust-bank-row" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
-                  <span style={{ color: '#777' }}>IFSC:</span>
-                  <strong style={{ color: '#000' }}>XXXXX000XXXX</strong>
-                </div>
-                <div className="trust-bank-row" style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
-                  <span style={{ color: '#777' }}>Branch:</span>
-                  <strong style={{ color: '#000' }}>Hyderabad / Kerala</strong>
-                </div>
-              </div>
-
-              {/* Contact Us note */}
-              <div style={{ marginTop: '24px', paddingTop: '18px', borderTop: '1px solid #e5e7eb' }}>
-                <h4 style={{ fontFamily: 'Inter', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>
-                  Contact Us
-                </h4>
-                <p style={{ fontFamily: 'Inter', fontSize: '0.88rem', color: '#555', margin: 0 }}>
-                  Phone: <a href="tel:+919391672398" style={{ textDecoration: 'underline', color: '#000' }}>+91 93916 72398</a><br />
-                  Email: <a href="mailto:sastatrust@gmail.com" style={{ textDecoration: 'underline', color: '#000' }}>sastatrust@gmail.com</a>
-                </p>
-              </div>
-            </div>
+        {loading ? <div className="receipts-state"><span className="receipts-spinner" /><p>Loading your records…</p></div> : visible.length > 0 ? (
+          <div className="receipts-grid">
+            {visible.map((item) => (
+              <article className="receipt-card" key={item.id}>
+                <div className="receipt-card-top"><span><Receipt size={16} /> Receipt #{item.id}</span><small>{formatDate(item)}</small></div>
+                <h3>{item.name || 'Contributor'}</h3>
+                <p>{item.details || 'Sasta Trust seva contribution'}</p>
+                <div className="receipt-card-bottom"><strong>{rupees(item.amount)}</strong><span><ShieldCheck size={15} /> Recorded</span></div>
+              </article>
+            ))}
           </div>
-        </section>
-
-        {/* =========================================================================
-            TOP 10 DEVOTEE DONORS LEADERBOARD
-            ========================================================================= */}
-        <section style={{ marginBottom: '80px' }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '24px',
-            flexWrap: 'wrap',
-            gap: '12px'
-          }}>
-            <div>
-              <h2 style={{ fontFamily: 'Libre Baskerville, serif', fontSize: '1.8rem', fontWeight: 700, color: '#000' }}>
-                Top 10 Devotee Donors
-              </h2>
-              <p style={{ fontFamily: 'Inter', fontSize: '0.9rem', color: '#666' }}>
-                Honoring generous souls whose offerings empower our continuous Anna Prasadam Seva.
-              </p>
-            </div>
-
-            {user?.role === 'owner' && allReceipts.length > 0 && (
-              <button
-                onClick={exportToExcel}
-                className="pill-btn pill-btn-outline pill-btn-sm"
-              >
-                <FileSpreadsheet size={15} /> Export Receipts (Excel)
-              </button>
-            )}
+        ) : (
+          <div className="receipts-empty">
+            <div className="receipts-empty-art"><Sparkles size={22} /><span><Receipt size={38} /></span><Heart size={20} /></div>
+            <p className="impact-kicker">Your seva record</p>
+            <h3>{user ? (query ? 'No matching receipts' : 'Your receipts will appear here') : 'Sign in to find your receipts'}</h3>
+            <p>{user ? (query ? 'Try another name, purpose or receipt number.' : 'Receipts are matched to the email address used when the donation was recorded. If yours is missing, contact the trust and we’ll help locate it.') : 'Use the same Google account whose email address was shared with Sasta Trust for your receipt.'}</p>
+            {user ? <a href="mailto:sastatrust@gmail.com?subject=Help%20finding%20my%20receipt">Ask us to find a receipt <ArrowRight size={16} /></a> : <button onClick={loginWithGoogle}>Continue with Google <ArrowRight size={16} /></button>}
+            <Link to="/donations" className="receipts-give-link">Explore ways to contribute</Link>
           </div>
-
-          {topDonors.length > 0 ? (
-            <div className="trust-donor-list" style={{
-              borderRadius: '20px',
-              border: '1px solid #eee',
-              overflow: 'hidden',
-              background: '#ffffff',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.03)'
-            }}>
-              {topDonors.map((donor, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '16px 24px',
-                    borderBottom: idx === topDonors.length - 1 ? 'none' : '1px solid #f3f4f6',
-                    background: idx === 0 ? '#fffbeb' : idx === 1 ? '#f8fafc' : '#ffffff'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <span style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: '50%',
-                      background: idx < 3 ? '#000000' : '#f3f4f6',
-                      color: idx < 3 ? '#ffffff' : '#666666',
-                      fontFamily: 'Inter',
-                      fontSize: '0.8rem',
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      {idx + 1}
-                    </span>
-                    <span style={{ fontFamily: 'Libre Baskerville, serif', fontWeight: 700, fontSize: '1rem', color: '#000' }}>
-                      {donor.name}
-                    </span>
-                  </div>
-                  <strong style={{ fontFamily: 'Inter', fontSize: '1rem', color: '#000' }}>
-                    ₹{Number(donor.amt).toLocaleString('en-IN')}
-                  </strong>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{
-              padding: '50px 20px',
-              textAlign: 'center',
-              background: '#fafafa',
-              borderRadius: '20px',
-              border: '1px dashed #d1d5db',
-              color: '#777'
-            }}>
-              <Trophy size={40} color="#9ca3af" style={{ margin: '0 auto 12px' }} />
-              <p style={{ fontFamily: 'Inter', fontSize: '0.95rem' }}>
-                No donation records found yet.
-              </p>
-            </div>
-          )}
-        </section>
-
-        {/* =========================================================================
-            MY RECEIPTS (LOOKUP & OFFICIAL RECEIPTS LIST)
-            ========================================================================= */}
-        <section id="my-receipts">
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '24px',
-            flexWrap: 'wrap',
-            gap: '16px'
-          }}>
-            <div>
-              <h2 style={{ fontFamily: 'Libre Baskerville, serif', fontSize: '1.8rem', fontWeight: 700, color: '#000' }}>
-                My Receipts
-              </h2>
-              <p style={{ fontFamily: 'Inter', fontSize: '0.88rem', color: '#888', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                SEVA IS WORSHIP — SERVICE IS TRADITION
-              </p>
-            </div>
-
-            {/* Search Input */}
-            <div style={{ position: 'relative', minWidth: '280px' }}>
-              <Search size={16} color="#888" style={{ position: 'absolute', left: 14, top: 12 }} />
-              <input
-                type="text"
-                placeholder="Search by name or email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '9px 16px 9px 40px',
-                  borderRadius: '30px',
-                  border: '1px solid #d1d5db',
-                  fontFamily: 'Inter',
-                  fontSize: '0.88rem',
-                  outline: 'none'
-                }}
-              />
-            </div>
-          </div>
-
-          <p style={{ fontFamily: 'Libre Baskerville, serif', fontStyle: 'italic', fontSize: '0.98rem', color: '#555', marginBottom: '28px' }}>
-            With blessings of Lord Dharma Sasta, Sasta Trust continues its humble journey of devotion and service.
-          </p>
-
-          {displayedReceipts.length > 0 ? (
-            <div className="trust-receipt-grid" style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '24px'
-            }}>
-              {displayedReceipts.map((rcpt) => (
-                <div
-                  key={rcpt.id}
-                  style={{
-                    padding: '24px',
-                    borderRadius: '20px',
-                    border: '1px solid #eee',
-                    background: '#ffffff',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.03)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                      <span style={{
-                        padding: '4px 10px',
-                        background: '#f3f4f6',
-                        borderRadius: '12px',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        color: '#555'
-                      }}>
-                        Receipt #{rcpt.id}
-                      </span>
-                      <span style={{ fontFamily: 'Inter', fontSize: '0.8rem', color: '#888' }}>
-                        {rcpt.date || new Date(rcpt.createdAt).toLocaleDateString('en-IN')}
-                      </span>
-                    </div>
-
-                    <h4 style={{ fontFamily: 'Libre Baskerville, serif', fontSize: '1.25rem', fontWeight: 700, color: '#000', marginBottom: '6px' }}>
-                      {rcpt.name}
-                    </h4>
-
-                    <p style={{ fontFamily: 'Inter', fontSize: '0.88rem', color: '#666', marginBottom: '16px' }}>
-                      Purpose: {rcpt.details || 'Anna Prasadam Seva'}
-                    </p>
-                  </div>
-
-                  <div style={{
-                    borderTop: '1px solid #f3f4f6',
-                    paddingTop: '16px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}>
-                    <strong style={{ fontFamily: 'Inter', fontSize: '1.2rem', color: '#111' }}>
-                      ₹{Number(rcpt.amount).toLocaleString('en-IN')}
-                    </strong>
-
-                    <button
-                      onClick={() => alert(`Receipt #${rcpt.id} verified: Sasta Trust Official Record`)}
-                      className="pill-btn pill-btn-black pill-btn-sm"
-                    >
-                      <Receipt size={14} /> Official Receipt
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{
-              padding: '60px 20px',
-              textAlign: 'center',
-              background: '#fafafa',
-              borderRadius: '20px',
-              border: '1px dashed #d1d5db'
-            }}>
-              <Receipt size={44} color="#9ca3af" style={{ margin: '0 auto 12px' }} />
-              <h3 style={{ fontFamily: 'Libre Baskerville, serif', fontSize: '1.3rem', color: '#111', marginBottom: '6px' }}>
-                No receipts found
-              </h3>
-              <p style={{ fontFamily: 'Inter', color: '#666', fontSize: '0.9rem' }}>
-                {searchQuery ? 'Try searching with a different name or contact value.' : 'Donations made under your email will appear here automatically.'}
-              </p>
-            </div>
-          )}
-        </section>
-      </div>
-
-      {/* QR Code Zoom Modal */}
-      <AnimatePresence>
-        {isQRModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsQRModalOpen(false)}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 99999,
-              background: 'rgba(0,0,0,0.85)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '20px'
-            }}
-          >
-            <div
-              onClick={e => e.stopPropagation()}
-              style={{
-                background: '#ffffff',
-                borderRadius: '24px',
-                padding: '36px',
-                maxWidth: '420px',
-                width: '100%',
-                textAlign: 'center',
-                position: 'relative'
-              }}
-            >
-              <button
-                onClick={() => setIsQRModalOpen(false)}
-                style={{
-                  position: 'absolute',
-                  top: '16px',
-                  right: '16px',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: '#666'
-                }}
-              >
-                <X size={20} />
-              </button>
-
-              <h3 style={{ fontFamily: 'Libre Baskerville', fontSize: '1.4rem', marginBottom: '6px' }}>
-                Sasta Trust UPI QR
-              </h3>
-              <p style={{ fontFamily: 'Inter', fontSize: '0.85rem', color: '#666', marginBottom: '20px' }}>
-                Scan to contribute directly for Anna Prasadam Seva
-              </p>
-
-              <img
-                src="/QRcode/QRCode.png"
-                alt="UPI QR Code"
-                style={{ width: '100%', maxWidth: '260px', height: 'auto', margin: '0 auto 20px', display: 'block' }}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=upi://pay?pa=sastatrust@upi&pn=Sasta%20Trust';
-                }}
-              />
-
-              <div style={{
-                background: '#f3f4f6',
-                borderRadius: '30px',
-                padding: '8px 16px',
-                fontFamily: 'Inter',
-                fontWeight: 600,
-                fontSize: '0.9rem',
-                marginBottom: '16px'
-              }}>
-                sastatrust@upi
-              </div>
-
-              <button
-                onClick={() => copyToClipboard('sastatrust@upi')}
-                className="pill-btn pill-btn-black pill-btn-sm"
-              >
-                <Copy size={14} /> Copy UPI ID
-              </button>
-            </div>
-          </motion.div>
         )}
-      </AnimatePresence>
-    </div>
+      </section>
+    </main>
   );
 };

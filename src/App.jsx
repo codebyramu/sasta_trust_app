@@ -7,6 +7,7 @@ import { OccasionDetails } from './pages/OccasionDetails';
 import { AddOccasion } from './pages/Admin/AddOccasion';
 import { SendReceipt } from './pages/Admin/SendReceipt';
 import { UserReceipts } from './pages/UserReceipts';
+import { Donate } from './pages/Donate';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuth } from './context/AuthContext';
 import { LoadingScreen } from './components/LoadingScreen';
@@ -60,7 +61,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/occasion/:id" element={<OccasionDetails />} />
             <Route path="/donate" element={<UserReceipts />} />
-            <Route path="/donations" element={<UserReceipts />} />
+            <Route path="/donations" element={<Donate />} />
             <Route path="/admin" element={<ProtectedRoute requireOwner={true}><AddOccasion /></ProtectedRoute>} />
             <Route path="/admin/receipt" element={<ProtectedRoute requireOwner={true}><SendReceipt /></ProtectedRoute>} />
           </Routes>
