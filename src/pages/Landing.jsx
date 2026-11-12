@@ -167,6 +167,23 @@ export const Landing = () => {
             {!skipScrollReveal && <span className="impact-reveal-hint"><span /> Scroll to see the seva</span>}
           </motion.div>
 
+          {!skipScrollReveal && <motion.div
+            className="impact-reveal-side-notes"
+            style={{ opacity: introOpacity }}
+            aria-hidden="true"
+          >
+            <div className="impact-reveal-side-note">
+              <Utensils size={19} />
+              <p>Made with care</p>
+              <span>Fresh meals, freely shared with pilgrims.</span>
+            </div>
+            <div className="impact-reveal-side-note is-right">
+              <MapPin size={19} />
+              <p>A pause along the way</p>
+              <span>Water and a helping hand near Azhudha River.</span>
+            </div>
+          </motion.div>}
+
           <motion.div
             className="impact-reveal-backdrop"
             style={{ opacity: skipScrollReveal ? 1 : heroOpacity }}
@@ -374,9 +391,6 @@ export const Landing = () => {
           <img src="/QRcode/QRCode.png" alt="Sasta Trust UPI donation QR code" />
         </a>
         <div className="impact-footer-bottom"><span>© 2026 Sasta Trust</span><span>Serving pilgrims since 2012 · Swamy Sharanam</span><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Back to top ↑</button></div>
-        <div className="impact-footer-art" aria-hidden="true">
-          <img src="/gallery/footer-sasta-seva.webp" alt="" />
-        </div>
       </footer>
     </div>
   );
