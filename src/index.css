@@ -1863,11 +1863,12 @@ body { background: #fff; }
   overflow: hidden;
   padding-bottom: 0;
   background-color: #fff;
-  background-image: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.97) 45%, rgba(255,255,255,.82) 73%, rgba(255,255,255,.56) 100%), url('/gallery/footer-seva-landscape.svg');
+  background-image: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.96) 45%, rgba(255,255,255,.76) 72%, rgba(255,255,255,.22) 100%), url('/gallery/footer-seva-landscape.svg');
   background-position: center, center bottom;
   background-size: 100% 100%, 100% 100%;
   background-repeat: no-repeat;
 }
+.impact-footer-bottom { background: rgba(255,255,255,.76); }
 
 @media (max-width: 700px) {
   .impact-scroll-stage { height: calc(100svh - 56px); max-height: none; }
@@ -1882,7 +1883,7 @@ body { background: #fff; }
   .impact-reveal-detail-items > span { padding: 0 10px; font-size: .64rem; }
   .impact-footer {
     padding-bottom: 0;
-    background-image: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.94) 56%, rgba(255,255,255,.65) 100%), url('/gallery/footer-seva-landscape.svg');
+    background-image: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.92) 56%, rgba(255,255,255,.3) 100%), url('/gallery/footer-seva-landscape.svg');
     background-size: 100% 100%, auto 180px;
     background-position: center, center bottom;
   }

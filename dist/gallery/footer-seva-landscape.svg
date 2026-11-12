@@ -1,43 +1,67 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 360" fill="none">
-  <g opacity=".8">
-    <path fill="#e7eee3" d="M0 227c130-58 245-54 360-3 116 52 223 58 340 11 118-48 230-55 344-12 130 50 263 57 556-8v145H0V227Z"/>
-    <path fill="#d7e4d5" d="M0 261c148-49 269-45 386 6 117 51 224 52 340 8 130-49 241-47 359 5 134 59 276 48 515-14v94H0v-99Z"/>
-    <path fill="#dbe7dc" d="M0 283c167-26 273-19 387 14 126 37 237 33 349-7 132-47 255-38 374 12 139 58 293 48 490 0v58H0v-77Z"/>
+  <defs>
+    <linearGradient id="far-bank" x1="0" y1="154" x2="0" y2="284" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e5ecdf"/><stop offset="1" stop-color="#d6e3d4"/>
+    </linearGradient>
+    <linearGradient id="river" x1="0" y1="244" x2="0" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d5e4df"/><stop offset="1" stop-color="#b6d0c8"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#d8b66f"/><stop offset="1" stop-color="#a77b38"/>
+    </linearGradient>
+  </defs>
+  <!-- Soft hills and the Azhudha River. -->
+  <path fill="url(#far-bank)" d="M0 208c113-43 215-61 314-38 83 20 126 9 207-28 103-47 195-21 281 10 77 28 147 17 232-16 101-40 202-21 285 17 89 40 163 42 281 1v127H0V208Z"/>
+  <path fill="#d4e1d1" d="M0 241c125-42 246-43 360-4 122 41 223 35 334-8 115-45 223-39 338 5 124 48 239 49 568-25v151H0V241Z"/>
+  <path fill="url(#river)" d="M0 267c175-31 303-30 426 3 127 34 247 33 363-5 135-44 259-38 387 8 124 45 253 47 424 0v87H0v-93Z"/>
+  <g stroke="#8eb0a5" stroke-linecap="round" opacity=".54">
+    <path stroke-width="3" d="M0 285c167-28 306-24 430 9 129 34 245 31 365-7 131-41 251-36 383 8 124 41 254 43 422 2"/>
+    <path stroke-width="2" d="M0 318c167-28 306-24 430 9 129 34 245 31 365-7 131-41 251-36 383 8 124 41 254 43 422 2"/>
+    <path stroke-width="2" d="M0 344c167-28 306-24 430 9 129 34 245 31 365-7 131-41 251-36 383 8 124 41 254 43 422 2"/>
   </g>
-  <g stroke="#a6bea7" stroke-linecap="round" opacity=".72">
-    <path stroke-width="3" d="M0 292c184-30 307-22 431 11s239 27 351-9 225-40 352-1 265 40 466-7"/>
-    <path stroke-width="2" d="M0 315c184-30 307-22 431 11s239 27 351-9 225-40 352-1 265 40 466-7"/>
-    <path stroke-width="2" d="M0 337c184-30 307-22 431 11s239 27 351-9 225-40 352-1 265 40 466-7"/>
+  <g fill="#b48a45" opacity=".28">
+    <circle cx="185" cy="216" r="3"/><circle cx="205" cy="201" r="2.5"/><circle cx="224" cy="218" r="3.5"/>
+    <circle cx="1321" cy="222" r="3"/><circle cx="1340" cy="205" r="2.5"/><circle cx="1360" cy="220" r="3.5"/>
   </g>
-  <g fill="#8ea88e" opacity=".54">
-    <path d="M1257 251c5-53 9-92 17-130 7 34 10 76 8 130h-25Z"/>
-    <path d="M1271 142c-26-25-47-35-66-38 12 19 34 34 66 46-21-31-30-57-28-78 19 19 29 45 31 78 5-35 18-59 38-72-3 26-15 50-36 75 27-17 51-23 71-17-19 17-43 24-74 23 35 9 57 24 66 45-26-8-48-23-69-47 9 30 8 55-4 74-10-25-10-52 3-89Z"/>
-    <path d="M1408 276c4-41 8-72 14-101 6 27 8 59 6 101h-20Z"/>
-    <path d="M1420 193c-20-19-36-27-50-29 9 15 26 26 50 35-16-24-23-44-21-60 15 15 22 34 23 60 4-27 14-45 29-55-2 20-11 38-27 57 21-13 39-17 54-13-14 13-33 18-56 17 26 7 43 19 50 35-20-6-37-18-53-36 7 23 6 42-3 57-8-19-8-40 2-68Z"/>
+  <!-- Riverside shrine and a pair of coconut palms. -->
+  <g fill="#53745f" opacity=".55">
+    <path d="M117 279h151v8H117zm15-77h120v7H132zm-8-7 68-42 68 42H124Z"/>
+    <path d="M145 207h8v67h-8zm36 0h8v67h-8zm36 0h8v67h-8zm-95 77h162v7H122z"/>
+    <path d="m135 285 18 15h99l19-15"/>
+    <path d="M1417 273c4-54 10-97 19-139 7 43 8 87 4 139h-23Z"/>
+    <path d="M1434 161c-28-24-54-34-77-31 18 19 42 34 75 44-24-26-36-52-34-76 23 18 36 43 40 76 4-34 18-58 43-72-5 29-18 53-40 75 30-16 55-19 75-8-21 16-46 23-77 20 35 12 56 29 64 51-29-9-52-26-70-53 7 31 3 56-11 75-8-29-4-62 12-101Z"/>
+    <path d="M1511 283c3-35 7-63 13-89 5 27 6 55 3 89h-16Z"/>
+    <path d="M1523 211c-18-16-33-23-47-23 11 14 26 24 47 31-14-20-20-38-18-52 13 12 20 29 21 52 4-23 12-39 25-47-2 17-10 33-24 49 18-11 34-14 47-9-12 11-28 15-48 14 23 6 37 16 43 30-17-5-32-16-46-31 6 20 5 36-3 49-7-16-6-34 3-58Z"/>
   </g>
-  <g fill="#547b60" opacity=".46" stroke="#547b60" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Small riverside shrine -->
-    <path d="M131 276h154v8H131zm15-80h124v7H146zm-7 7h138l-15-15H154zm23-17 53-37 53 37H162Z"/>
-    <path d="M160 204h9v72h-9zm34 0h9v72h-9zm35 0h9v72h-9zm34 0h9v72h-9z"/>
-    <path d="M118 286h180v8H118zm20 8 17 17h108l18-17"/>
-    <!-- Volunteers serving a meal -->
-    <circle cx="504" cy="247" r="10"/><path d="M495 260h18l7 39h-31zm-5 38h34v6h-34z"/>
-    <path d="m510 269 29 19-3 5-32-13m-15-1-20 18-4-4 19-24"/>
-    <circle cx="574" cy="252" r="9"/><path d="M566 264h16l7 35h-29zm-4 34h32v6h-32z"/>
-    <path d="m579 273 25 11-2 5-27-6m-13 0-17 19-4-3 14-23"/>
-    <!-- Serving table and vessel -->
-    <path d="M458 293h170v7H458zm11 7h6v24h-6zm143 0h6v24h-6z"/>
-    <path d="M523 274h41l-4 18h-33zm4-5h33v5h-33zm73 11h17v13h-17zm-112-2 16-9 14 9v8h-30z"/>
-    <!-- Seated pilgrims -->
-    <circle cx="673" cy="287" r="9"/><path d="M665 298h17l19 19h-29l-12-11zm-7 17h50v6h-50z"/>
-    <circle cx="734" cy="285" r="9"/><path d="M726 296h17l18 20h-29l-12-11zm-8 17h50v6h-50z"/>
-    <circle cx="795" cy="287" r="9"/><path d="M787 298h17l19 19h-29l-12-11zm-7 17h50v6h-50z"/>
+  <!-- Canopy over the serving table. -->
+  <path fill="#d2b87d" opacity=".5" d="m314 173 124-40 131 40-15 9H329l-15-9Z"/>
+  <path stroke="#9b8355" stroke-width="4" opacity=".53" d="M329 178v105m224-105v105M345 181v101m192-101v101M319 175h246"/>
+  <path stroke="#f5edda" stroke-width="2" opacity=".65" d="m334 170 105-31 109 32m-196 9 87-39m-65 40 88-42m-62 42 88-39m-61 39 83-36"/>
+  <!-- Volunteers preparing and serving a fresh meal. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="398" cy="218" r="13" fill="#bd8058"/><path d="M387 214q10-17 24-4l1 8h-25Z" fill="#3c5141"/>
+    <path d="M382 236q16-11 31 0l11 47h-52l10-47Z" fill="#6d9275"/>
+    <path d="m386 245 45 25m-44-20-22 27" stroke="#bd8058" stroke-width="9"/>
+    <circle cx="515" cy="211" r="14" fill="#c88b63"/><path d="M502 207q13-19 28 0l-2 7h-25Z" fill="#435848"/>
+    <path d="M497 230q18-12 36 1l14 53h-63l13-54Z" fill="#c29a54"/>
+    <path d="m506 242 47 14m-44-8-21 29" stroke="#c88b63" stroke-width="9"/>
+    <circle cx="633" cy="220" r="12" fill="#aa704f"/><path d="M621 216q11-16 24-2l1 7h-25Z" fill="#374d42"/>
+    <path d="M618 237q15-10 31 0l10 46h-52l11-46Z" fill="#8da88a"/>
+    <path d="m626 246 34 22m-34-18-22 25" stroke="#aa704f" stroke-width="8"/>
   </g>
-  <g stroke="#b48a45" stroke-width="3" stroke-linecap="round" opacity=".67">
-    <path d="M467 279h54m109 12h37m200 27h46"/>
-    <path d="M167 184h84m-42-52v19"/>
+  <!-- Serving counter, brass pots and banana-leaf meal. -->
+  <path fill="#54765f" d="M353 282h366v9H353zm19 9h7v28h-7zm320 0h7v28h-7z"/>
+  <path fill="url(#brass)" d="M420 250h42l-4 31h-34l-4-31Zm8-7h26v7h-26Zm129 14h49l-6 24h-37l-6-24Zm8-7h33v7h-33Z"/>
+  <path stroke="#8c642f" stroke-width="3" d="M427 250h28m128 7h35"/>
+  <path fill="#758e58" d="M483 276q34-19 68 0-34 16-68 0Z"/><path fill="#e9d7a7" d="M500 276q16-11 33 0-17 10-33 0Z"/>
+  <!-- Pilgrims seated together along the riverbank. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="816" cy="274" r="12" fill="#b97f5a"/><path d="M805 269q11-16 23-1v6h-24Z" fill="#4a5c47"/><path d="M803 289q14-8 27 1l21 20h-38l-14-11Z" fill="#d0ab69"/><path d="M820 294 795 309" stroke="#b97f5a" stroke-width="8"/>
+    <circle cx="905" cy="269" r="13" fill="#9e684d"/><path d="M893 265q11-17 25-2l1 6h-26Z" fill="#354b40"/><path d="M891 285q16-9 30 1l21 23h-39l-14-12Z" fill="#78967b"/><path d="M909 291 884 307" stroke="#9e684d" stroke-width="8"/>
+    <circle cx="995" cy="276" r="11" fill="#c58a63"/><path d="M985 272q10-15 21-1v6h-22Z" fill="#495e4e"/><path d="M982 290q14-8 27 1l19 18h-35l-14-11Z" fill="#c89c5a"/><path d="M999 296 976 309" stroke="#c58a63" stroke-width="7"/>
+    <path stroke="#617e68" stroke-width="5" d="M781 313h278"/>
   </g>
-  <g fill="#b48a45" opacity=".55">
-    <circle cx="433" cy="311" r="4"/><circle cx="443" cy="318" r="3"/><circle cx="838" cy="291" r="4"/>
+  <g fill="#b48a45" opacity=".65">
+    <circle cx="744" cy="291" r="3"/><circle cx="755" cy="301" r="2.5"/><circle cx="1066" cy="281" r="3"/>
   </g>
 </svg>
