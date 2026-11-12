@@ -78,11 +78,11 @@ export const Landing = () => {
     offset: ['start start', 'end end'],
   });
   const revealScale = useTransform(scrollYProgress, [0, 0.64], [0.55, 5.6]);
-  const introOpacity = useTransform(scrollYProgress, [0.08, 0.25], [1, 0]);
+  const introOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (0.25 - progress) / 0.17)));
   const introY = useTransform(scrollYProgress, [0.08, 0.25], [0, -24]);
-  const heroOpacity = useTransform(scrollYProgress, [0.48, 0.68], [0, 1]);
-  const heroY = useTransform(scrollYProgress, [0.48, 0.68], [24, 0]);
-  const wordOpacity = useTransform(scrollYProgress, [0.55, 0.7], [1, 0]);
+  const heroOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (progress - 0.68) / 0.14)));
+  const heroY = useTransform(scrollYProgress, [0.68, 0.82], [24, 0]);
+  const wordOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (0.82 - progress) / 0.14)));
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -148,7 +148,7 @@ export const Landing = () => {
             aria-hidden={skipScrollReveal}
           >
             <p className="impact-reveal-kicker">Sasta Trust · Azhudha River, Kerala</p>
-            <h2>Every pilgrim deserves a moment of care.</h2>
+            <h2>Hope begins with a meal.</h2>
             <p>Free Anna Prasadam and drinking water on the Sabarimala route.</p>
             {!skipScrollReveal && <span className="impact-reveal-hint"><span /> Scroll to see the seva</span>}
           </motion.div>
@@ -178,12 +178,13 @@ export const Landing = () => {
               className="impact-reveal-word-stage"
               style={{ scale: revealScale, opacity: wordOpacity }}
             >
+              <span className="impact-reveal-word-before">H</span>
               <span className="impact-reveal-word-o">
                 <span className="impact-reveal-o-photo">
                   <img src={heroSlides[activeSlide].image} alt="" />
                 </span>
               </span>
-              <span className="impact-reveal-word-rest">NE</span>
+              <span className="impact-reveal-word-after">PE</span>
             </motion.div>
           </div>}
 
