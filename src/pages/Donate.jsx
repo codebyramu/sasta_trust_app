@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowRight, Heart, HeartHandshake, Phone, Users } from 'lucide-react';
 
 const causes = [
-  { title: 'Anna Prasadam seva', copy: 'Help prepare and serve nourishing meals to pilgrims along the Azhudha River route.', image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM.jpeg', label: 'A meal shared on the pilgrimage' },
-  { title: 'Care for sacred spaces', copy: 'Support the upkeep of heritage temples and the people who care for them.', image: '/gallery/heritage_temple_restoration.jpg', label: 'Temple care and restoration' },
-  { title: 'Support for pilgrims', copy: 'Help make the pilgrimage safer and more welcoming for people who need a little extra care.', image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(2).jpeg', label: 'Volunteers supporting pilgrims' },
-  { title: 'Community care', copy: 'Extend practical support to elders and families in the Sasta Trust community.', image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.18%20PM.jpeg', label: 'Community members gathered together' },
+  { title: 'Anna Prasadam seva', eyebrow: 'PILGRIM CARE', copy: 'Help prepare and serve nourishing meals to pilgrims along the Azhudha River route.', image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM.jpeg', label: 'A meal shared on the pilgrimage' },
+  { title: 'Care for sacred spaces', eyebrow: 'SACRED SPACES', copy: 'Support the upkeep of heritage temples and the people who care for them.', image: '/gallery/heritage_temple_restoration.jpg', label: 'Temple care and restoration' },
+  { title: 'Support for pilgrims', eyebrow: 'PILGRIM SUPPORT', copy: 'Help make the pilgrimage safer and more welcoming for people who need a little extra care.', image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(2).jpeg', label: 'Volunteers supporting pilgrims' },
+  { title: 'Community care', eyebrow: 'COMMUNITY CARE', copy: 'Extend practical support to elders and families in the Sasta Trust community.', image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.18%20PM.jpeg', label: 'Community members gathered together' },
 ];
 
 export const Donate = () => (
@@ -30,15 +30,16 @@ export const Donate = () => (
     </section>
 
     <section className="contribute-causes" id="ways-to-give">
-      {causes.map((cause, index) => (
+      {causes.map((cause) => (
         <article className="contribute-cause" key={cause.title}>
           <div className="contribute-cause-image">
             <img src={cause.image} alt={cause.label} loading="lazy" />
-            <span>{String(index + 1).padStart(2, '0')}</span>
           </div>
           <div className="contribute-cause-copy">
+            <p className="contribute-cause-eyebrow">{cause.eyebrow}</p>
             <h3>{cause.title}</h3>
             <p>{cause.copy}</p>
+            <a href="#give">Support this seva <ArrowRight size={15} /></a>
           </div>
         </article>
       ))}

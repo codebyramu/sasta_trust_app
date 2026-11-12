@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 120" fill="none">
+  <defs>
+    <linearGradient id="mSky" x1="195" y1="0" x2="195" y2="120" gradientUnits="userSpaceOnUse"><stop stop-color="#F4FAFD"/><stop offset="1" stop-color="#DCEEF6"/></linearGradient>
+    <linearGradient id="mRiver" x1="195" y1="74" x2="195" y2="120" gradientUnits="userSpaceOnUse"><stop stop-color="#9BCFE0"/><stop offset="1" stop-color="#3986A8"/></linearGradient>
+  </defs>
+  <path fill="url(#mSky)" d="M0 0h390v120H0z"/>
+  <path d="m55 81 47-40 22 17 34-30 31 33 21-18 42 39H55Z" fill="#83B6C7"/>
+  <path d="m103 82 38-33 14 11 18-21 23 25 12-10 38 28h-143Z" fill="#397E96"/>
+  <path d="M0 78c49-9 78 7 127 0 44-7 74-6 112 2 53 11 95-6 151-1v41H0V78Z" fill="#428BA3"/>
+  <path d="M0 90c44-10 84 12 128 3 55-11 83-12 127-2 47 11 80-10 135-5v34H0V90Z" fill="#26738F"/>
+  <g fill="#205B72" stroke="#174B61" stroke-linejoin="round">
+    <path d="M12 107V67h4v-4h5v-5h5v-5h6v-6h6V38l7-13 7 13v9h6v6h6v5h5v5h4v4h4v40H12Z" stroke-width="1.6"/>
+    <path d="M24 55h37M19 63h47M14 72h56M13 83h58M12 96h61M11 106h64" stroke="#A7D2DE" stroke-width="1.4"/>
+    <path d="M31 107V91h14v16M37 98v9M46 98v9" fill="#DCEEF6" stroke-width="1.5"/>
+    <path d="M24 47h37M29 40h27M36 34h13M43 25V11m-5 10 5-9 6 9" stroke-width="2"/>
+  </g>
+  <path d="m76 107 18 8h20l-11-7H87l-9-8" fill="#4F91AA"/>
+  <g stroke="#367C91" stroke-linecap="round" stroke-width="1.5">
+    <path d="M94 80c1-11 1-21-2-31m0 8C83 49 77 48 70 49c7-5 13-5 22 1-4-9-3-16 0-21 2 7 4 14 3 22 5-8 11-12 19-11-5 5-10 10-19 14 9-4 16-4 23 0-7 3-14 5-23 5"/>
+    <path d="M357 81c2-12 2-23 0-34m0 6c-8-8-15-10-22-9 6-5 13-5 21 1-4-9-3-16 0-22 2 7 4 14 3 22 5-8 11-12 18-11-4 5-10 10-18 14 8-4 15-4 22 0-7 3-14 5-23 5"/>
+  </g>
+  <g fill="#164E68">
+    <circle cx="264" cy="65" r="4"/><path d="M258 79c0-8 2-12 6-12s6 4 6 12h-12Zm-2 0h16v3h-16z"/>
+    <circle cx="283" cy="62" r="4"/><path d="M277 79c0-9 2-13 6-13s6 4 6 13h-12Zm-2 0h16v3h-16z"/>
+    <circle cx="302" cy="66" r="3.5"/><path d="M297 79c0-7 2-11 5-11s5 4 5 11h-10Zm-2 0h14v3h-14z"/>
+  </g>
+  <path d="M326 78V62m0 0-4 6m4-6 4 6" stroke="#164E68" stroke-width="2"/>
+  <path d="M0 98c48-13 76 14 126 3 52-11 91-14 136-4 45 10 76-4 128-10v33H0V98Z" fill="url(#mRiver)"/>
+  <path d="M0 104c45-11 75 13 125 5 50-9 93-15 139-3 46 12 76-5 126-9" stroke="#D8F0F5" stroke-width="2"/>
+</svg>
