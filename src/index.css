@@ -1860,14 +1860,14 @@ body { background: #fff; }
 .impact-reveal-hero-copy { z-index: 4; }
 .impact-reveal-bottom { z-index: 4; }
 .impact-footer {
+  position: relative;
+  isolation: isolate;
   overflow: hidden;
   padding-bottom: 0;
-  background-color: #fff;
-  background-image: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.96) 45%, rgba(255,255,255,.76) 72%, rgba(255,255,255,.22) 100%), url('/gallery/footer-seva-landscape.svg');
-  background-position: center, center bottom;
-  background-size: 100% 100%, 100% 100%;
-  background-repeat: no-repeat;
+  background: #fff;
 }
+.impact-footer::before { position: absolute; z-index: 0; inset: 0; background-image: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.97) 42%, rgba(255,255,255,.84) 56%, rgba(255,255,255,.42) 78%, rgba(255,255,255,.1) 100%), url('/gallery/footer-seva-landscape.svg'); background-position: center, center top; background-size: 100% 100%, 100% auto; background-repeat: no-repeat; content: ''; pointer-events: none; }
+.impact-footer > * { position: relative; z-index: 1; }
 .impact-footer-bottom { background: rgba(255,255,255,.76); }
 
 @media (max-width: 700px) {
@@ -1883,10 +1883,8 @@ body { background: #fff; }
   .impact-reveal-detail-items > span { padding: 0 10px; font-size: .64rem; }
   .impact-footer {
     padding-bottom: 0;
-    background-image: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.92) 56%, rgba(255,255,255,.3) 100%), url('/gallery/footer-seva-landscape.svg');
-    background-size: 100% 100%, auto 180px;
-    background-position: center, center bottom;
   }
+  .impact-footer::before { background-image: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.92) 56%, rgba(255,255,255,.3) 100%), url('/gallery/footer-seva-landscape.svg'); background-size: 100% 100%, auto 180px; background-position: center, center bottom; }
 }
 
 /* Hold the forest-green canvas until the O-shaped image nearly fills the stage. */
@@ -1897,12 +1895,9 @@ body { background: #fff; }
 .impact-reveal-backdrop { background: #173b2c; }
 .impact-reveal-backdrop .impact-reveal-shade { opacity: .28; }
 .impact-scroll-stage {
-  background-color: #173b2c;
-  background-image: url('/gallery/home-seva-landscape.svg'), radial-gradient(ellipse at 50% 46%, #204a38 0%, #173b2c 68%);
-  background-position: center bottom, center;
-  background-size: cover, cover;
-  background-repeat: no-repeat;
+  background: radial-gradient(ellipse at 50% 46%, #204a38 0%, #173b2c 68%);
 }
+.impact-scroll-scenery { position: absolute; z-index: 0; inset: 0; background: url('/gallery/home-seva-landscape.svg') center bottom / cover no-repeat; transform-origin: center 55%; will-change: transform, opacity; pointer-events: none; }
 .impact-reveal-side-notes { position: absolute; z-index: 3; top: 57%; right: 50%; left: 50%; display: flex; width: min(1180px, calc(100% - 96px)); justify-content: space-between; transform: translate(-50%, -50%); pointer-events: none; }
 .impact-reveal-side-note { width: 215px; padding: 13px 0 13px 15px; border-left: 1px solid rgba(214,178,109,.65); color: rgba(255,255,255,.78); }
 .impact-reveal-side-note.is-right { border-right: 1px solid rgba(214,178,109,.65); border-left: 0; padding: 13px 15px 13px 0; text-align: right; }

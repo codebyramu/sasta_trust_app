@@ -80,6 +80,9 @@ export const Landing = () => {
   const revealEnd = 0.353;
   const revealClose = revealEnd * 0.9;
   const revealScale = useTransform(scrollYProgress, [0, revealEnd], [0.55, 8.1]);
+  const sceneryScale = useTransform(scrollYProgress, [0, revealEnd], [1, 1.12]);
+  const sceneryY = useTransform(scrollYProgress, [0, revealEnd], [0, -30]);
+  const sceneryOpacity = useTransform(scrollYProgress, [0, revealClose, revealEnd], [1, 0.55, 0.2]);
   const introFadeStart = revealEnd * 0.08;
   const introFadeEnd = revealEnd * 0.25;
   const introOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (introFadeEnd - progress) / (introFadeEnd - introFadeStart))));
@@ -151,6 +154,11 @@ export const Landing = () => {
     <div className="impact-home">
       <section className="impact-scroll-reveal" ref={revealRef} aria-label="A moment of care for every pilgrim">
         <div className="impact-scroll-stage" id="home">
+          <motion.div
+            className="impact-scroll-scenery"
+            style={{ scale: sceneryScale, y: sceneryY, opacity: skipScrollReveal ? 0 : sceneryOpacity }}
+            aria-hidden="true"
+          />
           <motion.div
             className="impact-reveal-intro"
             style={{ opacity: skipScrollReveal ? 0 : introOpacity, y: skipScrollReveal ? -28 : introY }}
