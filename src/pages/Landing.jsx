@@ -77,12 +77,22 @@ export const Landing = () => {
     target: revealRef,
     offset: ['start start', 'end end'],
   });
-  const revealScale = useTransform(scrollYProgress, [0, 0.94], [0.55, 8.1]);
-  const introOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (0.25 - progress) / 0.17)));
-  const introY = useTransform(scrollYProgress, [0.08, 0.25], [0, -24]);
-  const heroOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (progress - 0.9) / 0.1)));
-  const heroY = useTransform(scrollYProgress, [0.9, 1], [24, 0]);
-  const wordOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (1 - progress) / 0.1)));
+  const revealEnd = 0.353;
+  const revealClose = revealEnd * 0.9;
+  const revealScale = useTransform(scrollYProgress, [0, revealEnd], [0.55, 8.1]);
+  const introFadeStart = revealEnd * 0.08;
+  const introFadeEnd = revealEnd * 0.25;
+  const introOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (introFadeEnd - progress) / (introFadeEnd - introFadeStart))));
+  const introY = useTransform(scrollYProgress, [introFadeStart, introFadeEnd], [0, -24]);
+  const heroOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (progress - revealClose) / (revealEnd - revealClose))));
+  const heroY = useTransform(scrollYProgress, [revealClose, revealEnd], [24, 0]);
+  const wordOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (revealEnd - progress) / (revealEnd - revealClose))));
+  const apertureClip = useTransform(revealScale, (scale) => {
+    const progress = Math.max(0, Math.min(1, (scale - 0.55) / (8.1 - 0.55)));
+    const radiusX = 4.2 + ((34 - 4.2) * progress);
+    const radiusY = 10 + ((81 - 10) * progress);
+    return `ellipse(${radiusX}vw ${radiusY}svh at 50% 57%)`;
+  });
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -150,6 +160,11 @@ export const Landing = () => {
             <p className="impact-reveal-kicker">Sasta Trust · Azhudha River, Kerala</p>
             <h2>Hope begins with a meal.</h2>
             <p>Free Anna Prasadam and drinking water on the Sabarimala route.</p>
+            <div className="impact-reveal-promises">
+              <span><Utensils size={15} /> Anna Prasadam</span>
+              <span><Droplets size={15} /> Drinking water</span>
+              <span><HeartHandshake size={15} /> Pilgrim support</span>
+            </div>
             {!skipScrollReveal && <span className="impact-reveal-hint"><span /> Scroll to see the seva</span>}
           </motion.div>
 
@@ -173,17 +188,32 @@ export const Landing = () => {
             <div className="impact-reveal-shade" />
           </motion.div>
 
+          {!skipScrollReveal && <motion.div
+            className="impact-reveal-aperture"
+            style={{ clipPath: apertureClip, opacity: wordOpacity }}
+            aria-hidden="true"
+          >
+            <div className="impact-hero-slides">
+              {heroSlides.map((slide, index) => (
+                <img
+                  key={slide.image}
+                  className={`impact-hero-image${index === activeSlide ? ' is-active' : ''}`}
+                  src={slide.image}
+                  alt=""
+                  aria-hidden="true"
+                  fetchpriority={index === 0 ? 'high' : 'auto'}
+                />
+              ))}
+            </div>
+          </motion.div>}
+
           {!skipScrollReveal && <div className="impact-reveal-word-anchor" aria-hidden="true">
             <motion.div
               className="impact-reveal-word-stage"
               style={{ scale: revealScale, opacity: wordOpacity }}
             >
               <span className="impact-reveal-word-before">H</span>
-              <span className="impact-reveal-word-o">
-                <span className="impact-reveal-o-photo">
-                  <img src={heroSlides[activeSlide].image} alt="" />
-                </span>
-              </span>
+              <span className="impact-reveal-word-o" />
               <span className="impact-reveal-word-after">PE</span>
             </motion.div>
           </div>}
@@ -333,7 +363,7 @@ export const Landing = () => {
         </a>
         <div className="impact-footer-bottom"><span>© 2026 Sasta Trust</span><span>Serving pilgrims since 2012 · Swamy Sharanam</span><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Back to top ↑</button></div>
         <div className="impact-footer-art" aria-hidden="true">
-          <img src="/gallery/footer-meal-offering.webp" alt="" />
+          <img src="/gallery/footer-sasta-seva.webp" alt="" />
         </div>
       </footer>
     </div>
