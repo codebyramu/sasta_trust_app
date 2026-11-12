@@ -539,7 +539,7 @@ export const Navigation = () => {
           .trust-nav-subtitle { display: none !important; }
           .trust-nav-notifications, .trust-nav-auth-options [data-nav-login], .trust-nav-profile { display: none !important; }
           .trust-navigation-actions { gap: 0 !important; }
-          .trust-nav-donate { display: inline-flex !important; min-height: 36px !important; padding: 0 13px !important; border-radius: 4px !important; background: #e8bb65 !important; color: #14253d !important; font-size: .78rem !important; font-weight: 700 !important; }
+          .trust-nav-donate { display: inline-flex !important; min-height: 36px !important; padding: 0 13px !important; border-radius: 4px !important; background: #285943 !important; color: #fff !important; font-size: .78rem !important; font-weight: 700 !important; }
         }
       `}</style>
     </header>

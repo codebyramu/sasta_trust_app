@@ -18,26 +18,23 @@ import emailjs from '@emailjs/browser';
 
 const heroSlides = [
   {
-    image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(2).jpeg',
+    video: '/videos/anna-prasadam-volunteers.mp4',
+    poster: '/videos/anna-prasadam-volunteers-poster.jpg',
     alt: 'Volunteers serving Anna Prasadam to pilgrims at the camp',
     caption: 'Anna Prasadam seva · Azhudha River',
   },
   {
-    image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM.jpeg',
+    video: '/videos/anna-prasadam-serving.mp4',
+    poster: '/videos/anna-prasadam-serving-poster.jpg',
     alt: 'A volunteer offers food to a pilgrim',
     caption: 'A meal shared along the Sabarimala route',
-  },
-  {
-    image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(1).jpeg',
-    alt: 'Volunteers preparing a meal for pilgrims',
-    caption: 'Prepared and served by volunteers',
   },
 ];
 
 const waysToHelp = [
-  { title: 'Anna Prasadam', image: heroSlides[1].image, alt: 'Serving a meal to a pilgrim', icon: Utensils },
-  { title: 'Drinking water', image: heroSlides[2].image, alt: 'Food and water service at the camp', icon: Droplets },
-  { title: 'Pilgrim assistance', image: heroSlides[0].image, alt: 'Volunteers helping pilgrims at the camp', icon: HeartHandshake },
+  { title: 'Anna Prasadam', image: heroSlides[1].poster, alt: 'Serving a meal to a pilgrim', icon: Utensils },
+  { title: 'Drinking water', image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(1).jpeg', alt: 'Food and water service at the camp', icon: Droplets },
+  { title: 'Pilgrim assistance', image: heroSlides[0].poster, alt: 'Volunteers helping pilgrims at the camp', icon: HeartHandshake },
   { title: 'Temple care', image: null, alt: '', icon: Landmark },
   { title: 'Route support', image: null, alt: '', icon: MapPin },
 ];
@@ -65,7 +62,7 @@ const programmes = [
 
 export const Landing = () => {
   const [activeSlide, setActiveSlide] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 700px)').matches);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -83,6 +80,7 @@ export const Landing = () => {
   const sceneryScale = useTransform(scrollYProgress, [0, revealEnd], [1, 1.12]);
   const sceneryY = useTransform(scrollYProgress, [0, revealEnd], [0, -30]);
   const sceneryOpacity = useTransform(scrollYProgress, [0, revealClose, revealEnd], [1, 0.55, 0.2]);
+  const shadeOpacity = useTransform(scrollYProgress, [0, revealClose, revealEnd], [0.18, 0.28, 0.58]);
   const introFadeStart = revealEnd * 0.08;
   const introFadeEnd = revealEnd * 0.25;
   const introOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (introFadeEnd - progress) / (introFadeEnd - introFadeStart))));
@@ -91,8 +89,9 @@ export const Landing = () => {
   const heroY = useTransform(scrollYProgress, [revealClose, revealEnd], [24, 0]);
   const wordOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (revealEnd - progress) / (revealEnd - revealClose))));
   const apertureClip = useTransform(revealScale, (scale) => {
-    const radiusX = 4.2 * scale;
-    const radiusY = 9.3 * scale;
+    const progress = Math.max(0, Math.min(1, (scale - 0.55) / (8.1 - 0.55)));
+    const radiusX = 4.2 * scale + (66 * progress);
+    const radiusY = 9.3 * scale + (25 * progress);
     return `ellipse(${radiusX}vw ${radiusY}svh at 50% 57%)`;
   });
 
@@ -193,43 +192,28 @@ export const Landing = () => {
           </motion.div>}
 
           <motion.div
-            className="impact-reveal-backdrop"
-            style={{ opacity: skipScrollReveal ? 1 : heroOpacity }}
-            aria-hidden="true"
-          >
-            <div className="impact-hero-slides">
-              {heroSlides.map((slide, index) => (
-                <img
-                  key={slide.image}
-                  className={`impact-hero-image${index === activeSlide ? ' is-active' : ''}`}
-                  src={slide.image}
-                  alt=""
-                  aria-hidden="true"
-                  fetchpriority={index === 0 ? 'high' : 'auto'}
-                />
-              ))}
-            </div>
-            <div className="impact-reveal-shade" />
-          </motion.div>
-
-          {!skipScrollReveal && <motion.div
             className="impact-reveal-aperture"
-            style={{ clipPath: apertureClip, opacity: wordOpacity }}
+            style={{ clipPath: skipScrollReveal ? 'inset(0)' : apertureClip }}
             aria-hidden="true"
           >
             <div className="impact-hero-slides">
               {heroSlides.map((slide, index) => (
-                <img
-                  key={slide.image}
+                <video
+                  key={slide.video}
                   className={`impact-hero-image${index === activeSlide ? ' is-active' : ''}`}
-                  src={slide.image}
-                  alt=""
-                  aria-hidden="true"
-                  fetchpriority={index === 0 ? 'high' : 'auto'}
+                  src={slide.video}
+                  poster={slide.poster}
+                  autoPlay={!prefersReducedMotion}
+                  loop
+                  muted
+                  playsInline
+                  preload={index === 0 ? 'auto' : 'metadata'}
+                  aria-label={slide.alt}
                 />
               ))}
             </div>
-          </motion.div>}
+            <motion.div className="impact-reveal-shade" style={{ opacity: skipScrollReveal ? 0.4 : shadeOpacity }} />
+          </motion.div>
 
           {!skipScrollReveal && <div className="impact-reveal-word-anchor" aria-hidden="true">
             <motion.div
