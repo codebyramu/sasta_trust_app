@@ -88,9 +88,8 @@ export const Landing = () => {
   const heroY = useTransform(scrollYProgress, [revealClose, revealEnd], [24, 0]);
   const wordOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (revealEnd - progress) / (revealEnd - revealClose))));
   const apertureClip = useTransform(revealScale, (scale) => {
-    const progress = Math.max(0, Math.min(1, (scale - 0.55) / (8.1 - 0.55)));
-    const radiusX = 4.2 + ((34 - 4.2) * progress);
-    const radiusY = 9.3 + ((81 - 9.3) * progress);
+    const radiusX = 4.2 * scale;
+    const radiusY = 9.3 * scale;
     return `ellipse(${radiusX}vw ${radiusY}svh at 50% 57%)`;
   });
 

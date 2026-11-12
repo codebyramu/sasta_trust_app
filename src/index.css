@@ -1866,10 +1866,11 @@ body { background: #fff; }
 .impact-reveal-intro { z-index: 3; }
 .impact-reveal-hero-copy { z-index: 4; }
 .impact-reveal-bottom { z-index: 4; }
-.impact-footer { overflow: hidden; padding-bottom: 0; }
+.impact-footer { overflow: hidden; padding-bottom: 0; background: #fff; }
 .impact-footer > *:not(.impact-footer-art) { position: relative; z-index: 1; }
-.impact-footer-art { position: relative; z-index: 0; right: auto; bottom: auto; left: auto; grid-column: 1 / -1; height: clamp(165px, 15vw, 205px); margin: 0; background: transparent; }
-.impact-footer-art img { object-fit: cover; object-position: center 68%; }
+.impact-footer-art { position: absolute; z-index: 0; right: 0; bottom: 0; left: 0; height: clamp(180px, 20vw, 250px); margin: 0; background: transparent; pointer-events: none; }
+.impact-footer-art img { object-fit: cover; object-position: center bottom; }
+.impact-footer-art::after { position: absolute; inset: 0; background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.96) 34%, rgba(255,255,255,.64) 62%, rgba(255,255,255,.08) 100%); content: ''; }
 
 @media (max-width: 700px) {
   .impact-scroll-stage { height: calc(100svh - 56px); max-height: none; }
@@ -1883,8 +1884,8 @@ body { background: #fff; }
   .impact-reveal-detail-items { flex-wrap: wrap; row-gap: 9px; }
   .impact-reveal-detail-items > span { padding: 0 10px; font-size: .64rem; }
   .impact-footer { padding-bottom: 0; }
-  .impact-footer-art { height: 145px; }
-  .impact-footer-art img { object-fit: cover; object-position: center 70%; }
+  .impact-footer-art { height: 165px; }
+  .impact-footer-art img { object-fit: cover; object-position: center bottom; }
 }
 
 /* Hold the forest-green canvas until the O-shaped image nearly fills the stage. */
@@ -1895,9 +1896,10 @@ body { background: #fff; }
 .impact-reveal-backdrop { background: #173b2c; }
 .impact-reveal-backdrop .impact-reveal-shade { opacity: .28; }
 .impact-footer-art { height: clamp(165px, 15vw, 205px); }
+.impact-footer-art { height: clamp(180px, 20vw, 250px); }
 .impact-footer-art img { object-position: center bottom; }
 
 @media (max-width: 700px) {
-  .impact-footer-art { height: 145px; }
-  .impact-footer-art img { object-position: 28% bottom; }
+  .impact-footer-art { height: 165px; }
+  .impact-footer-art img { object-position: center bottom; }
 }
