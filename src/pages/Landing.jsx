@@ -77,11 +77,12 @@ export const Landing = () => {
     target: revealRef,
     offset: ['start start', 'end end'],
   });
-  const revealScale = useTransform(scrollYProgress, [0, 0.72], [0.34, 3.5]);
-  const introOpacity = useTransform(scrollYProgress, [0.12, 0.42], [1, 0]);
-  const introY = useTransform(scrollYProgress, [0.12, 0.42], [0, -28]);
-  const heroOpacity = useTransform(scrollYProgress, [0.52, 0.75], [0, 1]);
-  const heroY = useTransform(scrollYProgress, [0.52, 0.75], [24, 0]);
+  const revealScale = useTransform(scrollYProgress, [0, 0.64], [0.55, 5.6]);
+  const introOpacity = useTransform(scrollYProgress, [0.08, 0.25], [1, 0]);
+  const introY = useTransform(scrollYProgress, [0.08, 0.25], [0, -24]);
+  const heroOpacity = useTransform(scrollYProgress, [0.48, 0.68], [0, 1]);
+  const heroY = useTransform(scrollYProgress, [0.48, 0.68], [24, 0]);
+  const wordOpacity = useTransform(scrollYProgress, [0.55, 0.7], [1, 0]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -147,28 +148,44 @@ export const Landing = () => {
             aria-hidden={skipScrollReveal}
           >
             <p className="impact-reveal-kicker">Sasta Trust · Azhudha River, Kerala</p>
-            <h2>Every journey deserves<br />a moment of care.</h2>
-            <p>Free meals and drinking water for pilgrims travelling the Sabarimala route.</p>
+            <h2>Every pilgrim deserves a moment of care.</h2>
+            <p>Free Anna Prasadam and drinking water on the Sabarimala route.</p>
             {!skipScrollReveal && <span className="impact-reveal-hint"><span /> Scroll to see the seva</span>}
           </motion.div>
 
-          <div className="impact-reveal-window-shell" aria-hidden="true">
-            <motion.div className="impact-reveal-disc" style={{ scale: skipScrollReveal ? 1 : revealScale }}>
-              <div className="impact-hero-slides">
-                {heroSlides.map((slide, index) => (
-                  <img
-                    key={slide.image}
-                    className={`impact-hero-image${index === activeSlide ? ' is-active' : ''}`}
-                    src={slide.image}
-                    alt=""
-                    aria-hidden="true"
-                    fetchpriority={index === 0 ? 'high' : 'auto'}
-                  />
-                ))}
-              </div>
-              <div className="impact-reveal-shade" />
+          <motion.div
+            className="impact-reveal-backdrop"
+            style={{ opacity: skipScrollReveal ? 1 : heroOpacity }}
+            aria-hidden="true"
+          >
+            <div className="impact-hero-slides">
+              {heroSlides.map((slide, index) => (
+                <img
+                  key={slide.image}
+                  className={`impact-hero-image${index === activeSlide ? ' is-active' : ''}`}
+                  src={slide.image}
+                  alt=""
+                  aria-hidden="true"
+                  fetchpriority={index === 0 ? 'high' : 'auto'}
+                />
+              ))}
+            </div>
+            <div className="impact-reveal-shade" />
+          </motion.div>
+
+          {!skipScrollReveal && <div className="impact-reveal-word-anchor" aria-hidden="true">
+            <motion.div
+              className="impact-reveal-word-stage"
+              style={{ scale: revealScale, opacity: wordOpacity }}
+            >
+              <span className="impact-reveal-word-o">
+                <span className="impact-reveal-o-photo">
+                  <img src={heroSlides[activeSlide].image} alt="" />
+                </span>
+              </span>
+              <span className="impact-reveal-word-rest">NE</span>
             </motion.div>
-          </div>
+          </div>}
 
           <motion.div
             className="impact-reveal-hero-copy"
@@ -314,10 +331,10 @@ export const Landing = () => {
           <img src="/QRcode/QRCode.png" alt="Sasta Trust UPI donation QR code" />
         </a>
         <div className="impact-footer-bottom"><span>© 2026 Sasta Trust</span><span>Serving pilgrims since 2012 · Swamy Sharanam</span><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Back to top ↑</button></div>
+        <div className="impact-footer-art" aria-hidden="true">
+          <img src="/gallery/footer-meal-offering.webp" alt="" />
+        </div>
       </footer>
-      <div className="impact-footer-art" aria-hidden="true">
-        <img src="/gallery/footer-meal-offering.webp" alt="" />
-      </div>
     </div>
   );
 };
