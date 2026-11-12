@@ -256,10 +256,7 @@ export const Landing = () => {
 
       <footer className="impact-footer">
         <div className="impact-footer-art" aria-hidden="true">
-          <picture>
-            <source media="(max-width: 600px)" srcSet="/gallery/footer-seva-scene-mobile.svg" />
-            <img src="/gallery/footer-seva-scene.svg" alt="" />
-          </picture>
+          <img src="/gallery/footer-seva-panorama.webp" alt="" />
         </div>
         <div className="impact-footer-brand">
           <Link to="/" className="impact-footer-logo"><img src="/sasta_logo.png" alt="" /> <span>Sasta Trust</span></Link>
