@@ -1596,7 +1596,55 @@ body { background: #fff; }
 .receipts-export, .receipts-empty > a:not(.receipts-give-link), .receipts-empty > button { border-color: #285943; background: #285943; color: #fff; }
 .receipts-give-link { color: #285943; }
 
+/* Scroll reveal: a circular window into the trust's existing seva photography. */
+.impact-scroll-reveal { position: relative; height: 220svh; background: var(--trust-offwhite); }
+.impact-scroll-stage { position: sticky; top: 56px; height: calc(100svh - 56px); min-height: 520px; overflow: hidden; isolation: isolate; background: var(--trust-offwhite); }
+.impact-reveal-intro { position: absolute; z-index: 1; top: clamp(30px, 7vh, 74px); right: 20px; left: 20px; text-align: center; }
+.impact-reveal-kicker { margin-bottom: 12px; color: var(--trust-brass); font-size: .67rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.impact-reveal-intro h2 { color: var(--trust-charcoal); font: 500 clamp(2rem, 4.5vw, 4rem)/1.12 "Montserrat", var(--font-sans), sans-serif; letter-spacing: -.045em; }
+.impact-reveal-intro > p:not(.impact-reveal-kicker) { max-width: 590px; margin: 12px auto 0; color: var(--trust-muted); font-size: clamp(.82rem, 1.2vw, .98rem); line-height: 1.6; }
+.impact-reveal-hint { display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; color: var(--trust-forest); font-size: .68rem; font-weight: 600; letter-spacing: .04em; }
+.impact-reveal-hint > span { width: 6px; height: 6px; border-radius: 50%; background: var(--trust-brass); box-shadow: 0 0 0 4px rgba(180,138,69,.13); }
+.impact-reveal-window-shell { position: absolute; z-index: 2; top: 57%; left: 50%; width: min(76vw, 72svh); aspect-ratio: 1; transform: translate(-50%, -50%); }
+.impact-reveal-disc { position: absolute; inset: 0; overflow: hidden; border: 5px solid var(--trust-brass); border-radius: 50%; background: var(--trust-charcoal); box-shadow: 0 18px 55px rgba(32,41,35,.16); transform-origin: center; }
+.impact-reveal-disc .impact-hero-slides { position: absolute; inset: 0; overflow: hidden; }
+.impact-reveal-disc .impact-hero-image { object-position: center 48%; }
+.impact-reveal-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(15,30,24,.72), rgba(15,30,24,.12) 88%), linear-gradient(0deg, rgba(15,30,24,.48), transparent 55%); pointer-events: none; }
+.impact-reveal-hero-copy { position: absolute; z-index: 3; right: 24px; bottom: clamp(75px, 13vh, 130px); left: max(7%, calc((100vw - 1180px)/2)); max-width: 700px; color: #fff; }
+.impact-reveal-hero-copy .impact-eyebrow { color: rgba(255,255,255,.86); }
+.impact-reveal-hero-copy .impact-eyebrow span { background: var(--trust-brass); }
+.impact-reveal-hero-copy h1 { max-width: 700px; color: #fff; font: 600 clamp(2.6rem, 5.6vw, 5rem)/1.05 "Montserrat", var(--font-sans), sans-serif; letter-spacing: -.045em; }
+.impact-reveal-hero-copy h1 em { color: #f1d9a8; font-style: normal; }
+.impact-reveal-hero-copy > p:not(.impact-eyebrow) { max-width: 540px; margin-top: 14px; color: rgba(255,255,255,.9); font-size: clamp(.85rem, 1.2vw, 1rem); line-height: 1.7; }
+.impact-reveal-hero-copy .impact-hero-actions { margin-top: 20px; }
+.impact-reveal-hero-copy .impact-donate-button { background: var(--trust-forest); color: #fff; }
+.impact-reveal-hero-copy .impact-donate-button:hover { background: #1e4533; }
+.impact-reveal-hero-copy .impact-hero-secondary:hover { color: #f1d9a8; }
+.impact-reveal-bottom { position: absolute; z-index: 3; right: max(24px, calc((100vw - 1180px)/2)); bottom: 18px; left: max(24px, calc((100vw - 1180px)/2)); display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.impact-reveal-bottom > p { display: flex; align-items: center; gap: 8px; margin: 0; color: rgba(255,255,255,.9); font-size: .72rem; }
+.impact-reveal-bottom > p svg { flex: 0 0 auto; color: #f1d9a8; }
+.impact-reveal-bottom .impact-carousel-controls button { border-color: rgba(255,255,255,.7); }
+.impact-reveal-bottom .impact-carousel-controls button:hover { background: rgba(255,255,255,.2); }
+.impact-reveal-hero-copy .impact-donate-button:focus-visible,
+.impact-reveal-bottom button:focus-visible { outline: 3px solid #f1d9a8; outline-offset: 3px; }
+
 @media (max-width: 700px) {
+  .impact-scroll-reveal { height: auto; }
+  .impact-scroll-stage { position: relative; top: auto; height: calc(100svh - 56px); min-height: 540px; max-height: 760px; }
+  .impact-reveal-intro { display: none; }
+  .impact-reveal-window-shell { inset: 0; width: 100%; height: 100%; aspect-ratio: auto; transform: none; }
+  .impact-reveal-disc { border: 0; border-radius: 0; box-shadow: none; }
+  .impact-reveal-disc .impact-hero-image { object-position: 58% center; }
+  .impact-reveal-shade { background: linear-gradient(90deg, rgba(15,30,24,.74), rgba(15,30,24,.18)), linear-gradient(0deg, rgba(15,30,24,.58), transparent 68%); }
+  .impact-reveal-hero-copy { right: 20px; bottom: 100px; left: 20px; }
+  .impact-reveal-hero-copy .impact-eyebrow { margin-bottom: 12px; font-size: .57rem; }
+  .impact-reveal-hero-copy h1 { font-size: clamp(2.3rem, 10vw, 3.4rem); }
+  .impact-reveal-hero-copy > p:not(.impact-eyebrow) { max-width: 400px; font-size: .82rem; }
+  .impact-reveal-hero-copy .impact-hero-actions { align-items: flex-start; flex-direction: column; gap: 14px; margin-top: 17px; }
+  .impact-reveal-bottom { right: 17px; bottom: 13px; left: 17px; }
+  .impact-reveal-bottom > p { max-width: 65%; font-size: .61rem; }
+  .impact-reveal-bottom .impact-carousel-controls { gap: 8px; }
+  .impact-reveal-bottom .impact-carousel-controls button { width: 31px; height: 31px; }
   .contribute-hero { grid-template-columns: 1fr; gap: 24px; padding: 38px 20px 28px; }
   .contribute-hero h1 { font-size: clamp(2.35rem, 10vw, 3.35rem); }
   .contribute-hero-photo { order: 2; height: 62vw; max-height: 340px; min-height: 230px; }
@@ -1615,6 +1663,21 @@ body { background: #fff; }
   .contribute-qr-card { max-width: 350px; justify-self: center; }
   .contribute-thanks { padding: 46px 20px; }
   .impact-footer-art { height: 90px; }
+}
+
+@media (min-width: 701px) and (max-height: 650px) {
+  .impact-reveal-intro { top: 20px; }
+  .impact-reveal-window-shell { top: 60%; width: min(58vw, 62svh); }
+  .impact-reveal-hero-copy { bottom: 58px; }
+  .impact-reveal-hero-copy h1 { font-size: clamp(2.3rem, 5vw, 4rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .impact-scroll-reveal { height: auto; }
+  .impact-scroll-stage { position: relative; top: auto; }
+  .impact-reveal-intro { display: none; }
+  .impact-reveal-window-shell { top: 0; left: 0; width: 100%; height: 100%; aspect-ratio: auto; transform: none; }
+  .impact-reveal-disc { border: 0; border-radius: 0; box-shadow: none; }
 }
 
 /* Contribution page: photo-led choices and clear giving path. */

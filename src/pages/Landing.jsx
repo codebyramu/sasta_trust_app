@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import {
   ArrowLeft,
   ArrowRight,
@@ -64,16 +65,37 @@ const programmes = [
 
 export const Landing = () => {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
+  const revealRef = useRef(null);
+  const prefersReducedMotion = useReducedMotion();
+  const skipScrollReveal = prefersReducedMotion || isMobile;
+  const { scrollYProgress } = useScroll({
+    target: revealRef,
+    offset: ['start start', 'end end'],
+  });
+  const revealScale = useTransform(scrollYProgress, [0, 0.72], [0.34, 3.5]);
+  const introOpacity = useTransform(scrollYProgress, [0.12, 0.42], [1, 0]);
+  const introY = useTransform(scrollYProgress, [0.12, 0.42], [0, -28]);
+  const heroOpacity = useTransform(scrollYProgress, [0.52, 0.75], [0, 1]);
+  const heroY = useTransform(scrollYProgress, [0.52, 0.75], [24, 0]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
       setActiveSlide((current) => (current + 1) % heroSlides.length);
     }, 6500);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 700px)');
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener?.('change', update);
+    return () => media.removeEventListener?.('change', update);
   }, []);
 
   const goToSlide = (direction) => {
@@ -117,35 +139,57 @@ export const Landing = () => {
 
   return (
     <div className="impact-home">
-      <section className="impact-hero" id="home" aria-label="Sasta Trust pilgrim support">
-        <div className="impact-hero-slides" aria-live="polite">
-          {heroSlides.map((slide, index) => (
-            <img
-              key={slide.image}
-              className={`impact-hero-image${index === activeSlide ? ' is-active' : ''}`}
-              src={slide.image}
-              alt={index === activeSlide ? slide.alt : ''}
-              aria-hidden={index !== activeSlide}
-              fetchpriority={index === 0 ? 'high' : 'auto'}
-            />
-          ))}
-        </div>
-        <div className="impact-hero-shade" />
-        <div className="impact-hero-copy">
-          <p className="impact-eyebrow"><span /> Sasta Trust · Azhudha River, Kerala</p>
-          <h1>Meals and care<br /><em>for every pilgrim.</em></h1>
-          <p>Sasta Trust volunteers serve free meals and drinking water along the Sabarimala pilgrimage route.</p>
-          <div className="impact-hero-actions">
-            <Link to="/donations" className="impact-donate-button">Support the seva <ArrowRight size={17} /></Link>
-            <Link to="/dashboard" className="impact-hero-secondary"><CalendarDays size={16} /> Festival calendar</Link>
+      <section className="impact-scroll-reveal" ref={revealRef} aria-label="A moment of care for every pilgrim">
+        <div className="impact-scroll-stage" id="home">
+          <motion.div
+            className="impact-reveal-intro"
+            style={{ opacity: skipScrollReveal ? 0 : introOpacity, y: skipScrollReveal ? -28 : introY }}
+            aria-hidden={skipScrollReveal}
+          >
+            <p className="impact-reveal-kicker">Sasta Trust · Azhudha River, Kerala</p>
+            <h2>Every journey deserves<br />a moment of care.</h2>
+            <p>Free meals and drinking water for pilgrims travelling the Sabarimala route.</p>
+            {!skipScrollReveal && <span className="impact-reveal-hint"><span /> Scroll to see the seva</span>}
+          </motion.div>
+
+          <div className="impact-reveal-window-shell" aria-hidden="true">
+            <motion.div className="impact-reveal-disc" style={{ scale: skipScrollReveal ? 1 : revealScale }}>
+              <div className="impact-hero-slides">
+                {heroSlides.map((slide, index) => (
+                  <img
+                    key={slide.image}
+                    className={`impact-hero-image${index === activeSlide ? ' is-active' : ''}`}
+                    src={slide.image}
+                    alt=""
+                    aria-hidden="true"
+                    fetchpriority={index === 0 ? 'high' : 'auto'}
+                  />
+                ))}
+              </div>
+              <div className="impact-reveal-shade" />
+            </motion.div>
           </div>
-        </div>
-        <div className="impact-hero-bottom">
-          <p><MapPin size={15} /> {heroSlides[activeSlide].caption}</p>
-          <div className="impact-carousel-controls" aria-label="Hero image controls">
-            <button type="button" onClick={() => goToSlide(-1)} aria-label="Previous image"><ArrowLeft size={17} /></button>
-            <button type="button" onClick={() => goToSlide(1)} aria-label="Next image"><ArrowRight size={17} /></button>
-          </div>
+
+          <motion.div
+            className="impact-reveal-hero-copy"
+            style={{ opacity: skipScrollReveal ? 1 : heroOpacity, y: skipScrollReveal ? 0 : heroY }}
+          >
+            <p className="impact-eyebrow"><span /> Sasta Trust · Azhudha River, Kerala</p>
+            <h1>Meals and care<br /><em>for every pilgrim.</em></h1>
+            <p>Sasta Trust volunteers serve free meals and drinking water along the Sabarimala pilgrimage route.</p>
+            <div className="impact-hero-actions">
+              <Link to="/donations" className="impact-donate-button">Support the seva <ArrowRight size={17} /></Link>
+              <Link to="/dashboard" className="impact-hero-secondary"><CalendarDays size={16} /> Festival calendar</Link>
+            </div>
+          </motion.div>
+
+          <motion.div className="impact-reveal-bottom" style={{ opacity: skipScrollReveal ? 1 : heroOpacity }}>
+            <p><MapPin size={15} /> {heroSlides[activeSlide].caption}</p>
+            <div className="impact-carousel-controls" aria-label="Hero image controls">
+              <button type="button" onClick={() => goToSlide(-1)} aria-label="Previous image"><ArrowLeft size={17} /></button>
+              <button type="button" onClick={() => goToSlide(1)} aria-label="Next image"><ArrowRight size={17} /></button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
