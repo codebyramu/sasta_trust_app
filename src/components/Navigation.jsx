@@ -20,12 +20,23 @@ export const Navigation = () => {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
-      const heroHeight = document.getElementById('home')?.offsetHeight || window.innerHeight;
+      const homeHero = document.getElementById('home');
+      const reveal = document.querySelector('.impact-scroll-reveal');
+      const heroHeight = reveal
+        ? Math.max(
+            homeHero?.offsetHeight || window.innerHeight,
+            reveal.getBoundingClientRect().top + window.scrollY + reveal.offsetHeight - window.innerHeight + 64,
+          )
+        : homeHero?.offsetHeight || window.innerHeight;
       setCompactHomeBar(location.pathname === '/' && window.scrollY < heroHeight - 24);
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, [location.pathname]);
 
   useEffect(() => {

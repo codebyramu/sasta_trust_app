@@ -77,12 +77,12 @@ export const Landing = () => {
     target: revealRef,
     offset: ['start start', 'end end'],
   });
-  const revealScale = useTransform(scrollYProgress, [0, 0.64], [0.55, 5.6]);
+  const revealScale = useTransform(scrollYProgress, [0, 0.94], [0.55, 8.1]);
   const introOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (0.25 - progress) / 0.17)));
   const introY = useTransform(scrollYProgress, [0.08, 0.25], [0, -24]);
-  const heroOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (progress - 0.68) / 0.14)));
-  const heroY = useTransform(scrollYProgress, [0.68, 0.82], [24, 0]);
-  const wordOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (0.82 - progress) / 0.14)));
+  const heroOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (progress - 0.9) / 0.1)));
+  const heroY = useTransform(scrollYProgress, [0.9, 1], [24, 0]);
+  const wordOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (1 - progress) / 0.1)));
 
   useEffect(() => {
     const timer = window.setInterval(() => {

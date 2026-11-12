@@ -1869,3 +1869,11 @@ body { background: #fff; }
   .impact-footer-art { height: 125px; }
   .impact-footer-art img { object-fit: cover; object-position: center 70%; }
 }
+
+/* Hold the forest-green canvas until the O-shaped image nearly fills the stage. */
+.impact-scroll-stage { background: #173b2c; }
+.impact-reveal-intro h2 { color: #fff; }
+.impact-reveal-intro > p:not(.impact-reveal-kicker) { color: rgba(255,255,255,.78); }
+.impact-reveal-hint { color: #f1d9a8; }
+.impact-reveal-backdrop { background: #173b2c; }
+.impact-reveal-backdrop .impact-reveal-shade { opacity: .28; }
