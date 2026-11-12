@@ -1586,11 +1586,9 @@ body { background: #fff; }
 .receipts-empty > p:not(.impact-kicker) { max-width: 480px; margin: 8px auto 15px; color: #718089; font-size: .73rem; line-height: 1.7; }
 .receipts-empty > a:not(.receipts-give-link), .receipts-empty > button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 15px; border: 0; border-radius: 25px; background: #31834d; color: white; cursor: pointer; font: 700 .7rem Inter, sans-serif; }
 .receipts-give-link { margin-top: 14px; color: #276e94; font-size: .69rem; font-weight: 700; }
-.impact-footer { position: relative; overflow: hidden; padding-bottom: 185px; }
-.impact-footer > :not(.impact-footer-art) { position: relative; z-index: 1; }
-.impact-footer-art { position: absolute; z-index: 0; right: 0; bottom: 0; left: 0; height: 185px; pointer-events: none; }
-.impact-footer-art picture, .impact-footer-art img { display: block; width: 100%; height: 100%; }
-.impact-footer-art img { object-fit: cover; object-position: center bottom; }
+.impact-footer { position: relative; overflow: hidden; }
+.impact-footer-art { width: 100%; height: clamp(130px, 24vw, 440px); overflow: hidden; background: #fff; line-height: 0; pointer-events: none; }
+.impact-footer-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center bottom; }
 .trust-site-nav .nav-link:hover, .trust-site-nav .nav-link.active { color: #2eaa4c !important; }
 .impact-donate-button { border-radius: 24px; background: #32ad4e; color: #fff; }
 .impact-donate-button:hover { background: #258e40; }
@@ -1637,6 +1635,6 @@ body { background: #fff; }
   .receipt-card { padding: 15px; }
   .receipt-card h3 { font-size: .88rem; }
   .receipts-empty { padding: 33px 16px 36px; }
-  .impact-footer { padding-bottom: 130px; }
   .impact-footer-art { height: 130px; }
+  .impact-footer-art img { object-fit: contain; object-position: center bottom; }
 }

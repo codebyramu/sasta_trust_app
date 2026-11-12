@@ -255,9 +255,6 @@ export const Landing = () => {
       </section>
 
       <footer className="impact-footer">
-        <div className="impact-footer-art" aria-hidden="true">
-          <img src="/gallery/footer-seva-panorama.webp" alt="" />
-        </div>
         <div className="impact-footer-brand">
           <Link to="/" className="impact-footer-logo"><img src="/sasta_logo.png" alt="" /> <span>Sasta Trust</span></Link>
           <p>Anna Prasadam Seva and pilgrim support at the Azhudha River, Kerala.</p>
@@ -275,6 +272,9 @@ export const Landing = () => {
         </a>
         <div className="impact-footer-bottom"><span>© 2026 Sasta Trust</span><span>Serving pilgrims since 2012 · Swamy Sharanam</span><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Back to top ↑</button></div>
       </footer>
+      <div className="impact-footer-art" aria-hidden="true">
+        <img src="/gallery/footer-meal-offering.webp" alt="" />
+      </div>
     </div>
   );
 };
