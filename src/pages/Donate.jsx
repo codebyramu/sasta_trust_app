@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDown, ArrowRight, Heart, HeartHandshake, Phone, Users } from 'lucide-react';
+import { ArrowRight, Heart, HeartHandshake, Leaf, Phone, Users } from 'lucide-react';
 
 const causes = [
   { title: 'Anna Prasadam seva', eyebrow: 'PILGRIM CARE', copy: 'Help prepare and serve nourishing meals to pilgrims along the Azhudha River route.', image: '/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM.jpeg', label: 'A meal shared on the pilgrimage' },
@@ -12,21 +12,22 @@ const causes = [
 export const Donate = () => (
   <main className="contribute-page">
     <section className="contribute-hero">
-      <img src="/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(2).jpeg" alt="Volunteers serving pilgrims at the Azhudha River" />
-      <div className="contribute-hero-shade" />
       <div className="contribute-hero-copy">
-        <p className="contribute-kicker">Swamy Sharanam · Seva at Azhudha River</p>
-        <h1>Make room for one more at the meal.</h1>
-        <p>Your support helps Sasta Trust care for pilgrims, serve Anna Prasadam and look after the places that bring people together.</p>
-        <a className="contribute-primary" href="#ways-to-give">Explore ways to give <ArrowDown size={17} /></a>
+        <p className="contribute-kicker">Ways to give · Sasta Trust</p>
+        <h1>Put your support where it matters to you.</h1>
+        <p>Choose a seva that speaks to you. Your gift helps care for pilgrims, serve Anna Prasadam and support the Azhudha River community.</p>
+        <a className="contribute-primary" href="#ways-to-give">Explore the seva <ArrowRight size={16} /></a>
+        <div className="contribute-hero-promise"><Leaf size={17} /><span>Every offering helps carry the service forward.</span></div>
       </div>
-      <span className="contribute-photo-caption">Azhudha River · Kerala</span>
+      <figure className="contribute-hero-photo">
+        <img src="/photos_to_play/WhatsApp%20Image%202026-03-23%20at%201.10.17%20PM%20(2).jpeg" alt="Volunteers serving pilgrims at the Azhudha River" />
+        <figcaption><span>Anna Prasadam seva</span><span>Azhudha River · Kerala</span></figcaption>
+      </figure>
     </section>
 
     <section className="contribute-intro">
-      <p className="impact-kicker">Every offering carries the seva forward</p>
-      <h2>Choose the kind of care<br />you’d like to stand behind.</h2>
-      <p>Gifts help sustain ongoing service for pilgrims and the local community. Here are some of the ways the trust serves.</p>
+      <div><p className="impact-kicker">The work your gift supports</p><h2>Four ways to be part of the seva.</h2></div>
+      <p>Choose where you feel connected. Our team can help you direct your contribution or answer questions before you give.</p>
     </section>
 
     <section className="contribute-causes" id="ways-to-give">

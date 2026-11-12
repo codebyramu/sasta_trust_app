@@ -144,7 +144,6 @@ export const Landing = () => {
           <p><MapPin size={15} /> {heroSlides[activeSlide].caption}</p>
           <div className="impact-carousel-controls" aria-label="Hero image controls">
             <button type="button" onClick={() => goToSlide(-1)} aria-label="Previous image"><ArrowLeft size={17} /></button>
-            <span>0{activeSlide + 1}<i>/</i>0{heroSlides.length}</span>
             <button type="button" onClick={() => goToSlide(1)} aria-label="Next image"><ArrowRight size={17} /></button>
           </div>
         </div>
