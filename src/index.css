@@ -1911,7 +1911,9 @@ body { background: #fff; }
 
 /* Keep contribution cards readable across the four-column desktop layout. */
 .contribute-cause { display: flex; flex-direction: column; }
-.contribute-cause-image { width: 100%; }
+.contribute-cause-image { width: calc(100% - 24px); height: 175px; margin: 12px 12px 0; padding: 5px; overflow: hidden; border: 1px solid #d8c7a7; border-radius: 16px; background: #f7f6f2; box-shadow: 0 3px 10px rgba(32,41,35,.07); }
+.contribute-cause-image::after { inset: 5px; border-radius: 10px; background: linear-gradient(180deg, transparent 55%, rgba(12,44,60,.12)); }
+.contribute-cause-image img { border-radius: 10px; }
 .contribute-intro h2, .contribute-give h2, .contribute-thanks h2 { color: #202923; }
 .contribute-intro > p:last-child, .contribute-give-copy > p:not(.impact-kicker), .contribute-thanks > p:not(.impact-kicker) { color: #626a64; }
 .contribute-cause-copy h3 { color: #202923; }
@@ -1919,6 +1921,21 @@ body { background: #fff; }
 .contribute-cause-copy > a svg { color: #b48a45; }
 .contribute-primary { background: #285943; }
 .contribute-primary:hover { background: #1e4533; }
+
+/* Give the homepage story and trust photos the same soft, framed finish. */
+.impact-story-photo, .impact-about-image {
+  padding: 6px;
+  border: 1px solid #d8c7a7;
+  border-radius: 20px;
+  background: #f7f6f2;
+  box-shadow: 0 8px 24px rgba(32,41,35,.1);
+}
+.impact-story-photo img, .impact-about-image img { border-radius: 13px; }
+.impact-story-photo > span { right: 6px; bottom: 6px; left: 6px; border-radius: 0 0 13px 13px; }
+
+/* Avoid ghosted double exposure when the looping reveal changes video slides. */
+.impact-reveal-aperture .impact-hero-image { transition: none; transform: none; }
+.impact-reveal-aperture .impact-hero-image.is-active { transform: none; }
 
 @media (max-width: 600px) {
   .contribute-causes { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 18px 20px 48px; }
