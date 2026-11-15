@@ -1885,19 +1885,27 @@ body { background: #fff; }
   .impact-reveal-detail-items > span { padding: 0 10px; font-size: .64rem; }
 }
 
-/* Hold the forest-green canvas until the O-shaped image nearly fills the stage. */
-.impact-scroll-stage { background: #173b2c; }
+/* Custom forest valley artwork gives the homepage depth while preserving the trust palette. */
+.impact-scroll-stage { background: #173b2c url('/gallery/homepage-forest-hero-v2.png') center / cover no-repeat; }
 .impact-reveal-intro h2 { color: #fff; }
-.impact-reveal-intro > p:not(.impact-reveal-kicker) { color: rgba(255,255,255,.78); }
+.impact-reveal-intro > p:not(.impact-reveal-kicker) { color: rgba(255,255,255,.82); }
 .impact-reveal-hint { color: #f1d9a8; }
 .impact-reveal-backdrop { background: #173b2c; }
 .impact-reveal-backdrop .impact-reveal-shade { opacity: .28; }
 .impact-scroll-stage {
-  background: radial-gradient(ellipse at 50% 46%, #204a38 0%, #173b2c 68%);
+  background: #173b2c url('/gallery/homepage-forest-hero-v2.png') center / cover no-repeat;
 }
-.impact-scroll-scenery { position: absolute; z-index: 0; inset: 0; background: url('/gallery/home-seva-landscape.svg') center bottom / cover no-repeat; transform-origin: center 55%; will-change: transform, opacity; pointer-events: none; }
+.impact-scroll-scenery { position: absolute; z-index: 0; inset: 0; background: url('/gallery/homepage-forest-hero-v2.png') center / cover no-repeat; transform-origin: center 55%; will-change: transform, opacity; pointer-events: none; }
+.impact-reveal-promises { border-color: rgba(255,255,255,.18); }
+.impact-reveal-promises > span { color: rgba(255,255,255,.9); }
+.impact-reveal-promises > span + span { border-color: rgba(255,255,255,.18); }
+.impact-reveal-promises svg, .impact-reveal-detail-items svg, .impact-reveal-side-note > svg { color: #d6b26d; }
+.impact-reveal-detail-rail { color: rgba(255,255,255,.82); }
+.impact-reveal-detail-heading { color: #f1d9a8; }
+.impact-reveal-detail-items { border-color: rgba(255,255,255,.18); }
+.impact-reveal-detail-items > span + span { border-color: rgba(255,255,255,.18); }
 .impact-reveal-side-notes { position: absolute; z-index: 3; top: 57%; right: 50%; left: 50%; display: flex; width: min(1180px, calc(100% - 96px)); justify-content: space-between; transform: translate(-50%, -50%); pointer-events: none; }
-.impact-reveal-side-note { width: 215px; padding: 13px 0 13px 15px; border-left: 1px solid rgba(214,178,109,.65); color: rgba(255,255,255,.78); }
+.impact-reveal-side-note { width: 215px; padding: 13px 0 13px 15px; border-left: 1px solid rgba(214,178,109,.65); color: rgba(255,255,255,.8); }
 .impact-reveal-side-note.is-right { border-right: 1px solid rgba(214,178,109,.65); border-left: 0; padding: 13px 15px 13px 0; text-align: right; }
 .impact-reveal-side-note > svg { color: #d6b26d; }
 
@@ -1939,4 +1947,95 @@ body { background: #fff; }
 
 @media (max-width: 900px) {
   .impact-reveal-side-notes { display: none; }
+}
+
+/* Opening frame: split editorial panel with the seva footage held inside the O. */
+.impact-scroll-stage {
+  background: #173b2c url('/gallery/hope-board-background.png') center / cover no-repeat;
+}
+.impact-scroll-stage::before {
+  display: none;
+}
+.impact-scroll-left-panel { position: absolute; z-index: 0; inset: 0 48% 0 0; background: #dff9d8; will-change: opacity; }
+.impact-scroll-right-photo { position: absolute; z-index: 0; inset: 0 0 0 52%; background: url('/videos/anna-prasadam-volunteers-poster.jpg') center 44% / cover no-repeat; will-change: opacity; }
+.impact-scroll-scenery { opacity: 0; }
+.impact-reveal-intro {
+  top: clamp(36px, 8vh, 76px);
+  right: 52%;
+  left: 2.5%;
+  color: #285943;
+  text-align: center;
+}
+.impact-reveal-brand {
+  position: absolute;
+  top: -31px;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  transform: translateX(-50%);
+}
+.impact-reveal-kicker { color: #a2772f; font-size: .58rem; letter-spacing: .18em; }
+.impact-reveal-intro h2 {
+  max-width: 620px;
+  color: #254a37;
+  font: 700 clamp(1.7rem, 3.4vw, 3.1rem)/1.08 var(--font-sans), Arial, sans-serif;
+  letter-spacing: -.045em;
+}
+.impact-reveal-intro > p:not(.impact-reveal-kicker) { color: #536d5c; font-size: clamp(.72rem, .95vw, .88rem); }
+.impact-reveal-promises {
+  gap: 0;
+  margin-top: 8px;
+  padding: 8px 0;
+  border-color: rgba(40,89,67,.18);
+}
+.impact-reveal-promises > span { padding-inline: 10px; color: #536d5c; font-size: .61rem; }
+.impact-reveal-promises > span + span { border-color: rgba(40,89,67,.18); }
+.impact-reveal-promises svg { color: #8e9d8d; }
+.impact-reveal-hint { margin-top: 12px; color: #986e2a; font-size: .62rem; }
+.impact-reveal-word-anchor { inset: 0; z-index: 3; width: auto; transform: none; }
+.impact-reveal-intro { z-index: 5; }
+.impact-reveal-detail-rail { z-index: 4; }
+.impact-reveal-hero-copy, .impact-reveal-bottom { z-index: 6; }
+.impact-reveal-word-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 42.6% 58%;
+  will-change: transform, opacity;
+}
+.impact-reveal-word-stage img { display: block; width: 100%; height: 100%; object-fit: fill; }
+.impact-reveal-paper { position: absolute; z-index: 1; top: 0; left: 0; width: 60.76%; height: 99.6%; object-fit: fill; transform-origin: 47% 53%; pointer-events: none; will-change: transform, filter; }
+.impact-reveal-arrow { position: absolute; z-index: 4; top: 5%; left: calc(50% - 150px); width: 300px; height: 76px; transform-origin: 50% 0; filter: drop-shadow(0 2px 4px rgba(25,54,39,.1)); pointer-events: none; will-change: transform; }
+.impact-reveal-arrow svg { display: block; width: 100%; height: 100%; }
+.impact-reveal-flower { position: absolute; z-index: 4; top: 81.9%; left: 88.3%; width: 11.7%; height: 18.1%; object-fit: contain; transform-origin: 80% 85%; pointer-events: none; will-change: transform; }
+.impact-reveal-aperture { z-index: 2; }
+.impact-reveal-aperture .impact-hero-image { object-position: 50% 45%; }
+.impact-reveal-shade { background: transparent; }
+.impact-reveal-side-notes { top: 74%; right: 52%; left: 2.5%; width: auto; justify-content: center; }
+.impact-reveal-side-note { width: 70%; padding: 8px 0 8px 14px; border-color: rgba(180,138,69,.65); color: #536d5c; text-align: left; }
+.impact-reveal-side-note.is-right { display: none; }
+.impact-reveal-side-note > p { color: #254a37; }
+.impact-reveal-detail-rail { right: 52%; bottom: 18px; left: 3%; color: #536d5c; text-align: center; }
+.impact-reveal-detail-heading { color: #254a37; font-size: .55rem; }
+.impact-reveal-detail-items { border-color: rgba(40,89,67,.2); }
+.impact-reveal-detail-items > span { padding-inline: 9px; color: #536d5c; font-size: .58rem; }
+.impact-reveal-detail-items > span + span { border-color: rgba(40,89,67,.2); }
+.impact-reveal-detail-items svg { color: #8e9d8d; }
+
+@media (max-width: 700px) {
+  .impact-scroll-stage { background: #173b2c; }
+  .impact-scroll-left-panel { inset: 0; }
+  .impact-scroll-stage::before { inset: 53% 0 0; }
+  .impact-reveal-intro { top: 24px; right: 16px; left: 16px; }
+  .impact-reveal-brand { top: -4px; left: 15px; width: 20px; height: 20px; transform: none; }
+  .impact-reveal-kicker { padding-top: 3px; font-size: .5rem; }
+  .impact-reveal-intro h2 { max-width: 420px; font-size: clamp(1.55rem, 7vw, 2.25rem); }
+  .impact-reveal-promises > span { padding-inline: 6px; font-size: .55rem; }
+  .impact-reveal-word-anchor { inset: 0; }
+  .impact-reveal-arrow, .impact-reveal-paper, .impact-reveal-flower { display: none; }
+  .impact-reveal-side-notes, .impact-reveal-detail-rail { display: none; }
+  .impact-reveal-aperture .impact-hero-image { object-position: center; }
 }

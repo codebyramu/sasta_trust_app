@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1366 768" fill="none">
+  <defs>
+    <linearGradient id="green" x1="0" y1="220" x2="0" y2="650" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#174D2D"/>
+      <stop offset=".48" stop-color="#20713D"/>
+      <stop offset="1" stop-color="#104326"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="220" x2="0" y2="650" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF0BC"/>
+      <stop offset=".42" stop-color="#C99A4F"/>
+      <stop offset=".7" stop-color="#F5D98F"/>
+      <stop offset="1" stop-color="#9B692D"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" y1="300" x2="0" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#398B4D"/>
+      <stop offset="1" stop-color="#0B4428"/>
+    </linearGradient>
+    <mask id="wordMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1366" height="768" style="mask-type:alpha">
+      <image href="hope-scroll-word-mask.png" width="1366" height="768" preserveAspectRatio="none"/>
+    </mask>
+    <filter id="goldEdge" x="-3%" y="-5%" width="106%" height="110%" color-interpolation-filters="sRGB">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="expanded"/>
+      <feFlood flood-color="#C99A4F" result="goldColor"/>
+      <feComposite in="goldColor" in2="expanded" operator="in" result="goldShape"/>
+      <feDropShadow in="goldShape" dx="0" dy="7" stdDeviation="6" flood-color="#10291B" flood-opacity=".42"/>
+    </filter>
+    <filter id="greenShadow" x="-5%" y="-7%" width="110%" height="120%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#10291B" flood-opacity=".38"/>
+    </filter>
+    <g id="sprig" fill="#E8C777" stroke="#F7E5AD" stroke-width="1.4" stroke-linejoin="round">
+      <path d="M0 0C-15-17-13-30 1-39C14-25 13-12 0 0Z"/>
+      <path d="M3-11C20-30 34-30 40-16C27-5 14-4 3-11Z"/>
+      <path d="M-3-23C-21-39-22-53-8-59C5-45 5-33-3-23Z"/>
+    </g>
+  </defs>
+
+  <image href="hope-scroll-word-mask.png" width="1366" height="768" preserveAspectRatio="none" filter="url(#goldEdge)"/>
+  <rect width="1366" height="768" fill="url(#green)" mask="url(#wordMask)" filter="url(#greenShadow)"/>
+  <path d="M65 735C151 670 173 545 193 374M89 674C128 644 146 619 164 585M164 528C207 504 236 474 260 436" fill="none" stroke="#E7C677" stroke-width="3" mask="url(#wordMask)"/>
+  <g mask="url(#wordMask)">
+    <use href="#sprig" transform="translate(111 644) rotate(24) scale(.8)"/>
+    <use href="#sprig" transform="translate(228 491) rotate(42) scale(.64)"/>
+    <path d="M729 495C692 456 658 427 625 407M453 578C488 618 519 645 557 667" stroke="#E7C677" stroke-width="2.5"/>
+    <use href="#sprig" transform="translate(718 492) rotate(112) scale(.64)"/>
+    <use href="#sprig" transform="translate(672 450) rotate(108) scale(.56)"/>
+    <use href="#sprig" transform="translate(474 604) rotate(-55) scale(.67)"/>
+    <use href="#sprig" transform="translate(525 645) rotate(-63) scale(.55)"/>
+    <path d="M886 710C959 637 1013 517 1057 382" fill="none" stroke="#E7C677" stroke-width="2.5"/>
+    <use href="#sprig" transform="translate(946 621) rotate(30) scale(.75)"/>
+    <use href="#sprig" transform="translate(1004 502) rotate(28) scale(.6)"/>
+    <path d="M1126 712C1215 702 1297 666 1363 589" fill="none" stroke="#E7C677" stroke-width="2.5"/>
+    <use href="#sprig" transform="translate(1287 670) rotate(54) scale(.72)"/>
+    <use href="#sprig" transform="translate(1204 706) rotate(77) scale(.55)"/>
+  </g>
+</svg>

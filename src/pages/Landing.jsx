@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import {
   ArrowLeft,
   ArrowRight,
@@ -74,33 +74,116 @@ export const Landing = () => {
     target: revealRef,
     offset: ['start start', 'end end'],
   });
-  const revealEnd = 0.353;
-  const revealClose = revealEnd * 0.9;
-  const revealScale = useTransform(scrollYProgress, [0, revealEnd], [0.55, 8.1]);
-  const sceneryScale = useTransform(scrollYProgress, [0, revealEnd], [1, 1.12]);
-  const sceneryY = useTransform(scrollYProgress, [0, revealEnd], [0, -30]);
-  const sceneryOpacity = useTransform(scrollYProgress, [0, revealClose, revealEnd], [1, 0.55, 0.2]);
-  const shadeOpacity = useTransform(scrollYProgress, [0, revealClose, revealEnd], [0.18, 0.28, 0.58]);
-  const introFadeStart = revealEnd * 0.08;
-  const introFadeEnd = revealEnd * 0.25;
-  const introOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (introFadeEnd - progress) / (introFadeEnd - introFadeStart))));
-  const introY = useTransform(scrollYProgress, [introFadeStart, introFadeEnd], [0, -24]);
-  const heroOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (progress - revealClose) / (revealEnd - revealClose))));
-  const heroY = useTransform(scrollYProgress, [revealClose, revealEnd], [24, 0]);
-  const wordOpacity = useTransform(scrollYProgress, (progress) => Math.max(0, Math.min(1, (revealEnd - progress) / (revealEnd - revealClose))));
+  const referenceProgress = useTransform(scrollYProgress, (progress) => {
+    const sectionHeight = revealRef.current?.offsetHeight || window.innerHeight;
+    const availableScroll = Math.max(1, sectionHeight - window.innerHeight);
+    const referenceTravel = Math.max(600, window.innerHeight * 2.55);
+    return Math.max(0, Math.min(1, progress * availableScroll / referenceTravel));
+  });
+  const easedProgress = useSpring(referenceProgress, { stiffness: 180, damping: 28, mass: 0.55 });
+  const phase = (progress, start, end) => {
+    const value = Math.max(0, Math.min(1, (progress - start) / (end - start)));
+    return value * value * (3 - 2 * value);
+  };
+  const getOrnamentProgress = (progress) => {
+    if (progress < 0.2) return 0;
+    if (progress < 0.53) return phase(progress, 0.2, 0.53);
+    if (progress < 0.58) return 1;
+    return 1 - phase(progress, 0.58, 1);
+  };
+  const paperTransform = useTransform(easedProgress, (progress) => {
+    const p = getOrnamentProgress(progress);
+    const scale = Math.min(window.innerWidth / 1366, (revealRef.current?.querySelector('.impact-scroll-stage')?.clientHeight || window.innerHeight) / 768);
+    const x = (-1200 * (1 - p)) * scale;
+    const y = (-65 * (1 - p) - Math.sin(p * Math.PI) * 83) * scale;
+    const rotate = -34 * (1 - p) + 23 * Math.sin(p * Math.PI * 1.9) * (1 - p);
+    const size = 0.75 + 0.25 * p + 0.11 * Math.sin(p * Math.PI) * (1 - p);
+    const skew = 8 * (1 - p) * Math.sin(p * Math.PI * 1.8);
+    return `translate3d(${x}px, ${y}px, 0) rotate(${rotate}deg) scale(${size}) skewY(${skew}deg)`;
+  });
+  const paperFilter = useTransform(easedProgress, (progress) => {
+    const p = getOrnamentProgress(progress);
+    return `drop-shadow(${8 * p}px ${11 * p}px ${9 * p}px rgba(31,30,12,${0.08 * p}))`;
+  });
+  const arrowTransform = useTransform(easedProgress, (progress) => {
+    const w = getOrnamentProgress(progress);
+    const scale = Math.min(window.innerWidth / 1366, (revealRef.current?.querySelector('.impact-scroll-stage')?.clientHeight || window.innerHeight) / 768);
+    const bounce = (1 - w) * Math.sin(w * Math.PI * 2.5) * 12 * scale;
+    const y = (-227 * (1 - w)) * scale + bounce;
+    return `translate3d(0, ${y}px, 0)`;
+  });
+  const flowerTransform = useTransform(easedProgress, (progress) => {
+    const f = getOrnamentProgress(progress);
+    const scale = Math.min(window.innerWidth / 1366, (revealRef.current?.querySelector('.impact-scroll-stage')?.clientHeight || window.innerHeight) / 768);
+    const x = (250 * (1 - f)) * scale;
+    const y = (235 * (1 - f) - 24 * Math.sin(Math.PI * f)) * scale;
+    const rotate = 42 * (1 - f) - 8 * Math.sin(f * Math.PI * 1.6) * (1 - f);
+    const size = 0.72 + 0.28 * f;
+    return `translate3d(${x}px, ${y}px, 0) rotate(${rotate}deg) scale(${size})`;
+  });
+  const revealScale = useTransform(easedProgress, (progress) => {
+    if (progress < 0.2) return 0.55 + (0.45 * phase(progress, 0, 0.2));
+    if (progress < 0.58) return 1;
+    if (progress < 0.74) return 1 + (1.5 * phase(progress, 0.58, 0.74));
+    if (progress < 0.88) return 2.5 + (5.5 * phase(progress, 0.74, 0.88));
+    return 8 + (10.5 * phase(progress, 0.88, 1));
+  });
+  const sceneryScale = useTransform(easedProgress, [0, 1], [1, 1.12]);
+  const sceneryY = useTransform(easedProgress, [0, 1], [0, -30]);
+  const sceneryOpacity = useTransform(easedProgress, [0, 0.2, 0.53], [1, 0.45, 0]);
+  const shadeOpacity = useTransform(easedProgress, [0, 0.9, 1], [0.18, 0.28, 0.58]);
+  const leftContentOpacity = useTransform(
+    easedProgress,
+    [0, 0.08, 0.2],
+    [1, 0.42, 0],
+  );
+  const leftPanelOpacity = useTransform(
+    easedProgress,
+    [0, 0.2, 0.53],
+    [1, 0.45, 0],
+  );
+  const introY = useTransform(easedProgress, [0, 0.2], [0, -18]);
+  const heroOpacity = useTransform(easedProgress, (progress) => Math.max(0, Math.min(1, (progress - 0.9) / 0.1)));
+  const heroY = useTransform(easedProgress, [0.9, 1], [24, 0]);
+  const wordOpacity = useTransform(easedProgress, [0.84, 1], [1, 0]);
+  const rightPhotoOpacity = useTransform(
+    easedProgress,
+    [0, 0.06, 0.2],
+    [1, 0.35, 0],
+  );
   const apertureClip = useTransform(revealScale, (scale) => {
-    const progress = Math.max(0, Math.min(1, (scale - 0.55) / (8.1 - 0.55)));
-    const radiusX = 4.2 * scale + (66 * progress);
-    const radiusY = 9.3 * scale + (25 * progress);
-    return `ellipse(${radiusX}vw ${radiusY}svh at 50% 57%)`;
+    const stage = revealRef.current?.querySelector('.impact-scroll-stage');
+    const stageWidth = stage?.clientWidth || window.innerWidth;
+    const stageHeight = stage?.clientHeight || window.innerHeight;
+    // The lettering's gold bevel grows about five viewBox units into the O.
+    const radiusX = stageWidth * (109 / 1366) * scale;
+    const radiusY = stageHeight * (136 / 768) * scale;
+    const centerX = 42.6;
+    const centerY = 58;
+    return `ellipse(${radiusX}px ${radiusY}px at ${centerX}% ${centerY}%)`;
   });
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % heroSlides.length);
-    }, 6500);
-    return () => window.clearInterval(timer);
-  }, []);
+    const videos = revealRef.current?.querySelectorAll('.impact-reveal-aperture video');
+    if (!videos?.length) return undefined;
+
+    const syncPlayback = (progress) => {
+      videos.forEach((video, index) => {
+        if (index === activeSlide && progress > 0.002 && !prefersReducedMotion) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    };
+
+    syncPlayback(scrollYProgress.get());
+    const unsubscribe = scrollYProgress.on('change', syncPlayback);
+    return () => {
+      unsubscribe();
+      videos.forEach((video) => video.pause());
+    };
+  }, [activeSlide, prefersReducedMotion, scrollYProgress]);
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 700px)');
@@ -154,17 +237,53 @@ export const Landing = () => {
       <section className="impact-scroll-reveal" ref={revealRef} aria-label="A moment of care for every pilgrim">
         <div className="impact-scroll-stage" id="home">
           <motion.div
+            className="impact-scroll-left-panel"
+            style={{ opacity: skipScrollReveal ? 1 : leftPanelOpacity }}
+            aria-hidden="true"
+          />
+          <motion.div
+            className="impact-scroll-right-photo"
+            style={{ opacity: skipScrollReveal ? 0 : rightPhotoOpacity }}
+            aria-hidden="true"
+          />
+          {!skipScrollReveal && <>
+            <motion.img
+              className="impact-reveal-paper"
+              src="/gallery/hope-scroll-paper.png"
+              alt=""
+              style={{ transform: paperTransform, filter: paperFilter }}
+              aria-hidden="true"
+            />
+            <motion.div className="impact-reveal-arrow" style={{ transform: arrowTransform }} aria-hidden="true">
+              <svg viewBox="0 0 300 76" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 39H105M195 39H296" fill="none" stroke="#D5AF67" strokeWidth="2" strokeLinecap="round" />
+                <path d="M150 61C133 51 128 38 135 27C145 33 150 43 150 61Z" fill="#285943" stroke="#E5C780" strokeWidth="2" strokeLinejoin="round" />
+                <path d="M150 61C167 51 172 38 165 27C155 33 150 43 150 61Z" fill="#285943" stroke="#E5C780" strokeWidth="2" strokeLinejoin="round" />
+                <path d="M150 58C146 40 146 24 150 9C157 22 157 39 150 58Z" fill="#285943" stroke="#E5C780" strokeWidth="2" strokeLinejoin="round" />
+                <path d="M134 59Q150 67 166 59" fill="none" stroke="#E5C780" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </motion.div>
+            <motion.img
+              className="impact-reveal-flower"
+              src="/gallery/hope-scroll-flower.png"
+              alt=""
+              style={{ transform: flowerTransform }}
+              aria-hidden="true"
+            />
+          </>}
+          <motion.div
             className="impact-scroll-scenery"
             style={{ scale: sceneryScale, y: sceneryY, opacity: skipScrollReveal ? 0 : sceneryOpacity }}
             aria-hidden="true"
           />
           <motion.div
             className="impact-reveal-intro"
-            style={{ opacity: skipScrollReveal ? 0 : introOpacity, y: skipScrollReveal ? -28 : introY }}
+            style={{ opacity: skipScrollReveal ? 0 : leftContentOpacity, y: skipScrollReveal ? -28 : introY }}
             aria-hidden={skipScrollReveal}
           >
+            <img className="impact-reveal-brand" src="/sasta_logo.png" alt="" />
             <p className="impact-reveal-kicker">Sasta Trust · Azhudha River, Kerala</p>
-            <h2>Hope begins with a meal.</h2>
+            <h2>Hope begins with a meal</h2>
             <p>Free Anna Prasadam and drinking water on the Sabarimala route.</p>
             <div className="impact-reveal-promises">
               <span><Utensils size={15} /> Anna Prasadam</span>
@@ -176,7 +295,7 @@ export const Landing = () => {
 
           {!skipScrollReveal && <motion.div
             className="impact-reveal-side-notes"
-            style={{ opacity: introOpacity }}
+            style={{ opacity: leftContentOpacity }}
             aria-hidden="true"
           >
             <div className="impact-reveal-side-note">
@@ -203,7 +322,7 @@ export const Landing = () => {
                   className={`impact-hero-image${index === activeSlide ? ' is-active' : ''}`}
                   src={slide.video}
                   poster={slide.poster}
-                  autoPlay={!prefersReducedMotion}
+                  autoPlay={false}
                   loop
                   muted
                   playsInline
@@ -215,20 +334,18 @@ export const Landing = () => {
             <motion.div className="impact-reveal-shade" style={{ opacity: skipScrollReveal ? 0.4 : shadeOpacity }} />
           </motion.div>
 
-          {!skipScrollReveal && <div className="impact-reveal-word-anchor" aria-hidden="true">
+          {!skipScrollReveal && <motion.div className="impact-reveal-word-anchor" aria-hidden="true">
             <motion.div
               className="impact-reveal-word-stage"
               style={{ scale: revealScale, opacity: wordOpacity }}
             >
-              <span className="impact-reveal-word-before">H</span>
-              <span className="impact-reveal-word-o" />
-              <span className="impact-reveal-word-after">PE</span>
+              <img src="/gallery/hope-board-lettering.png" alt="" />
             </motion.div>
-          </div>}
+          </motion.div>}
 
           {!skipScrollReveal && <motion.div
             className="impact-reveal-detail-rail"
-            style={{ opacity: introOpacity }}
+            style={{ opacity: leftContentOpacity }}
             aria-hidden="true"
           >
             <p className="impact-reveal-detail-heading">Care along the pilgrim path</p>
