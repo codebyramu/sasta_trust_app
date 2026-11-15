@@ -22,10 +22,6 @@
       <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="expanded"/>
       <feFlood flood-color="#C99A4F" result="goldColor"/>
       <feComposite in="goldColor" in2="expanded" operator="in" result="goldShape"/>
-      <feDropShadow in="goldShape" dx="0" dy="7" stdDeviation="6" flood-color="#10291B" flood-opacity=".42"/>
-    </filter>
-    <filter id="greenShadow" x="-5%" y="-7%" width="110%" height="120%" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#10291B" flood-opacity=".38"/>
     </filter>
     <g id="sprig" fill="#E8C777" stroke="#F7E5AD" stroke-width="1.4" stroke-linejoin="round">
       <path d="M0 0C-15-17-13-30 1-39C14-25 13-12 0 0Z"/>
@@ -35,21 +31,31 @@
   </defs>
 
   <image href="hope-scroll-word-mask.png" width="1366" height="768" preserveAspectRatio="none" filter="url(#goldEdge)"/>
-  <rect width="1366" height="768" fill="url(#green)" mask="url(#wordMask)" filter="url(#greenShadow)"/>
-  <path d="M65 735C151 670 173 545 193 374M89 674C128 644 146 619 164 585M164 528C207 504 236 474 260 436" fill="none" stroke="#E7C677" stroke-width="3" mask="url(#wordMask)"/>
+  <rect width="1366" height="768" fill="url(#green)" mask="url(#wordMask)"/>
+  <path d="M29 600C75 566 104 492 131 404M162 456C220 450 285 451 357 457" fill="none" stroke="#E7C677" stroke-width="3" mask="url(#wordMask)"/>
   <g mask="url(#wordMask)">
-    <use href="#sprig" transform="translate(111 644) rotate(24) scale(.8)"/>
-    <use href="#sprig" transform="translate(228 491) rotate(42) scale(.64)"/>
-    <path d="M729 495C692 456 658 427 625 407M453 578C488 618 519 645 557 667" stroke="#E7C677" stroke-width="2.5"/>
-    <use href="#sprig" transform="translate(718 492) rotate(112) scale(.64)"/>
-    <use href="#sprig" transform="translate(672 450) rotate(108) scale(.56)"/>
-    <use href="#sprig" transform="translate(474 604) rotate(-55) scale(.67)"/>
-    <use href="#sprig" transform="translate(525 645) rotate(-63) scale(.55)"/>
-    <path d="M886 710C959 637 1013 517 1057 382" fill="none" stroke="#E7C677" stroke-width="2.5"/>
-    <use href="#sprig" transform="translate(946 621) rotate(30) scale(.75)"/>
-    <use href="#sprig" transform="translate(1004 502) rotate(28) scale(.6)"/>
-    <path d="M1126 712C1215 702 1297 666 1363 589" fill="none" stroke="#E7C677" stroke-width="2.5"/>
-    <use href="#sprig" transform="translate(1287 670) rotate(54) scale(.72)"/>
-    <use href="#sprig" transform="translate(1204 706) rotate(77) scale(.55)"/>
+    <use href="#sprig" transform="translate(59 581) rotate(18) scale(1.05)"/>
+    <use href="#sprig" transform="translate(95 522) rotate(20) scale(.88)"/>
+    <use href="#sprig" transform="translate(123 458) rotate(24) scale(.78)"/>
+    <use href="#sprig" transform="translate(204 462) rotate(82) scale(.58)"/>
+
+    <path d="M603 272C657 278 705 313 740 367" stroke="#E7C677" stroke-width="3"/>
+    <use href="#sprig" transform="translate(631 290) rotate(112) scale(.75)"/>
+    <use href="#sprig" transform="translate(676 318) rotate(123) scale(.78)"/>
+    <use href="#sprig" transform="translate(715 350) rotate(139) scale(.68)"/>
+    <path d="M431 526C448 575 484 618 533 642" stroke="#E7C677" stroke-width="3"/>
+    <use href="#sprig" transform="translate(451 568) rotate(-38) scale(.8)"/>
+    <use href="#sprig" transform="translate(488 608) rotate(-51) scale(.78)"/>
+    <use href="#sprig" transform="translate(526 636) rotate(-64) scale(.62)"/>
+
+    <path d="M758 584C792 536 813 472 834 391" stroke="#E7C677" stroke-width="3"/>
+    <use href="#sprig" transform="translate(776 552) rotate(20) scale(.92)"/>
+    <use href="#sprig" transform="translate(804 491) rotate(18) scale(.82)"/>
+    <use href="#sprig" transform="translate(827 428) rotate(20) scale(.72)"/>
+
+    <path d="M1081 598C1164 581 1253 589 1335 541" stroke="#E7C677" stroke-width="3"/>
+    <use href="#sprig" transform="translate(1151 591) rotate(76) scale(.72)"/>
+    <use href="#sprig" transform="translate(1220 582) rotate(66) scale(.8)"/>
+    <use href="#sprig" transform="translate(1294 565) rotate(51) scale(.78)"/>
   </g>
 </svg>

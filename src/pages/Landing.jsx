@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import {
-  ArrowLeft,
   ArrowRight,
   CalendarDays,
   CheckCircle2,
@@ -61,7 +60,7 @@ const programmes = [
 ];
 
 export const Landing = () => {
-  const [activeSlide, setActiveSlide] = useState(0);
+  const activeSlide = 0;
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 700px)').matches);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
@@ -192,10 +191,6 @@ export const Landing = () => {
     media.addEventListener?.('change', update);
     return () => media.removeEventListener?.('change', update);
   }, []);
-
-  const goToSlide = (direction) => {
-    setActiveSlide((current) => (current + direction + heroSlides.length) % heroSlides.length);
-  };
 
   const handleContactSubmit = async (event) => {
     event.preventDefault();
@@ -371,10 +366,6 @@ export const Landing = () => {
 
           <motion.div className="impact-reveal-bottom" style={{ opacity: skipScrollReveal ? 1 : heroOpacity }}>
             <p><MapPin size={15} /> {heroSlides[activeSlide].caption}</p>
-            <div className="impact-carousel-controls" aria-label="Hero image controls">
-              <button type="button" onClick={() => goToSlide(-1)} aria-label="Previous image"><ArrowLeft size={17} /></button>
-              <button type="button" onClick={() => goToSlide(1)} aria-label="Next image"><ArrowRight size={17} /></button>
-            </div>
           </motion.div>
         </div>
       </section>
