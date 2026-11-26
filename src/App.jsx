@@ -9,8 +9,6 @@ import { SendReceipt } from './pages/Admin/SendReceipt';
 import { UserReceipts } from './pages/UserReceipts';
 import { Donate } from './pages/Donate';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { useAuth } from './context/AuthContext';
-import { LoadingScreen } from './components/LoadingScreen';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Page transition wrapper
@@ -43,14 +41,10 @@ const PageTransition = ({ children }) => {
 };
 
 function App() {
-  const { loading } = useAuth();
   const location = useLocation();
-  if (loading) {
-    return <LoadingScreen />;
-  }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#ffffff' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--brand-paper, #f7f8fb)' }}>
       <Navigation />
 
       {/* Main Routed Content */}

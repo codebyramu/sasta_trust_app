@@ -144,7 +144,7 @@ export const SendReceipt = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
+    <div className="redesign-admin-page" style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
       <section style={{ padding: '60px 6% 40px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <button
