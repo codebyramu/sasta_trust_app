@@ -56,7 +56,7 @@ export const AddOccasion = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
+    <div className="redesign-admin-page" style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '90px' }}>
       <section style={{ padding: '60px 6% 40px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
         <div style={{ maxWidth: '850px', margin: '0 auto' }}>
           <button
