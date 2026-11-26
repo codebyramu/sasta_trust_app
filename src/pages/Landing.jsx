@@ -61,14 +61,13 @@ const programmes = [
 
 export const Landing = () => {
   const activeSlide = 0;
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 700px)').matches);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const revealRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
-  const skipScrollReveal = prefersReducedMotion || isMobile;
+  const skipScrollReveal = true;
   const { scrollYProgress } = useScroll({
     target: revealRef,
     offset: ['start start', 'end end'],
@@ -183,14 +182,6 @@ export const Landing = () => {
       videos.forEach((video) => video.pause());
     };
   }, [activeSlide, prefersReducedMotion, scrollYProgress]);
-
-  useEffect(() => {
-    const media = window.matchMedia('(max-width: 700px)');
-    const update = () => setIsMobile(media.matches);
-    update();
-    media.addEventListener?.('change', update);
-    return () => media.removeEventListener?.('change', update);
-  }, []);
 
   const handleContactSubmit = async (event) => {
     event.preventDefault();

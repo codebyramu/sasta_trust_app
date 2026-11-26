@@ -2052,3 +2052,116 @@ body { background: #fff; }
   .impact-reveal-side-notes, .impact-reveal-detail-rail { display: none; }
   .impact-reveal-aperture .impact-hero-image { object-position: center; }
 }
+
+/* Clear, editorial layout focused on the trust's real work and ways to help. */
+.trust-site-nav {
+  border-bottom: 1px solid rgba(32, 41, 35, .08) !important;
+  background: rgba(250, 249, 245, .97) !important;
+  box-shadow: 0 3px 18px rgba(32, 41, 35, .035);
+  color: #202923 !important;
+  backdrop-filter: blur(14px);
+}
+.trust-site-nav .nav-link { color: #4d5b50 !important; }
+.trust-site-nav .nav-link:hover, .trust-site-nav .nav-link.active { color: #285943 !important; }
+.trust-site-nav .trust-mobile-menu-toggle { border-color: #d8ded5 !important; color: #285943 !important; }
+.trust-site-nav .trust-mobile-menu { border-color: #e3e7e2 !important; background: #faf9f5 !important; }
+.trust-site-nav .trust-mobile-menu a, .trust-site-nav .trust-mobile-menu button { color: #202923 !important; }
+.trust-site-nav .trust-mobile-menu a:hover { background: #eff2ec !important; }
+.trust-nav-donate { border-radius: 999px !important; background: #285943 !important; }
+.impact-scroll-reveal { height: auto; background: #f7f6f2; }
+.impact-scroll-stage {
+  position: relative;
+  top: auto;
+  height: min(720px, calc(100svh - 72px));
+  min-height: 560px;
+  overflow: hidden;
+  background: #173b2c;
+}
+.impact-scroll-stage::after {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(17, 38, 28, .83) 0%, rgba(17, 38, 28, .68) 44%, rgba(17, 38, 28, .16) 100%), linear-gradient(0deg, rgba(17, 38, 28, .5), transparent 44%);
+  content: "";
+  pointer-events: none;
+}
+.impact-scroll-left-panel, .impact-scroll-right-photo, .impact-scroll-scenery,
+.impact-reveal-intro, .impact-reveal-side-notes, .impact-reveal-detail-rail,
+.impact-reveal-word-anchor, .impact-reveal-paper, .impact-reveal-arrow, .impact-reveal-flower { display: none !important; }
+.impact-reveal-aperture { z-index: 1; }
+.impact-reveal-aperture .impact-hero-image { object-position: center 44%; }
+.impact-reveal-shade { background: transparent !important; }
+.impact-reveal-hero-copy {
+  right: 24px;
+  bottom: clamp(82px, 12vh, 116px);
+  left: max(7%, calc((100vw - 1180px)/2));
+  max-width: 700px;
+}
+.impact-reveal-hero-copy .impact-eyebrow { color: #f1d9a8; letter-spacing: .16em; }
+.impact-reveal-hero-copy h1 {
+  max-width: 690px;
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: clamp(2.8rem, 5.4vw, 4.7rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.045em;
+}
+.impact-reveal-hero-copy h1 em { color: #e6c982; font-style: italic; }
+.impact-reveal-hero-copy > p:not(.impact-eyebrow) { max-width: 520px; font-size: .98rem; line-height: 1.75; }
+.impact-reveal-hero-copy .impact-donate-button { min-height: 48px; padding-inline: 22px; border-radius: 999px; background: #f1d9a8; color: #203b2e; }
+.impact-reveal-hero-copy .impact-donate-button:hover { background: #fff0ca; }
+.impact-reveal-hero-copy .impact-hero-secondary { min-height: 44px; }
+.impact-reveal-bottom { z-index: 4; right: max(24px, calc((100vw - 1180px)/2)); left: max(24px, calc((100vw - 1180px)/2)); }
+.impact-reveal-bottom > p { font-size: .74rem; }
+.impact-ways { padding: 76px 24px 82px; background: #faf9f5; }
+.impact-section-heading { margin-bottom: 38px; }
+.impact-section-heading h2, .impact-programmes-heading h2 { border: 0; font-family: "Libre Baskerville", Georgia, serif; font-size: clamp(1.8rem, 3.1vw, 2.65rem); font-weight: 400; letter-spacing: -.04em; }
+.impact-section-heading .impact-kicker, .impact-programmes-heading .impact-kicker { color: #9a7538; }
+.impact-ways-grid { width: min(100%, 1120px); gap: 24px; }
+.impact-way { padding: 24px 14px 20px; border: 1px solid #e3e7e2; border-radius: 12px; background: #fff; box-shadow: 0 6px 22px rgba(32,41,35,.035); transition: transform .2s, box-shadow .2s; }
+.impact-way:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(32,41,35,.08); }
+.impact-way-image { width: clamp(96px, 10vw, 130px); border-width: 4px; }
+.impact-way-title { margin-top: 17px; color: #344338; font-size: .84rem; font-weight: 600; }
+.impact-story { background: #244b38; }
+.impact-story-copy h2, .impact-about-copy h2, .impact-contact-copy h2 { font-family: "Libre Baskerville", Georgia, serif; font-weight: 400; letter-spacing: -.04em; }
+.impact-story-copy h2 { font-size: clamp(2rem, 3.5vw, 3.1rem); }
+.impact-story-copy .impact-kicker { color: #e2c27f; }
+.impact-story-photo, .impact-about-image { border-radius: 15px; }
+.impact-story-photo img, .impact-about-image img { border-radius: 10px; }
+.impact-about { background: #f7f6f2; }
+.impact-stats { padding-top: 26px; }
+.impact-stats strong { color: #285943; }
+.impact-programmes { padding-block: 76px 84px; }
+.impact-programme { padding-block: 23px; }
+.impact-programme h3 { color: #26382b; }
+.impact-contact, #contact.impact-contact { background: #f2f1e9; }
+.impact-contact-copy h2 { font-size: clamp(2rem, 3.3vw, 2.9rem); }
+.impact-contact-panel { border: 1px solid #e3e7e2; border-radius: 12px; box-shadow: 0 14px 40px rgba(32,41,35,.07); }
+.impact-contact-form input, .impact-contact-form textarea { border-radius: 7px; }
+.impact-contact-form > button, .impact-contact-success button { min-height: 43px; padding-inline: 18px; border-radius: 999px; }
+.impact-footer { padding-top: 42px; }
+.impact-footer-logo { color: #26382b; }
+.impact-footer-bottom { padding-block: 18px; }
+
+@media (max-width: 700px) {
+  .impact-scroll-stage { height: calc(100svh - 56px); min-height: 560px; max-height: 760px; }
+  .impact-scroll-stage::after { background: linear-gradient(90deg, rgba(17,38,28,.77), rgba(17,38,28,.31)), linear-gradient(0deg, rgba(17,38,28,.66), transparent 68%); }
+  .impact-reveal-hero-copy { right: 20px; bottom: 94px; left: 20px; }
+  .impact-reveal-hero-copy h1 { font-size: clamp(2.45rem, 10vw, 3.55rem); }
+  .impact-reveal-hero-copy > p:not(.impact-eyebrow) { font-size: .88rem; }
+  .impact-reveal-hero-copy .impact-hero-actions { align-items: flex-start; flex-direction: row; flex-wrap: wrap; gap: 12px 18px; }
+  .impact-reveal-bottom { right: 18px; bottom: 16px; left: 18px; }
+  .impact-ways { padding: 52px 18px 58px; }
+  .impact-ways-grid { gap: 12px; }
+  .impact-way { padding: 17px 7px 15px; border-radius: 9px; }
+  .impact-way-image { width: clamp(72px, 21vw, 100px); }
+  .impact-way-title { font-size: .7rem; }
+  .impact-story, .impact-about { padding: 46px 20px; }
+  .impact-stats { padding: 8px 20px 40px; }
+  .impact-programmes { padding-block: 50px 56px; }
+  .impact-contact, #contact.impact-contact { padding: 45px 20px; }
+  .impact-footer { padding-top: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .impact-way, .impact-hero-image { transition: none; }
+}
