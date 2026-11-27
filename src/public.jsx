@@ -124,9 +124,9 @@ export function Home() {
             <Link className="service-card" key={path} to={path}>
               <div className="card-icons">
                 <span>
-                  <Icon size={22} strokeWidth={1.6} />
+                  <Icon size={26} strokeWidth={1.8} />
                 </span>
-                <ArrowRight size={16} />
+                <ArrowRight size={19} />
               </div>
               <h3>{title}</h3>
               <p>{desc}</p>
@@ -422,9 +422,9 @@ export function Contact() {
             Message
             <textarea name="message" rows="4" required />
           </label>
-          <button className="btn" disabled={busy}>
+          <button className="btn" type="submit" disabled={busy}>
             {busy ? 'Sending…' : 'Send enquiry'}
-            <ArrowRight size={15} />
+            <ArrowRight size={16} />
           </button>
           {notice && <p role="status">{notice}</p>}
         </form>
