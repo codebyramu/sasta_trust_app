@@ -124,9 +124,9 @@ export function Home() {
             <Link className="service-card" key={path} to={path}>
               <div className="card-icons">
                 <span>
-                  <Icon size={26} strokeWidth={1.8} />
+                  <Icon size={22} strokeWidth={1.6} />
                 </span>
-                <ArrowRight size={19} />
+                <ArrowRight size={16} />
               </div>
               <h3>{title}</h3>
               <p>{desc}</p>
