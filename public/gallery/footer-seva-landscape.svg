@@ -4,7 +4,7 @@
       <stop stop-color="#e5ecdf"/><stop offset="1" stop-color="#d6e3d4"/>
     </linearGradient>
     <linearGradient id="river" x1="0" y1="244" x2="0" y2="360" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#d5e4df"/><stop offset="1" stop-color="#b6d0c8"/>
+      <stop stop-color="#d5e4df"/><stop offset="1" stop-color="#e3e3e3"/>
     </linearGradient>
     <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
       <stop stop-color="#d8b66f"/><stop offset="1" stop-color="#a77b38"/>
@@ -14,7 +14,7 @@
   <path fill="url(#far-bank)" d="M0 208c113-43 215-61 314-38 83 20 126 9 207-28 103-47 195-21 281 10 77 28 147 17 232-16 101-40 202-21 285 17 89 40 163 42 281 1v127H0V208Z"/>
   <path fill="#d4e1d1" d="M0 241c125-42 246-43 360-4 122 41 223 35 334-8 115-45 223-39 338 5 124 48 239 49 568-25v151H0V241Z"/>
   <path fill="url(#river)" d="M0 267c175-31 303-30 426 3 127 34 247 33 363-5 135-44 259-38 387 8 124 45 253 47 424 0v87H0v-93Z"/>
-  <g stroke="#8eb0a5" stroke-linecap="round" opacity=".54">
+  <g stroke="#664b33" stroke-linecap="round" opacity=".54">
     <path stroke-width="3" d="M0 285c167-28 306-24 430 9 129 34 245 31 365-7 131-41 251-36 383 8 124 41 254 43 422 2"/>
     <path stroke-width="2" d="M0 318c167-28 306-24 430 9 129 34 245 31 365-7 131-41 251-36 383 8 124 41 254 43 422 2"/>
     <path stroke-width="2" d="M0 344c167-28 306-24 430 9 129 34 245 31 365-7 131-41 251-36 383 8 124 41 254 43 422 2"/>
@@ -24,7 +24,7 @@
     <circle cx="1321" cy="222" r="3"/><circle cx="1340" cy="205" r="2.5"/><circle cx="1360" cy="220" r="3.5"/>
   </g>
   <!-- Riverside shrine and a pair of coconut palms. -->
-  <g fill="#53745f" opacity=".55">
+  <g fill="#664b33" opacity=".55">
     <path d="M117 279h151v8H117zm15-77h120v7H132zm-8-7 68-42 68 42H124Z"/>
     <path d="M145 207h8v67h-8zm36 0h8v67h-8zm36 0h8v67h-8zm-95 77h162v7H122z"/>
     <path d="m135 285 18 15h99l19-15"/>
@@ -39,27 +39,27 @@
   <path stroke="#f5edda" stroke-width="2" opacity=".65" d="m334 170 105-31 109 32m-196 9 87-39m-65 40 88-42m-62 42 88-39m-61 39 83-36"/>
   <!-- Volunteers preparing and serving a fresh meal. -->
   <g stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="398" cy="218" r="13" fill="#bd8058"/><path d="M387 214q10-17 24-4l1 8h-25Z" fill="#3c5141"/>
-    <path d="M382 236q16-11 31 0l11 47h-52l10-47Z" fill="#6d9275"/>
+    <circle cx="398" cy="218" r="13" fill="#bd8058"/><path d="M387 214q10-17 24-4l1 8h-25Z" fill="#664b33"/>
+    <path d="M382 236q16-11 31 0l11 47h-52l10-47Z" fill="#664b33"/>
     <path d="m386 245 45 25m-44-20-22 27" stroke="#bd8058" stroke-width="9"/>
-    <circle cx="515" cy="211" r="14" fill="#c88b63"/><path d="M502 207q13-19 28 0l-2 7h-25Z" fill="#435848"/>
+    <circle cx="515" cy="211" r="14" fill="#c88b63"/><path d="M502 207q13-19 28 0l-2 7h-25Z" fill="#664b33"/>
     <path d="M497 230q18-12 36 1l14 53h-63l13-54Z" fill="#c29a54"/>
     <path d="m506 242 47 14m-44-8-21 29" stroke="#c88b63" stroke-width="9"/>
-    <circle cx="633" cy="220" r="12" fill="#aa704f"/><path d="M621 216q11-16 24-2l1 7h-25Z" fill="#374d42"/>
-    <path d="M618 237q15-10 31 0l10 46h-52l11-46Z" fill="#8da88a"/>
+    <circle cx="633" cy="220" r="12" fill="#aa704f"/><path d="M621 216q11-16 24-2l1 7h-25Z" fill="#664b33"/>
+    <path d="M618 237q15-10 31 0l10 46h-52l11-46Z" fill="#664b33"/>
     <path d="m626 246 34 22m-34-18-22 25" stroke="#aa704f" stroke-width="8"/>
   </g>
   <!-- Serving counter, brass pots and banana-leaf meal. -->
-  <path fill="#54765f" d="M353 282h366v9H353zm19 9h7v28h-7zm320 0h7v28h-7z"/>
+  <path fill="#664b33" d="M353 282h366v9H353zm19 9h7v28h-7zm320 0h7v28h-7z"/>
   <path fill="url(#brass)" d="M420 250h42l-4 31h-34l-4-31Zm8-7h26v7h-26Zm129 14h49l-6 24h-37l-6-24Zm8-7h33v7h-33Z"/>
   <path stroke="#8c642f" stroke-width="3" d="M427 250h28m128 7h35"/>
-  <path fill="#758e58" d="M483 276q34-19 68 0-34 16-68 0Z"/><path fill="#e9d7a7" d="M500 276q16-11 33 0-17 10-33 0Z"/>
+  <path fill="#664b33" d="M483 276q34-19 68 0-34 16-68 0Z"/><path fill="#e9d7a7" d="M500 276q16-11 33 0-17 10-33 0Z"/>
   <!-- Pilgrims seated together along the riverbank. -->
   <g stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="816" cy="274" r="12" fill="#b97f5a"/><path d="M805 269q11-16 23-1v6h-24Z" fill="#4a5c47"/><path d="M803 289q14-8 27 1l21 20h-38l-14-11Z" fill="#d0ab69"/><path d="M820 294 795 309" stroke="#b97f5a" stroke-width="8"/>
-    <circle cx="905" cy="269" r="13" fill="#9e684d"/><path d="M893 265q11-17 25-2l1 6h-26Z" fill="#354b40"/><path d="M891 285q16-9 30 1l21 23h-39l-14-12Z" fill="#78967b"/><path d="M909 291 884 307" stroke="#9e684d" stroke-width="8"/>
-    <circle cx="995" cy="276" r="11" fill="#c58a63"/><path d="M985 272q10-15 21-1v6h-22Z" fill="#495e4e"/><path d="M982 290q14-8 27 1l19 18h-35l-14-11Z" fill="#c89c5a"/><path d="M999 296 976 309" stroke="#c58a63" stroke-width="7"/>
-    <path stroke="#617e68" stroke-width="5" d="M781 313h278"/>
+    <circle cx="816" cy="274" r="12" fill="#b97f5a"/><path d="M805 269q11-16 23-1v6h-24Z" fill="#664b33"/><path d="M803 289q14-8 27 1l21 20h-38l-14-11Z" fill="#d0ab69"/><path d="M820 294 795 309" stroke="#b97f5a" stroke-width="8"/>
+    <circle cx="905" cy="269" r="13" fill="#9e684d"/><path d="M893 265q11-17 25-2l1 6h-26Z" fill="#664b33"/><path d="M891 285q16-9 30 1l21 23h-39l-14-12Z" fill="#664b33"/><path d="M909 291 884 307" stroke="#9e684d" stroke-width="8"/>
+    <circle cx="995" cy="276" r="11" fill="#c58a63"/><path d="M985 272q10-15 21-1v6h-22Z" fill="#664b33"/><path d="M982 290q14-8 27 1l19 18h-35l-14-11Z" fill="#c89c5a"/><path d="M999 296 976 309" stroke="#c58a63" stroke-width="7"/>
+    <path stroke="#664b33" stroke-width="5" d="M781 313h278"/>
   </g>
   <g fill="#b48a45" opacity=".65">
     <circle cx="744" cy="291" r="3"/><circle cx="755" cy="301" r="2.5"/><circle cx="1066" cy="281" r="3"/>

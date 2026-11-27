@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1366 768" fill="none">
   <defs>
     <linearGradient id="green" x1="0" y1="220" x2="0" y2="650" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#174D2D"/>
-      <stop offset=".48" stop-color="#20713D"/>
-      <stop offset="1" stop-color="#104326"/>
+      <stop stop-color="#664b33"/>
+      <stop offset=".48" stop-color="#664b33"/>
+      <stop offset="1" stop-color="#664b33"/>
     </linearGradient>
     <linearGradient id="gold" x1="0" y1="220" x2="0" y2="650" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FFF0BC"/>
@@ -12,8 +12,8 @@
       <stop offset="1" stop-color="#9B692D"/>
     </linearGradient>
     <linearGradient id="leaf" x1="0" y1="300" x2="0" y2="700" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#398B4D"/>
-      <stop offset="1" stop-color="#0B4428"/>
+      <stop stop-color="#664b33"/>
+      <stop offset="1" stop-color="#664b33"/>
     </linearGradient>
     <mask id="wordMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1366" height="768" style="mask-type:alpha">
       <image href="hope-scroll-word-mask.png" width="1366" height="768" preserveAspectRatio="none"/>
